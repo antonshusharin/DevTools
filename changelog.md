@@ -1,3 +1,10 @@
+### 2025-04-29
+
+- Updated to Hearthstone version 32.2.0.219846 (contributed by Endefx)
+- It is now possible to reroll event quests (contributed by Endefx)
+- Fixed a bug which made it impossible to read the history on your opponent's turn (contributed by Endefx)
+- Added an extra auto attack speed setting (contributed by Sito)
+
 ### 2025-03-18
 
 - Updated to Hearthstone version 32.0.0.217964 (contributed by Endefx)

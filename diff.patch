@@ -394,7 +394,7 @@ index 00000000..17c1c11d
 +*.sln.iml
 +.vscode
 diff --git a/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs b/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
-index 3960d15e..d9e97f8b 100644
+index c56682d6..73d51eea 100644
 --- a/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
 +++ b/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
 @@ -7,6 +7,7 @@ using Hearthstone.DataModels;
@@ -10306,7 +10306,7 @@ index 00000000..a9482aa6
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleInputMgr.cs b/Assembly-CSharp/Accessibility/AccessibleInputMgr.cs
 new file mode 100644
-index 00000000..786a2241
+index 00000000..a88fc54f
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleInputMgr.cs
 @@ -0,0 +1,258 @@
@@ -10552,7 +10552,7 @@ index 00000000..786a2241
 +        {
 +            for (var i = 0; i <= 9; i++)
 +            {
-+                if (Input.GetKeyUp(KeyCode.Alpha0 + i))
++                if (Input.GetKeyDown(KeyCode.Alpha0 + i))
 +                {
 +                    if (i == 0)
 +                    {
@@ -32380,7 +32380,7 @@ index ebabc8bf..380f8aa4 100644
  		m_rewards = new List<RewardData>(rewardDataList);
  		FixUpRewardOrigins(m_rewards);
 diff --git a/Assembly-CSharp/Actor.cs b/Assembly-CSharp/Actor.cs
-index 6cd64c15..df69898a 100644
+index 530f896f..529389b2 100644
 --- a/Assembly-CSharp/Actor.cs
 +++ b/Assembly-CSharp/Actor.cs
 @@ -1053,11 +1053,11 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
@@ -32542,7 +32542,7 @@ index 6cd64c15..df69898a 100644
  
  	public void SetPortraitDesaturation(float desaturation)
  	{
-@@ -3066,15 +3066,15 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -3066,14 +3066,14 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  		if (!(m_costTextMesh == null))
  		{
  			if (HasHideStats(entityDef) || entityDef.HasTag(GAME_TAG.HIDE_COST) || (entityDef.IsCardButton() && entityDef.HasTriggerVisual() && (!GameMgr.Get().IsBattlegrounds() || !entityDef.HasTag(GAME_TAG.HAS_ACTIVATE_POWER))) || m_showCostOverride == -1 || (m_showCostOverride != 1 && ((entityDef.IsBaconSpell() && m_entity != null && m_entity.GetControllerSide() == Player.Side.FRIENDLY) || (!entityDef.IsBaconSpell() && UseTechLevelManaGem()))))
@@ -32555,16 +32555,15 @@ index 6cd64c15..df69898a 100644
 -			}
 +		{
 +			m_costTextMesh.Text = "";
-+		}
+ 		}
 +		else
 +		{
 +			m_costTextMesh.Text = Convert.ToString(entityDef.GetTag(GAME_TAG.COST));
- 		}
- 	}
++		}
 +	}
+ 	}
  
  	public void UpdateAttackTextMesh(EntityDef entityDef)
- 	{
 @@ -3110,16 +3110,16 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  				{
  					m_attackObject.SetActive(value: false);
@@ -32603,23 +32602,23 @@ index 6cd64c15..df69898a 100644
  			return;
  		}
 -		if (questEnt.HasTag(GAME_TAG.BACON_MINION_TYPE_REWARD))
-+
-+		var formattedText = FormatDynamicQuestRewardText(questEnt, m_entityDef);
-+		if (formattedText != null)
- 		{
+-		{
 -			string defaultCardTextInHand = CardTextBuilder.GetDefaultCardTextInHand(m_entityDef);
 -			defaultCardTextInHand = string.Format(defaultCardTextInHand, GameStrings.GetRaceNameBattlegrounds((TAG_RACE)questEnt.GetTag(GAME_TAG.BACON_MINION_TYPE_REWARD)));
 -			SetCardDefPowerTextOverride(defaultCardTextInHand);
 -		}
 -		if (questEnt.HasTag(GAME_TAG.BACON_CARD_DBID_REWARD))
--		{
--			string cardTextInHand = m_entityDef.GetCardTextInHand();
++
++		var formattedText = FormatDynamicQuestRewardText(questEnt, m_entityDef);
++		if (formattedText != null)
+ 		{
+-			string defaultCardTextInHand2 = CardTextBuilder.GetDefaultCardTextInHand(m_entityDef);
 -			CardDbfRecord record = GameDbf.Card.GetRecord(questEnt.GetTag(GAME_TAG.BACON_CARD_DBID_REWARD));
 -			if (record != null)
 -			{
 -				string arg = record.Name;
--				cardTextInHand = string.Format(cardTextInHand, arg);
--				SetCardDefPowerTextOverride(cardTextInHand);
+-				defaultCardTextInHand2 = string.Format(defaultCardTextInHand2, arg);
+-				SetCardDefPowerTextOverride(defaultCardTextInHand2);
 -			}
 +			SetCardDefPowerTextOverride(formattedText);
  		}
@@ -32693,9 +32692,9 @@ index 6cd64c15..df69898a 100644
  		}
 -	}
  
- 	public void UpdateDivineShield(GAME_TAG tagChanged = GAME_TAG.TAG_NOT_SET, int oldValue = 0, int newValue = 0)
+ 	public void UpdateImmolating(GAME_TAG tagChanged = GAME_TAG.TAG_NOT_SET, int oldValue = 0, int newValue = 0)
  	{
-@@ -5321,7 +5310,7 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -5371,7 +5360,7 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  		{
  			cardColorType = CardColorSwitcher.GetCardColorTypeForClass(classType);
  			cardColor = GetClassColor(cardColorType);
@@ -32704,7 +32703,7 @@ index 6cd64c15..df69898a 100644
  		if (flag3)
  		{
  			cardColorType = CardColorSwitcher.GetCardColorTypeForClasses(GetClasses());
-@@ -5333,17 +5322,17 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -5383,17 +5372,17 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  			if (cardColorType == CardColorSwitcher.CardColorType.TYPE_GENERIC)
  			{
  				cardColorType = CardColorSwitcher.GetCardColorTypeForClass(GetClassMatchingHero());
@@ -32729,7 +32728,7 @@ index 6cd64c15..df69898a 100644
  		bool flag5 = HasHearthstoneFaction();
  		bool flag6 = IsTradeable();
  		bool flag7 = IsForgeable();
-@@ -5351,18 +5340,18 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -5401,18 +5390,18 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  		m_tradeableBannerContainer?.gameObject.SetActive(flag6);
  		m_forgeBannerContainer?.gameObject.SetActive(flag7);
  		if (flag5 && m_hearthstoneFactionBannerContainer != null)
@@ -32754,7 +32753,7 @@ index 6cd64c15..df69898a 100644
  		else
  		{
  			m_deckActionBanner = null;
-@@ -5668,9 +5657,9 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -5758,9 +5747,9 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  				m_cardMesh.GetComponent<Renderer>().GetMaterial(m_cardFrontMatIdx).mainTexture = m_cardColorTex;
  			}
  			if ((cardType == TAG_CARDTYPE.SPELL || cardType == TAG_CARDTYPE.BATTLEGROUND_SPELL || (cardType == TAG_CARDTYPE.WEAPON && colorType == CardColorSwitcher.CardColorType.TYPE_DEATHKNIGHT)) && (bool)m_portraitMesh && m_portraitFrameMatIdx > -1)
@@ -32767,7 +32766,7 @@ index 6cd64c15..df69898a 100644
  		}
  		else if (m_legacyCardColorMaterialIndex >= 0 && m_meshRenderer != null)
  		{
-@@ -5789,18 +5778,18 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -5879,18 +5868,18 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  		{
  			if (reparent)
  			{
@@ -32793,7 +32792,7 @@ index 6cd64c15..df69898a 100644
  		}
  		m_entity = card.GetEntity();
  		UpdateTextComponents(m_entity);
-@@ -5953,10 +5942,10 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -6043,10 +6032,10 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  				return;
  			}
  			if (entity.IsStealthed() && !Options.Get().GetBool(Option.HAS_SEEN_STEALTH_TAUNTER, defaultVal: false))
@@ -32808,7 +32807,7 @@ index 6cd64c15..df69898a 100644
  			flag = entity.IsStealthed() || entity.IsTauntIgnored() || entity.IsImmune();
  		}
  		switch (m_premiumType)
-@@ -6097,8 +6086,8 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -6187,8 +6176,8 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  
  	public void DeactivateEvilTwinMustache()
  	{
@@ -32819,7 +32818,7 @@ index 6cd64c15..df69898a 100644
  		ActivateSpellDeathState(SpellType.EVIL_TWIN_MUSTACHE_SIGNATURE);
  		ActivateSpellDeathState(SpellType.EVIL_TWIN_MUSTACHE_DIAMOND);
  	}
-@@ -6291,19 +6280,19 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -6381,19 +6370,19 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  			}
  			return;
  		}
@@ -32849,7 +32848,7 @@ index 6cd64c15..df69898a 100644
  
  	public void DoCardDeathVisuals()
  	{
-@@ -6330,19 +6319,19 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -6420,19 +6409,19 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  			}
  			return;
  		}
@@ -32862,12 +32861,12 @@ index 6cd64c15..df69898a 100644
 -			Spell spell2 = item2.m_Spell;
 -			if (!(spell2 == null))
 +			if (!(m_localSpellTable != null))
- 			{
--				spell2.Deactivate();
++			{
 +				return;
 +			}
 +			foreach (SpellTableEntry item2 in m_localSpellTable.m_Table)
-+			{
+ 			{
+-				spell2.Deactivate();
 +				Spell spell2 = item2.m_Spell;
 +				if (!(spell2 == null))
 +				{
@@ -32879,7 +32878,7 @@ index 6cd64c15..df69898a 100644
  
  	public void ReleaseSpell(SpellType spellType)
  	{
-@@ -6978,4 +6967,28 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
+@@ -7068,4 +7057,28 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent
  	{
  		return m_cardRuneBanner;
  	}
@@ -32887,22 +32886,22 @@ index 6cd64c15..df69898a 100644
 +	#region Accessibility
 +	internal static string FormatDynamicQuestRewardText(Entity questEnt, EntityDef entityDef)
 +	{
-+				if (questEnt.HasTag(GAME_TAG.BACON_MINION_TYPE_REWARD))
++		if (questEnt.HasTag(GAME_TAG.BACON_MINION_TYPE_REWARD))
 +		{
-+			string cardTextInHand = entityDef.GetCardTextInHand();
-+			cardTextInHand = string.Format(cardTextInHand, GameStrings.GetRaceNameBattlegrounds((TAG_RACE)questEnt.GetTag(GAME_TAG.BACON_MINION_TYPE_REWARD)));
-+			return cardTextInHand;
++			string defaultCardTextInHand = CardTextBuilder.GetDefaultCardTextInHand(entityDef);
++			defaultCardTextInHand = string.Format(defaultCardTextInHand, GameStrings.GetRaceNameBattlegrounds((TAG_RACE)questEnt.GetTag(GAME_TAG.BACON_MINION_TYPE_REWARD)));
++			return defaultCardTextInHand;
 +		}
 +		if (questEnt.HasTag(GAME_TAG.BACON_CARD_DBID_REWARD))
 +		{
-+			string cardTextInHand2 = entityDef.GetCardTextInHand();
++			string defaultCardTextInHand2 = CardTextBuilder.GetDefaultCardTextInHand(entityDef);
 +			CardDbfRecord record = GameDbf.Card.GetRecord(questEnt.GetTag(GAME_TAG.BACON_CARD_DBID_REWARD));
 +			if (record != null)
 +			{
 +				string arg = record.Name;
-+				cardTextInHand2 = string.Format(cardTextInHand2, arg);
++				defaultCardTextInHand2 = string.Format(defaultCardTextInHand2, arg);
++				return defaultCardTextInHand2;
 +			}
-+			return cardTextInHand2;
 +		}
 +		return null;
 +	}
@@ -33372,7 +33371,7 @@ index 0936cc72..82f74cfe 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/AdventureChooserTray.cs b/Assembly-CSharp/AdventureChooserTray.cs
-index 81d4715d..61952404 100644
+index da0e2659..5993e9de 100644
 --- a/Assembly-CSharp/AdventureChooserTray.cs
 +++ b/Assembly-CSharp/AdventureChooserTray.cs
 @@ -56,6 +56,7 @@ public class AdventureChooserTray : AccordionMenuTray
@@ -35366,7 +35365,7 @@ index 649dcf7f..c5625d28 100644
  	public class Info
  	{
 diff --git a/Assembly-CSharp/AssetLoader.cs b/Assembly-CSharp/AssetLoader.cs
-index 9b006755..350c8d98 100644
+index c31a753c..9bfbd7ba 100644
 --- a/Assembly-CSharp/AssetLoader.cs
 +++ b/Assembly-CSharp/AssetLoader.cs
 @@ -379,7 +379,7 @@ public class AssetLoader : IAssetLoader, IService, IAssetBundleError
@@ -35657,7 +35656,7 @@ index e61a7e8d..55d2f971 100644
  			if (actorSpell != null)
  			{
 diff --git a/Assembly-CSharp/BaconCollectionDisplay.cs b/Assembly-CSharp/BaconCollectionDisplay.cs
-index 3a0e1937..5a8a9008 100644
+index 3c30c6e9..400d6659 100644
 --- a/Assembly-CSharp/BaconCollectionDisplay.cs
 +++ b/Assembly-CSharp/BaconCollectionDisplay.cs
 @@ -8,6 +8,7 @@ using Hearthstone.Progression;
@@ -35747,7 +35746,7 @@ index 3a0e1937..5a8a9008 100644
  	}
  
  	private bool OnBackOutOfCollectionScreen()
-@@ -564,6 +567,8 @@ public class BaconCollectionDisplay : CollectibleDisplay
+@@ -577,6 +580,8 @@ public class BaconCollectionDisplay : CollectibleDisplay
  			yield return null;
  		}
  		m_isReady = true;
@@ -35881,7 +35880,7 @@ index cb556bbb..bebe5a5f 100644
  		{
  			PartyManager.Get().UpdateBattlegroundsStrikeMemberAttribute();
 diff --git a/Assembly-CSharp/BaconDisplay.cs b/Assembly-CSharp/BaconDisplay.cs
-index b642df61..7e9ce3e9 100644
+index 6df79070..2a596c4f 100644
 --- a/Assembly-CSharp/BaconDisplay.cs
 +++ b/Assembly-CSharp/BaconDisplay.cs
 @@ -78,7 +78,7 @@ public class BaconDisplay : AbsSceneDisplay
@@ -36019,7 +36018,7 @@ index b642df61..7e9ce3e9 100644
  	}
  
  	private void ShowLowMemoryAlertMessage()
-@@ -1177,7 +1185,7 @@ public class BaconDisplay : AbsSceneDisplay
+@@ -1173,7 +1181,7 @@ public class BaconDisplay : AbsSceneDisplay
  				pastGame.TeammateTrinket2MinionType = (int)trinket2MinionTypeList[num];
  				pastGame.TeammateTrinketHeroPowerMinionType = (int)trinketHPMinionTypeList[num];
  				pastGame.TeammateDualHeroPower = cardDataModel3;
@@ -36028,7 +36027,7 @@ index b642df61..7e9ce3e9 100644
  			else
  			{
  				pastGame.Hero = cardDataModel;
-@@ -1592,10 +1600,10 @@ public class BaconDisplay : AbsSceneDisplay
+@@ -1605,10 +1613,10 @@ public class BaconDisplay : AbsSceneDisplay
  			return;
  		}
  		if (!service.HasProductsAvailable())
@@ -36042,7 +36041,7 @@ index b642df61..7e9ce3e9 100644
  		StoreManager.Get().StartGeneralTransaction(requestedTab, OnStoreBackButtonPressed);
  		Shop shop = Shop.Get();
  		if (shop != null)
-@@ -1685,7 +1693,7 @@ public class BaconDisplay : AbsSceneDisplay
+@@ -1698,7 +1706,7 @@ public class BaconDisplay : AbsSceneDisplay
  		}
  	}
  
@@ -36051,7 +36050,7 @@ index b642df61..7e9ce3e9 100644
  	{
  		CollectionManager.Get().NotifyOfBoxTransitionStart();
  		SceneMgr.Get().SetNextMode(SceneMgr.Mode.BACON_COLLECTION);
-@@ -1787,8 +1795,8 @@ public class BaconDisplay : AbsSceneDisplay
+@@ -1800,8 +1808,8 @@ public class BaconDisplay : AbsSceneDisplay
  		UpdatePlayButtonBasedOnPartyInfo();
  		UpdateDuosToggleButtonBasedOnPartyInfo();
  		UpdateDuosPartyPlanner();
@@ -36062,7 +36061,7 @@ index b642df61..7e9ce3e9 100644
  
  	private void OnBattlegroundsGameModeChanged(string gameMode, bool showPartyUI, object userData)
  	{
-@@ -1849,18 +1857,18 @@ public class BaconDisplay : AbsSceneDisplay
+@@ -1862,18 +1870,18 @@ public class BaconDisplay : AbsSceneDisplay
  		{
  			return;
  		}
@@ -36093,7 +36092,7 @@ index b642df61..7e9ce3e9 100644
  			Box box = Box.Get();
  			SceneMgr sceneMgr = SceneMgr.Get();
  			if (!box.IsBusy() && !box.IsTransitioningToSceneMode() && !sceneMgr.IsTransitioning())
-@@ -1896,30 +1904,30 @@ public class BaconDisplay : AbsSceneDisplay
+@@ -1909,30 +1917,30 @@ public class BaconDisplay : AbsSceneDisplay
  				text = GameStrings.Get("GLUE_BACON_INCOMPLETE_TEAM");
  			}
  		}
@@ -37392,7 +37391,7 @@ index e9c787a6..57ee7426 100644
  
  	public bool Valid => AverageFrameMSResult != 0;
 diff --git a/Assembly-CSharp/BigCard.cs b/Assembly-CSharp/BigCard.cs
-index 4066cb47..5360cd19 100644
+index 935caaed..52494323 100644
 --- a/Assembly-CSharp/BigCard.cs
 +++ b/Assembly-CSharp/BigCard.cs
 @@ -111,7 +111,7 @@ public class BigCard : MonoBehaviour
@@ -37428,21 +37427,18 @@ index 4066cb47..5360cd19 100644
  
  	private void LogUncaughtBigCardException(Exception e)
  	{
-@@ -339,25 +339,25 @@ public class BigCard : MonoBehaviour
+@@ -357,24 +357,24 @@ public class BigCard : MonoBehaviour
  			return;
  		}
  		using DefLoader.DisposableFullDef disposableFullDef = DefLoader.Get().GetFullDef(num);
 -		string evolvingActorPrefab = GetEvolvingActorPrefab(disposableFullDef);
 -		GameObject gameObject2 = AssetLoader.Get().InstantiatePrefab(evolvingActorPrefab, AssetLoadingOptions.IgnorePrefabPosition);
 -		m_extraBigCardActor = gameObject2.GetComponent<Actor>();
--		SetupActor(m_card, m_extraBigCardActor);
--		m_extraBigCardActor.SetEntity(null);
--		m_extraBigCardActor.transform.parent = m_bigCardActor.transform;
 +			string evolvingActorPrefab = GetEvolvingActorPrefab(disposableFullDef);
 +			GameObject gameObject2 = AssetLoader.Get().InstantiatePrefab(evolvingActorPrefab, AssetLoadingOptions.IgnorePrefabPosition);
 +			m_extraBigCardActor = gameObject2.GetComponent<Actor>();
-+			SetupActor(m_card, m_extraBigCardActor);
-+			m_extraBigCardActor.SetEntity(null);
+ 		SetupActorWithoutCard(m_extraBigCardActor, disposableFullDef, m_card.GetEntity().GetController());
+-		m_extraBigCardActor.transform.parent = m_bigCardActor.transform;
 +			m_extraBigCardActor.transform.parent = m_bigCardActor.transform;
  		m_extraBigCardActor.transform.localScale = new Vector3(0.75f, 1f, 0.75f);
 -		GameObject gameObject3 = GameObjectUtils.FindChildBySubstring(gameObject2, "EvolutionVFX");
@@ -37471,7 +37467,7 @@ index 4066cb47..5360cd19 100644
  
  	private string GetEvolvingActorPrefab(DefLoader.DisposableFullDef evolvingCardDef)
  	{
-@@ -418,9 +418,9 @@ public class BigCard : MonoBehaviour
+@@ -435,9 +435,9 @@ public class BigCard : MonoBehaviour
  		{
  			BigCardDisplayBones componentInChildren = actor.GetComponentInChildren<BigCardDisplayBones>();
  			if (componentInChildren == null)
@@ -37484,7 +37480,7 @@ index 4066cb47..5360cd19 100644
  			if (!componentInChildren.HasBonesForCurrentPlatform())
  			{
  				return false;
-@@ -520,7 +520,7 @@ public class BigCard : MonoBehaviour
+@@ -537,7 +537,7 @@ public class BigCard : MonoBehaviour
  	}
  
  	private BigCardDisplay_RelativeBoardPosition GetBoardPositionOfPlayZoneCard()
@@ -37493,7 +37489,7 @@ index 4066cb47..5360cd19 100644
  		Zone zone = m_card.GetZone();
  		if ((zone is ZonePlay || zone is ZoneHeroPower || zone is ZoneWeapon || zone is ZoneBattlegroundTrinket || m_card.GetEntity().IsBattlegroundTrinket() || m_card.GetEntity().IsAnomaly() || zone is ZoneBattlegroundQuestReward) && !m_card.GetEntity().IsLocation() && !m_card.GetEntity().IsMinion() && !m_card.GetEntity().IsBaconSpell())
  		{
-@@ -575,7 +575,7 @@ public class BigCard : MonoBehaviour
+@@ -592,7 +592,7 @@ public class BigCard : MonoBehaviour
  			if (entity2.IsMinion())
  			{
  				result = platformScale.m_BigCardScale_Minion;
@@ -37502,7 +37498,7 @@ index 4066cb47..5360cd19 100644
  			else if (entity2.IsLettuceAbility())
  			{
  				result = platformScale.m_BigCardScale_LettuceAbility;
-@@ -667,7 +667,7 @@ public class BigCard : MonoBehaviour
+@@ -684,7 +684,7 @@ public class BigCard : MonoBehaviour
  		{
  			return;
  		}
@@ -37511,7 +37507,7 @@ index 4066cb47..5360cd19 100644
  		float? num = null;
  		if (m_card.GetEntity().IsHeroPower())
  		{
-@@ -675,8 +675,8 @@ public class BigCard : MonoBehaviour
+@@ -692,8 +692,8 @@ public class BigCard : MonoBehaviour
  			if ((bool)UniversalInputManager.UsePhoneUI)
  			{
  				num *= scale.m_BigCardScale_Tooltip;
@@ -37521,7 +37517,7 @@ index 4066cb47..5360cd19 100644
  		TooltipPanelManager.Get().UpdateKeywordHelp(keywordArgs2.card, keywordArgs2.actor, keywordArgs2.boneSource, num);
  	}
  
-@@ -755,25 +755,25 @@ public class BigCard : MonoBehaviour
+@@ -772,25 +772,25 @@ public class BigCard : MonoBehaviour
  		{
  			return;
  		}
@@ -37563,7 +37559,7 @@ index 4066cb47..5360cd19 100644
  		case BigCardDisplay_RelativeBoardPosition.IRRELEVANT:
  		{
  			Entity entity = m_card.GetEntity();
-@@ -787,8 +787,8 @@ public class BigCard : MonoBehaviour
+@@ -804,8 +804,8 @@ public class BigCard : MonoBehaviour
  			{
  				if ((bool)UniversalInputManager.UsePhoneUI)
  				{
@@ -37574,7 +37570,7 @@ index 4066cb47..5360cd19 100644
  						bone = component.m_InnerRightBone;
  						bone2 = component.m_OuterRightBone;
  					}
-@@ -813,17 +813,17 @@ public class BigCard : MonoBehaviour
+@@ -830,17 +830,17 @@ public class BigCard : MonoBehaviour
  			else if (entity.IsBattlegroundTrinket())
  			{
  				if (entity.GetTag(GAME_TAG.TAG_SCRIPT_DATA_NUM_6) == 3)
@@ -37599,7 +37595,7 @@ index 4066cb47..5360cd19 100644
  			}
  			else if (entity.IsAnomaly())
  			{
-@@ -839,8 +839,8 @@ public class BigCard : MonoBehaviour
+@@ -856,8 +856,8 @@ public class BigCard : MonoBehaviour
  					bone2 = component.m_OuterLeftBone;
  					tooltipBoneSource = TooltipPanelManager.TooltipBoneSource.TOP_RIGHT;
  				}
@@ -37610,7 +37606,7 @@ index 4066cb47..5360cd19 100644
  					bone = component.m_InnerRightBone;
  					bone2 = component.m_OuterRightBone;
  					tooltipBoneSource = TooltipPanelManager.TooltipBoneSource.TOP_RIGHT;
-@@ -851,7 +851,7 @@ public class BigCard : MonoBehaviour
+@@ -868,7 +868,7 @@ public class BigCard : MonoBehaviour
  				if (!entity.IsAnomaly() && !entity.IsBattlegroundHeroBuddy())
  				{
  					Log.Gameplay.PrintError($"Unknown card type ({entity.GetCardType()}) used in {MethodBase.GetCurrentMethod().Name} while trying to display big cards.");
@@ -37619,7 +37615,7 @@ index 4066cb47..5360cd19 100644
  				}
  				bone = component.m_InnerLeftBone;
  				bone2 = component.m_OuterLeftBone;
-@@ -859,21 +859,21 @@ public class BigCard : MonoBehaviour
+@@ -876,21 +876,21 @@ public class BigCard : MonoBehaviour
  			}
  			break;
  		}
@@ -37651,7 +37647,7 @@ index 4066cb47..5360cd19 100644
  			float scaleForCard = GetScaleForCard(scale, m_bigCardActor.GetCard(), queryForSelf: true);
  			Vector3 scale2 = Vector3.one * scaleForCard;
  			BigCardBones_ScaleAndPlaceBigCard(m_bigCardActor, zone2, scale2, bone, flag);
-@@ -883,14 +883,14 @@ public class BigCard : MonoBehaviour
+@@ -900,14 +900,14 @@ public class BigCard : MonoBehaviour
  			}
  		}
  		if (m_extraBigCardActor != null && flag2)
@@ -37670,7 +37666,7 @@ index 4066cb47..5360cd19 100644
  
  	private void CheckIfTooltipSideShouldBeFlipped(ref TooltipPanelManager.TooltipBoneSource boneSource)
  	{
-@@ -1199,23 +1199,23 @@ public class BigCard : MonoBehaviour
+@@ -1216,23 +1216,23 @@ public class BigCard : MonoBehaviour
  		{
  			return;
  		}
@@ -37703,7 +37699,7 @@ index 4066cb47..5360cd19 100644
  
  	private void LoadAndDisplayTooltipPhoneSigils()
  	{
-@@ -1331,8 +1331,8 @@ public class BigCard : MonoBehaviour
+@@ -1348,8 +1348,8 @@ public class BigCard : MonoBehaviour
  			{
  				if (phoneSecretActor != null)
  				{
@@ -37714,7 +37710,7 @@ index 4066cb47..5360cd19 100644
  			}
  			m_phoneSecretActors.Clear();
  		}
-@@ -1665,8 +1665,8 @@ public class BigCard : MonoBehaviour
+@@ -1682,8 +1682,8 @@ public class BigCard : MonoBehaviour
  		if (flag)
  		{
  			num = entity.GetTag(GAME_TAG.BACON_COMPANION_ID);
@@ -37725,7 +37721,7 @@ index 4066cb47..5360cd19 100644
  		EntityDef entityDef2 = null;
  		if (num != 0)
  		{
-@@ -1709,26 +1709,26 @@ public class BigCard : MonoBehaviour
+@@ -1726,26 +1726,26 @@ public class BigCard : MonoBehaviour
  			{
  				if (!flag2)
  				{
@@ -37772,7 +37768,7 @@ index 4066cb47..5360cd19 100644
  				}
  				else
  				{
-@@ -1754,10 +1754,10 @@ public class BigCard : MonoBehaviour
+@@ -1771,10 +1771,10 @@ public class BigCard : MonoBehaviour
  							EntityDef entityDef3 = DefLoader.Get().GetEntityDef(num3);
  							if (entityDef3 == null)
  							{
@@ -38955,10 +38951,10 @@ index 11e0378e..5f907320 100644
  		if (!m_currentPageIsPageA)
  		{
 diff --git a/Assembly-CSharp/BookTab.cs b/Assembly-CSharp/BookTab.cs
-index 2b3ba062..2bf17cfe 100644
+index d854c71e..4ae773b4 100644
 --- a/Assembly-CSharp/BookTab.cs
 +++ b/Assembly-CSharp/BookTab.cs
-@@ -96,6 +96,11 @@ public class BookTab : PegUIElement
+@@ -94,6 +94,11 @@ public class BookTab : PegUIElement
  		return m_isVisible;
  	}
  
@@ -38970,7 +38966,7 @@ index 2b3ba062..2bf17cfe 100644
  	public void SetTargetVisibility(bool visible)
  	{
  		m_shouldBeVisible = visible;
-@@ -135,37 +140,37 @@ public class BookTab : PegUIElement
+@@ -133,37 +138,37 @@ public class BookTab : PegUIElement
  		{
  			return;
  		}
@@ -39530,7 +39526,7 @@ index 6048edbe..9c505000 100644
  	private List<GameObject> m_horizontalDividers = new List<GameObject>();
  
 diff --git a/Assembly-CSharp/Card.cs b/Assembly-CSharp/Card.cs
-index c36cbd27..7cfbe861 100644
+index 3ecf36bc..99fc9da9 100644
 --- a/Assembly-CSharp/Card.cs
 +++ b/Assembly-CSharp/Card.cs
 @@ -12,6 +12,7 @@ using Hearthstone.Progression;
@@ -39552,7 +39548,7 @@ index c36cbd27..7cfbe861 100644
  	}
  
  	public void NotifyOfVictoryStrikePlayed(Entity source, Entity target)
-@@ -671,10 +672,10 @@ public class Card : MonoBehaviour
+@@ -673,10 +674,10 @@ public class Card : MonoBehaviour
  				SoundManager.Get().LoadAndPlay("collection_manager_card_mouse_over.prefab:0d4e20bc78956bc48b5e2963ec39211c", base.gameObject);
  			}
  		}
@@ -39567,7 +39563,7 @@ index c36cbd27..7cfbe861 100644
  		if (m_entity.IsControlledByFriendlySidePlayer() && (m_entity.IsHero() || m_zone is ZonePlay) && !m_transitioningZones)
  		{
  			bool flag = m_entity.HasSpellPower() || m_entity.HasSpellPowerDouble();
-@@ -1371,10 +1372,10 @@ public class Card : MonoBehaviour
+@@ -1373,10 +1374,10 @@ public class Card : MonoBehaviour
  			Entity entity = m_entity;
  			if (entity == null || !entity.IsLaunchpad())
  			{
@@ -39580,7 +39576,7 @@ index c36cbd27..7cfbe861 100644
  
  	public void UpdateProposedManaUsage()
  	{
-@@ -1781,13 +1782,13 @@ public class Card : MonoBehaviour
+@@ -1783,13 +1784,13 @@ public class Card : MonoBehaviour
  		if (suboption >= m_subOptionEffects.Count)
  		{
  			if (m_entity != null)
@@ -39599,7 +39595,7 @@ index c36cbd27..7cfbe861 100644
  			return null;
  		}
  		return m_subOptionEffects[suboption];
-@@ -2015,14 +2016,14 @@ public class Card : MonoBehaviour
+@@ -2021,14 +2022,14 @@ public class Card : MonoBehaviour
  	}
  
  	private EmoteEntry GetEmoteEntryExact(EmoteType emoteType)
@@ -39621,7 +39617,7 @@ index c36cbd27..7cfbe861 100644
  		return null;
  	}
  
-@@ -2175,8 +2176,8 @@ public class Card : MonoBehaviour
+@@ -2181,8 +2182,8 @@ public class Card : MonoBehaviour
  	{
  		if (!m_suppressDeathEffects && !IsHeroUsingDeathSpellOverride())
  		{
@@ -39632,7 +39628,7 @@ index c36cbd27..7cfbe861 100644
  				ForceActivateDeathSoundSpells();
  			}
  			m_suppressDeathSounds = false;
-@@ -2186,15 +2187,15 @@ public class Card : MonoBehaviour
+@@ -2192,15 +2193,15 @@ public class Card : MonoBehaviour
  
  	public void ForceActivateDeathSoundSpells()
  	{
@@ -39656,7 +39652,7 @@ index c36cbd27..7cfbe861 100644
  
  	private bool IsHeroUsingDeathSpellOverride()
  	{
-@@ -2312,10 +2313,10 @@ public class Card : MonoBehaviour
+@@ -2318,10 +2319,10 @@ public class Card : MonoBehaviour
  		if (gameState != null)
  		{
  			gameEntity = gameState.GetGameEntity();
@@ -39671,7 +39667,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		if (gameEntity != null && gameEntity.GetGameOptions().GetBooleanOption(GameEntityOption.DELAY_CARD_SOUND_SPELLS))
  		{
-@@ -2462,10 +2463,10 @@ public class Card : MonoBehaviour
+@@ -2468,10 +2469,10 @@ public class Card : MonoBehaviour
  					if (delaySec > 0f)
  					{
  						yield return new WaitForSeconds(delaySec);
@@ -39684,7 +39680,7 @@ index c36cbd27..7cfbe861 100644
  					AudioSource activeAudioSource = emoteSoundSpell.GetActiveAudioSource();
  					if ((bool)activeAudioSource && (bool)activeAudioSource.clip && waitTime < activeAudioSource.clip.length)
  					{
-@@ -2747,11 +2748,11 @@ public class Card : MonoBehaviour
+@@ -2753,11 +2754,11 @@ public class Card : MonoBehaviour
  	{
  		SpellManager spellManager = SpellManager.Get();
  		if (asset != null && spellManager != null && asset is Spell spell)
@@ -39699,7 +39695,7 @@ index c36cbd27..7cfbe861 100644
  
  	private void DestroyEmoteList()
  	{
-@@ -2989,7 +2990,7 @@ public class Card : MonoBehaviour
+@@ -2995,7 +2996,7 @@ public class Card : MonoBehaviour
  			}
  			if (m_actor != null)
  			{
@@ -39708,7 +39704,7 @@ index c36cbd27..7cfbe861 100644
  			}
  			break;
  		case GAME_TAG.LETTUCE_IS_COMBAT_ACTION_TAKEN:
-@@ -3034,7 +3035,7 @@ public class Card : MonoBehaviour
+@@ -3040,7 +3041,7 @@ public class Card : MonoBehaviour
  			if (m_entity != null && (m_entity.IsControlledByOpposingSidePlayer() || (GameMgr.Get() != null && GameMgr.Get().IsSpectator())))
  			{
  				StartCoroutine(WaitAndForgeCard());
@@ -39717,7 +39713,16 @@ index c36cbd27..7cfbe861 100644
  			break;
  		case GAME_TAG.EXHAUSTED:
  			if (m_actor != null)
-@@ -3654,16 +3655,16 @@ public class Card : MonoBehaviour
+@@ -3153,7 +3154,7 @@ public class Card : MonoBehaviour
+ 		case GAME_TAG.END_OF_TURN_TRIGGER:
+ 			if (m_entity != null && m_entity.GetZone() == TAG_ZONE.PLAY)
+ 			{
+-				UpdateBauble();
++			UpdateBauble();
+ 			}
+ 			break;
+ 		}
+@@ -3663,16 +3664,16 @@ public class Card : MonoBehaviour
  		while (true)
  		{
  			if (m_actor == null || m_actor.gameObject == null)
@@ -39741,7 +39746,7 @@ index c36cbd27..7cfbe861 100644
  				break;
  			}
  			yield return null;
-@@ -3693,16 +3694,16 @@ public class Card : MonoBehaviour
+@@ -3702,16 +3703,16 @@ public class Card : MonoBehaviour
  			}
  			if (flag)
  			{
@@ -39761,7 +39766,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		Spell playSpell;
  		while (true)
-@@ -3712,8 +3713,8 @@ public class Card : MonoBehaviour
+@@ -3721,8 +3722,8 @@ public class Card : MonoBehaviour
  			{
  				break;
  			}
@@ -39772,7 +39777,7 @@ index c36cbd27..7cfbe861 100644
  		SetInputEnabled(enabled: true);
  		if (exhausted && (GameState.Get()?.IsValidOption(m_entity) ?? false) && !m_entity.HasSubCards() && playSpell != null)
  		{
-@@ -3763,7 +3764,7 @@ public class Card : MonoBehaviour
+@@ -3772,7 +3773,7 @@ public class Card : MonoBehaviour
  		}
  		if (m_actor.GetComponent<Animation>() != null)
  		{
@@ -39781,7 +39786,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		Spell spell = GetPlaySpell(0);
  		if (spell != null)
-@@ -4229,7 +4230,7 @@ public class Card : MonoBehaviour
+@@ -4238,7 +4239,7 @@ public class Card : MonoBehaviour
  			{
  				if (fallbackToDefault)
  				{
@@ -39790,7 +39795,7 @@ index c36cbd27..7cfbe861 100644
  				}
  				return;
  			}
-@@ -4290,13 +4291,13 @@ public class Card : MonoBehaviour
+@@ -4299,13 +4300,13 @@ public class Card : MonoBehaviour
  		if (m_zone is ZoneHand)
  		{
  			if (m_entity.HasTag(GAME_TAG.GHOSTLY))
@@ -39808,7 +39813,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		else if ((m_entity.IsWeapon() && (m_zone is ZoneWeapon || m_zone is ZoneHeroPower)) || (m_entity.IsBattlegroundHeroBuddy() && m_zone is ZoneBattlegroundHeroBuddy) || (m_entity.IsBattlegroundQuestReward() && m_zone is ZoneBattlegroundQuestReward) || (m_entity.IsBattlegroundTrinket() && m_zone is ZoneBattlegroundTrinket) || (m_entity.IsAnomaly() && m_zone is ZoneBattlegroundAnomaly))
  		{
-@@ -4713,19 +4714,19 @@ public class Card : MonoBehaviour
+@@ -4722,19 +4723,19 @@ public class Card : MonoBehaviour
  			else if (m_entity.IsPassable())
  			{
  				ShowPassableHover();
@@ -39836,7 +39841,7 @@ index c36cbd27..7cfbe861 100644
  			else if (m_entity.IsPassable())
  			{
  				HidePassableHover();
-@@ -4834,17 +4835,17 @@ public class Card : MonoBehaviour
+@@ -4843,17 +4844,17 @@ public class Card : MonoBehaviour
  			m_actor.SetDeckActionHighlightState(DeckActionHighlightState.None);
  		}
  		else if (!m_overPlayfield)
@@ -39859,7 +39864,7 @@ index c36cbd27..7cfbe861 100644
  			m_actor.SetDeckActionHighlightState(DeckActionHighlightState.None);
  		}
  		if (m_entity.HasTag(GAME_TAG.FORCE_GREEN_GLOW_ACTIVE) && m_entity.IsControlledByFriendlySidePlayer())
-@@ -4923,11 +4924,11 @@ public class Card : MonoBehaviour
+@@ -4932,11 +4933,11 @@ public class Card : MonoBehaviour
  			int num = GameUtils.StarshipLaunchCost(m_entity.GetController());
  			bool flag8 = m_entity.GetController().GetNumAvailableResources() >= num;
  			if (m_mousedOver)
@@ -39875,7 +39880,7 @@ index c36cbd27..7cfbe861 100644
  				else if (m_entity.GetRealTimeTitanAbilityUsable())
  				{
  					m_actor.SetActorState(ActorStateType.CARD_TITAN_ABILITY_MOUSE_OVER);
-@@ -4936,22 +4937,22 @@ public class Card : MonoBehaviour
+@@ -4945,22 +4946,22 @@ public class Card : MonoBehaviour
  				{
  					if (flag8)
  					{
@@ -39908,7 +39913,7 @@ index c36cbd27..7cfbe861 100644
  				if (m_entity.GetRealTimeTitanAbilityUsable())
  				{
  					m_actor.SetActorState(ActorStateType.CARD_TITAN_ABILITY);
-@@ -4961,7 +4962,7 @@ public class Card : MonoBehaviour
+@@ -4970,7 +4971,7 @@ public class Card : MonoBehaviour
  				{
  					if (flag8)
  					{
@@ -39917,7 +39922,7 @@ index c36cbd27..7cfbe861 100644
  					}
  					return true;
  				}
-@@ -5697,11 +5698,11 @@ public class Card : MonoBehaviour
+@@ -5706,11 +5707,11 @@ public class Card : MonoBehaviour
  		if (!m_alwaysShowCardsInTooltip)
  		{
  			if (m_zone is ZoneHand)
@@ -39933,7 +39938,7 @@ index c36cbd27..7cfbe861 100644
  		return true;
  	}
  
-@@ -5927,8 +5928,8 @@ public class Card : MonoBehaviour
+@@ -5936,8 +5937,8 @@ public class Card : MonoBehaviour
  			if (string.IsNullOrEmpty(text))
  			{
  				Debug.LogWarning("[UpdateRewardActor] - rewardEnt is null and no backup QUEST_REWARD_DBID");
@@ -39944,7 +39949,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		if (entity == null)
  		{
-@@ -6066,10 +6067,10 @@ public class Card : MonoBehaviour
+@@ -6075,10 +6076,10 @@ public class Card : MonoBehaviour
  				m_actor.Hide();
  				if (!GameMgr.Get().IsBattlegrounds() || m_entity == null || m_entity.GetRealTimeZone() == TAG_ZONE.HAND)
  				{
@@ -39957,7 +39962,7 @@ index c36cbd27..7cfbe861 100644
  		else if ((m_prevZone is ZoneGraveyard || m_prevZone is ZoneDeck) && m_zone.m_ServerTag == TAG_ZONE.PLAY)
  		{
  			ShowCard();
-@@ -6854,9 +6855,9 @@ public class Card : MonoBehaviour
+@@ -6863,9 +6864,9 @@ public class Card : MonoBehaviour
  					if (entity != null && entity.IsMinion())
  					{
  						if (entity.HasTag(GAME_TAG.MINIATURIZE) && !m_entity.HasTag(GAME_TAG.CREATED_BY_MINIATURIZE))
@@ -39970,7 +39975,7 @@ index c36cbd27..7cfbe861 100644
  						if (entity.HasTag(GAME_TAG.GIGANTIFY) && !m_entity.HasTag(GAME_TAG.CREATED_BY_GIGANTIFY))
  						{
  							flag6 = false;
-@@ -6893,7 +6894,7 @@ public class Card : MonoBehaviour
+@@ -6902,7 +6903,7 @@ public class Card : MonoBehaviour
  					}
  					if (m_entity.HasTag(GAME_TAG.LINKED_ENTITY))
  					{
@@ -39979,7 +39984,7 @@ index c36cbd27..7cfbe861 100644
  						{
  							ActivateMinionSpawnEffects();
  						}
-@@ -6965,23 +6966,23 @@ public class Card : MonoBehaviour
+@@ -6974,23 +6975,23 @@ public class Card : MonoBehaviour
  		}
  		else if (m_prevZone is ZoneHand && (m_zone is ZonePlay || m_zone is ZoneHero))
  		{
@@ -40019,7 +40024,7 @@ index c36cbd27..7cfbe861 100644
  		else if (m_prevZone is ZoneHand && m_zone is ZoneWeapon)
  		{
  			if (ActivateActorSpells_HandToWeapon(oldActor))
-@@ -7228,10 +7229,10 @@ public class Card : MonoBehaviour
+@@ -7237,10 +7238,10 @@ public class Card : MonoBehaviour
  			if (m_prevZone != null && m_prevZone.m_Side != m_zone.m_Side)
  			{
  				if (m_prevZone is ZoneSecret && m_zone is ZoneSecret)
@@ -40034,7 +40039,7 @@ index c36cbd27..7cfbe861 100644
  				else if (m_prevZone is ZonePlay && m_zone is ZonePlay)
  				{
  					ActivateStateSpells();
-@@ -7262,8 +7263,8 @@ public class Card : MonoBehaviour
+@@ -7271,8 +7272,8 @@ public class Card : MonoBehaviour
  			ShowSecretQuestBirth();
  			flag = true;
  			m_actorReady = true;
@@ -40045,7 +40050,7 @@ index c36cbd27..7cfbe861 100644
  		if (!flag)
  		{
  			if ((bool)oldActor)
-@@ -7460,36 +7461,36 @@ public class Card : MonoBehaviour
+@@ -7469,36 +7470,36 @@ public class Card : MonoBehaviour
  		}
  		else
  		{
@@ -40112,7 +40117,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		srcDeck.UpdateLayout();
  		PowerTask cardDrawBlockingTask = GetPowerTaskToBlockCardDraw();
-@@ -7503,10 +7504,10 @@ public class Card : MonoBehaviour
+@@ -7512,10 +7513,10 @@ public class Card : MonoBehaviour
  		}
  		else
  		{
@@ -40127,7 +40132,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		m_actorReady = true;
  		if (ShouldCardDrawWaitForTurnStartSpells())
-@@ -7598,6 +7599,7 @@ public class Card : MonoBehaviour
+@@ -7607,6 +7608,7 @@ public class Card : MonoBehaviour
  	private IEnumerator DrawUnknownOpponentCard(ZoneHand handZone, ZoneDeck srcDeck)
  	{
  		SoundManager.Get().LoadAndPlay("draw_card_and_add_to_hand_opp_1.prefab:5a05fbb2c5833a94182e1b454647d5c8", base.gameObject);
@@ -40135,7 +40140,7 @@ index c36cbd27..7cfbe861 100644
  		base.gameObject.transform.rotation = IN_DECK_HIDDEN_ROTATION;
  		DetermineIfOverrideDrawTimeScale();
  		bool hasDrawOverride = GetController() != null && GetController().HasTag(GAME_TAG.DRAW_SPELL_OVERRIDE);
-@@ -7643,36 +7645,36 @@ public class Card : MonoBehaviour
+@@ -7652,36 +7654,36 @@ public class Card : MonoBehaviour
  		}
  		else
  		{
@@ -40202,7 +40207,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		srcDeck.UpdateLayout();
  		yield return new WaitForSeconds(0.2f);
-@@ -7689,10 +7691,10 @@ public class Card : MonoBehaviour
+@@ -7698,10 +7700,10 @@ public class Card : MonoBehaviour
  		}
  		else
  		{
@@ -40217,7 +40222,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		m_doNotSort = false;
  		m_beingDrawnByOpponent = false;
-@@ -7746,6 +7748,7 @@ public class Card : MonoBehaviour
+@@ -7755,6 +7757,7 @@ public class Card : MonoBehaviour
  	private IEnumerator RevealDrawnOpponentCard(string handActorPath, Actor handActor, ZoneHand handZone, ZoneDeck srcDeck)
  	{
  		SoundManager.Get().LoadAndPlay("draw_card_1.prefab:19dd221ebfed9754e85ef1f104e0fddb", base.gameObject);
@@ -40225,7 +40230,7 @@ index c36cbd27..7cfbe861 100644
  		handActor.transform.parent = m_actor.transform.parent;
  		TransformUtil.CopyLocal(handActor, m_actor);
  		m_actor.Hide();
-@@ -7793,36 +7796,36 @@ public class Card : MonoBehaviour
+@@ -7802,36 +7805,36 @@ public class Card : MonoBehaviour
  		}
  		else
  		{
@@ -40292,7 +40297,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		srcDeck.UpdateLayout();
  		yield return new WaitForSeconds(1.75f);
-@@ -8118,29 +8121,29 @@ public class Card : MonoBehaviour
+@@ -8127,29 +8130,29 @@ public class Card : MonoBehaviour
  		}
  		else
  		{
@@ -40345,7 +40350,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		if (num2)
  		{
-@@ -8152,10 +8155,10 @@ public class Card : MonoBehaviour
+@@ -8161,10 +8164,10 @@ public class Card : MonoBehaviour
  		}
  		else
  		{
@@ -40360,7 +40365,7 @@ index c36cbd27..7cfbe861 100644
  		}
  		m_actorReady = true;
  		RefreshActor();
-@@ -8678,6 +8681,7 @@ public class Card : MonoBehaviour
+@@ -8687,6 +8690,7 @@ public class Card : MonoBehaviour
  	public IEnumerator AnimatePlayToDeck(GameObject mover, ZoneDeck deckZone, bool hideBackSide = false, float timeScale = 1f)
  	{
  		SoundManager.Get().LoadAndPlay("MinionToDeck_transition.prefab:8063f1b133f28e34aaeade8fcabe250c");
@@ -40368,7 +40373,7 @@ index c36cbd27..7cfbe861 100644
  		Vector3 vector = deckZone.GetThicknessForLayout().GetMeshRenderer().bounds.center + IN_DECK_OFFSET;
  		if (m_entity != null && m_entity.IsMercenary())
  		{
-@@ -9242,19 +9246,19 @@ public class Card : MonoBehaviour
+@@ -9251,19 +9255,19 @@ public class Card : MonoBehaviour
  		Spell chosenSpell = GetBestDeathSpell() as Spell;
  		if (!(chosenSpell == null))
  		{
@@ -40400,7 +40405,7 @@ index c36cbd27..7cfbe861 100644
  	}
  
  	private bool HandlePlayActorDeath(Actor oldActor)
-@@ -9412,41 +9416,41 @@ public class Card : MonoBehaviour
+@@ -9421,41 +9425,41 @@ public class Card : MonoBehaviour
  		Spell spell = actor.GetSpell(SpellType.FORGEABLE_HAMMER_IMPACT);
  		if (!(spell == null))
  		{
@@ -40473,7 +40478,7 @@ index c36cbd27..7cfbe861 100644
  	}
  
  	private Spell GetBestNullZoneSpell()
-@@ -9500,7 +9504,7 @@ public class Card : MonoBehaviour
+@@ -9509,7 +9513,7 @@ public class Card : MonoBehaviour
  		{
  			return false;
  		}
@@ -40482,7 +40487,7 @@ index c36cbd27..7cfbe861 100644
  		if (collider == null)
  		{
  			return false;
-@@ -9649,4 +9653,23 @@ public class Card : MonoBehaviour
+@@ -9658,4 +9662,23 @@ public class Card : MonoBehaviour
  		}
  		return m_cardDef.CardDef.GetComponent<T>();
  	}
@@ -41648,7 +41653,7 @@ index a03fe27e..908031c7 100644
 +    #endregion
  }
 diff --git a/Assembly-CSharp/CardBackManager.cs b/Assembly-CSharp/CardBackManager.cs
-index 47e39928..286b9bce 100644
+index 73413870..2cc1eb47 100644
 --- a/Assembly-CSharp/CardBackManager.cs
 +++ b/Assembly-CSharp/CardBackManager.cs
 @@ -16,1022 +16,1026 @@ using Hearthstone.DataModels;
@@ -43799,10 +43804,10 @@ index 47e39928..286b9bce 100644
  						item.SetFloat("_Seed", num);
  					}
  					if (item.HasProperty("_AnimTime") && item.HasProperty("_FrameCount"))
-@@ -1132,405 +1136,405 @@ public class CardBackManager : IService
+@@ -1129,405 +1133,405 @@ public class CardBackManager : IService
+ 						float @float = item.GetFloat("_AnimTime");
  						float float2 = item.GetFloat("_FrameCount");
- 						materialPropertyBlock.SetFloat("_TimeOffset", Time.timeSinceLevelLoad - float2 - num * @float);
- 						component2.SetPropertyBlock(materialPropertyBlock);
+ 						item.SetFloat("_TimeOffset", Time.timeSinceLevelLoad - float2 - num * @float);
 -					}
 -					if (item.HasProperty("_LightingBlend"))
 -					{
@@ -45103,7 +45108,7 @@ index 51238c6b..aa809693 100644
  	}
  
 diff --git a/Assembly-CSharp/Cheats.cs b/Assembly-CSharp/Cheats.cs
-index f6da54ae..00e05ff5 100644
+index cc6f78ad..fa084ec3 100644
 --- a/Assembly-CSharp/Cheats.cs
 +++ b/Assembly-CSharp/Cheats.cs
 @@ -256,9 +256,9 @@ public class Cheats : IService
@@ -45119,7 +45124,7 @@ index f6da54ae..00e05ff5 100644
  		},
  		{
  			ScenarioDbId.TB_BACONSHOP_DUOS_VS_AI,
-@@ -4016,7 +4016,7 @@ public class Cheats : IService
+@@ -4004,7 +4004,7 @@ public class Cheats : IService
  
  	private bool OnProcessCheat_setRotationRotatedBoostersPopup(string func, string[] args, string rawArgs)
  	{
@@ -45128,7 +45133,7 @@ index f6da54ae..00e05ff5 100644
  		DialogManager.Get().ShowSetRotationTutorialPopup(UserAttentionBlocker.SET_ROTATION_INTRO, info);
  		return true;
  	}
-@@ -4535,7 +4535,7 @@ public class Cheats : IService
+@@ -4523,7 +4523,7 @@ public class Cheats : IService
  						}
  						continue;
  					}
@@ -45137,7 +45142,7 @@ index f6da54ae..00e05ff5 100644
  					if (!enumerable2.Any())
  					{
  						errorMsg = "party invite: no online Hearthstone friend matching name " + arg + " (arg index " + num3 + ")";
-@@ -5566,18 +5566,18 @@ public class Cheats : IService
+@@ -5554,18 +5554,18 @@ public class Cheats : IService
  			string text = args[0];
  			if (!string.IsNullOrWhiteSpace(text))
  			{
@@ -45167,7 +45172,7 @@ index f6da54ae..00e05ff5 100644
  		}
  		GameSaveDataManager.Get().SaveSubkey(new GameSaveDataManager.SubkeySaveRequest(GameSaveKeyId.PLAYER_OPTIONS, GameSaveKeySubkeyId.LIST_OF_SEEN_CARD_CHANGES, new long[0]));
  		UIStatus.Get().AddInfo("Card Change popup for all events will be displayed on next login", 10f);
-@@ -6719,155 +6719,155 @@ public class Cheats : IService
+@@ -6707,155 +6707,155 @@ public class Cheats : IService
  					{
  						if (brawlType != BrawlType.BRAWL_TYPE_FIRESIDE_GATHERING)
  						{
@@ -45434,7 +45439,7 @@ index f6da54ae..00e05ff5 100644
  			if ((text2 == "ranked" || text2 == "arena") && (text3 == "reward" || text3 == "rewards"))
  			{
  				flag = flag && (!debugCommandResponse.HasResponse || !debugCommandResponse.Response.StartsWith("Error"));
-@@ -8036,11 +8036,11 @@ public class Cheats : IService
+@@ -8024,11 +8024,11 @@ public class Cheats : IService
  			}
  		}
  		else if (string.Equals(a, "get") && args.Length > 1)
@@ -45450,7 +45455,7 @@ index f6da54ae..00e05ff5 100644
  		return true;
  	}
  
-@@ -8139,19 +8139,19 @@ public class Cheats : IService
+@@ -8127,19 +8127,19 @@ public class Cheats : IService
  		else if (string.Equals(a, "data"))
  		{
  			if (args.Length > 1 && string.Equals(args[1].ToLower(), "clear"))
@@ -45478,7 +45483,7 @@ index f6da54ae..00e05ff5 100644
  		else if (string.Equals(a, "lazy"))
  		{
  			ServiceManager.Get<ILoginService>()?.ClearAuthentication();
-@@ -8303,7 +8303,7 @@ public class Cheats : IService
+@@ -8291,7 +8291,7 @@ public class Cheats : IService
  			{
  				text2 = text.Substring(6);
  			}
@@ -45487,7 +45492,7 @@ index f6da54ae..00e05ff5 100644
  			Func<string, string, bool> fnStartsWithMatch = (string evtName, string userInput) => evtName.StartsWith(userInput, StringComparison.InvariantCultureIgnoreCase);
  			Func<string, string, bool> fnEndsWithMatch = (string evtName, string userInput) => evtName.EndsWith(userInput, StringComparison.InvariantCultureIgnoreCase);
  			Func<string, string, bool> fnExactMatch = (string evtName, string userInput) => evtName.Equals(userInput, StringComparison.InvariantCultureIgnoreCase);
-@@ -9842,128 +9842,128 @@ public class Cheats : IService
+@@ -9830,128 +9830,128 @@ public class Cheats : IService
  			ScenarioDbId[] array = ((adventureDbId == AdventureDbId.BOH) ? (wingIdFromMissionId switch
  			{
  				WingDbId.BOH_REXXAR => new ScenarioDbId[8]
@@ -45718,7 +45723,7 @@ index f6da54ae..00e05ff5 100644
  					ScenarioDbId.BOH_JAINA_01,
  					ScenarioDbId.BOH_JAINA_02,
  					ScenarioDbId.BOH_JAINA_03,
-@@ -9974,105 +9974,105 @@ public class Cheats : IService
+@@ -9962,105 +9962,105 @@ public class Cheats : IService
  					ScenarioDbId.BOH_JAINA_08
  				}, 
  			}) : (wingIdFromMissionId switch
@@ -45906,7 +45911,7 @@ index f6da54ae..00e05ff5 100644
  				}, 
  				_ => new ScenarioDbId[8]
  				{
-@@ -10754,8 +10754,8 @@ public class Cheats : IService
+@@ -10742,8 +10742,8 @@ public class Cheats : IService
  			UIStatus.Get().AddInfo(message, 10f);
  			return true;
  		}
@@ -45917,7 +45922,7 @@ index f6da54ae..00e05ff5 100644
  		return true;
  	}
  
-@@ -11260,56 +11260,56 @@ public class Cheats : IService
+@@ -11248,56 +11248,56 @@ public class Cheats : IService
  	{
  		using FileStream stream = File.Open(path, FileMode.Create);
  		using StreamWriter streamWriter = new StreamWriter(stream);
@@ -47129,7 +47134,7 @@ index ec2cd89c..f2f2b2f0 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/CollectionDeckBoxVisual.cs b/Assembly-CSharp/CollectionDeckBoxVisual.cs
-index c9a0b484..cdc67725 100644
+index bc125d2a..82d902ee 100644
 --- a/Assembly-CSharp/CollectionDeckBoxVisual.cs
 +++ b/Assembly-CSharp/CollectionDeckBoxVisual.cs
 @@ -6,6 +6,7 @@ using Blizzard.T5.MaterialService.Extensions;
@@ -47658,7 +47663,7 @@ index cc38b844..513f3cd5 100644
 +    #endregion
  }
 diff --git a/Assembly-CSharp/CollectionManager.cs b/Assembly-CSharp/CollectionManager.cs
-index 32ad5e90..aa7d697c 100644
+index b57a437a..517739d0 100644
 --- a/Assembly-CSharp/CollectionManager.cs
 +++ b/Assembly-CSharp/CollectionManager.cs
 @@ -17,6 +17,7 @@ using PegasusLettuce;
@@ -47866,7 +47871,7 @@ index 32ad5e90..aa7d697c 100644
  			return true;
  		};
  		CollectibleCardFilterFunc item2 = delegate(CollectibleCard card)
-@@ -2248,29 +2283,29 @@ public class CollectionManager
+@@ -2249,29 +2284,29 @@ public class CollectionManager
  			foreach (CounterpartCardsDbfRecord item in counterpartCards)
  			{
  				CollectibleCard card = GetCard(GameUtils.TranslateDbIdToCardId(item.DeckEquivalentCardId), collectibleCard2.PremiumType);
@@ -47880,7 +47885,7 @@ index 32ad5e90..aa7d697c 100644
 +				continue;
 +			}
 +			string text = null;
- 				if (collectibleCard2.Set == TAG_CARD_SET.CORE && collectibleCard2.OwnedCount == collectibleCard2.DefaultMaxCopiesPerDeck)
+ 				if (set == TAG_CARD_SET.CORE && collectibleCard2.OwnedCount == collectibleCard2.DefaultMaxCopiesPerDeck)
 -				{
 -					text = card.CardId;
 -				}
@@ -47891,7 +47896,7 @@ index 32ad5e90..aa7d697c 100644
 +			}
 +			else
 +			{
- 					if ((collectibleCard2.OwnedCount == 1 && card.OwnedCount == 1) || ((collectibleCard2.Set == TAG_CARD_SET.CORE || collectibleCard2.Set == TAG_CARD_SET.WONDERS) && collectibleCard2.OwnedCount < card.OwnedCount) || card.Set == TAG_CARD_SET.CORE)
+ 					if ((collectibleCard2.OwnedCount == 1 && card.OwnedCount == 1) || ((set == TAG_CARD_SET.CORE || set == TAG_CARD_SET.WONDERS) && collectibleCard2.OwnedCount < card.OwnedCount) || card.Set == TAG_CARD_SET.CORE)
 -					{
 -						continue;
 -					}
@@ -47913,7 +47918,7 @@ index 32ad5e90..aa7d697c 100644
  		for (int num = collectibleCards.Count - 1; num > -1; num--)
  		{
  			CollectibleCard collectibleCard = collectibleCards[num];
-@@ -2824,8 +2859,8 @@ public class CollectionManager
+@@ -2825,8 +2860,8 @@ public class CollectionManager
  		{
  			if (ownedCard.PremiumType != TAG_PREMIUM.SIGNATURE)
  			{
@@ -47924,16 +47929,16 @@ index 32ad5e90..aa7d697c 100644
  		}
  		return num;
  	}
-@@ -2869,7 +2904,7 @@ public class CollectionManager
- 				RemoveCollectionCard(cardChange.cardID, cardChange.premium, cardChange.count);
+@@ -2873,7 +2908,7 @@ public class CollectionManager
+ 				RemoveCollectionCard(cardChange.cardID, cardChange.premium, cardChange.count, list);
  				break;
  			}
 -		}
 +	}
- 		SendPendingDeckUpdates();
- 		OnCollectionChanged();
- 		AchieveManager.Get().ValidateAchievesNow();
-@@ -3004,6 +3039,11 @@ public class CollectionManager
+ 		CollectionDeckTray collectionDeckTray = CollectionDeckTray.Get();
+ 		if (collectionDeckTray != null && collectionDeckTray.m_decksContent != null)
+ 		{
+@@ -3013,6 +3048,11 @@ public class CollectionManager
  
  	public bool ShouldAccountSeeStandardWild()
  	{
@@ -47945,7 +47950,7 @@ index 32ad5e90..aa7d697c 100644
  		if (!RankMgr.Get().WildCardsAllowedInCurrentLeague())
  		{
  			return false;
-@@ -3017,6 +3057,11 @@ public class CollectionManager
+@@ -3026,6 +3066,11 @@ public class CollectionManager
  
  	public bool AccountHasUnlockedWild()
  	{
@@ -47957,7 +47962,7 @@ index 32ad5e90..aa7d697c 100644
  		long value = 0L;
  		if (!GameSaveDataManager.Get().GetSubkeyValue(GameSaveKeyId.PLAYER_FLAGS, GameSaveKeySubkeyId.PLAYER_FLAGS_UNLOCKED_WILD, out value))
  		{
-@@ -3061,6 +3106,7 @@ public class CollectionManager
+@@ -3070,6 +3115,7 @@ public class CollectionManager
  		{
  			return true;
  		}
@@ -47965,7 +47970,7 @@ index 32ad5e90..aa7d697c 100644
  		if (m_lastSearchForWildCardsTime > m_collectionLastModifiedTime)
  		{
  			return m_accountHasWildCards;
-@@ -3070,18 +3116,35 @@ public class CollectionManager
+@@ -3079,18 +3125,35 @@ public class CollectionManager
  		return m_accountHasWildCards;
  	}
  
@@ -48001,7 +48006,7 @@ index 32ad5e90..aa7d697c 100644
  		return m_decks.Values.Count((CollectionDeck deck) => deck.FormatType == FormatType.FT_TWIST);
  	}
  
-@@ -3204,10 +3267,17 @@ public class CollectionManager
+@@ -3213,10 +3276,17 @@ public class CollectionManager
  		}
  		SetDeckRuleset(deckRuleset);
  		SetEditedDeck(deck, callbackData);
@@ -48019,7 +48024,7 @@ index 32ad5e90..aa7d697c 100644
  		bool editMode = m_editMode;
  		m_editMode = false;
  		FriendChallengeMgr.Get().UpdateMyAvailability();
-@@ -3618,7 +3688,7 @@ public class CollectionManager
+@@ -3627,7 +3697,7 @@ public class CollectionManager
  			if (entityDef.HasTag(GAME_TAG.DECK_RULE_MOD_DECK_SIZE))
  			{
  				num = entityDef.GetTag(GAME_TAG.DECK_RULE_MOD_DECK_SIZE);
@@ -48028,7 +48033,7 @@ index 32ad5e90..aa7d697c 100644
  		}
  		int num3 = deck.GetTotalValidCardCount() + list.Count;
  		int num4 = num - num3;
-@@ -3695,6 +3765,9 @@ public class CollectionManager
+@@ -3704,6 +3774,9 @@ public class CollectionManager
  
  	public bool ShouldShowWildToStandardTutorial(bool checkPrevSceneIsPlayMode = true)
  	{
@@ -48038,7 +48043,7 @@ index 32ad5e90..aa7d697c 100644
  		if (!ShouldAccountSeeStandardWild())
  		{
  			return false;
-@@ -3829,6 +3902,7 @@ public class CollectionManager
+@@ -3838,6 +3911,7 @@ public class CollectionManager
  		}
  		BattlegroundsDataInit();
  		LettuceInitImpl();
@@ -48046,7 +48051,7 @@ index 32ad5e90..aa7d697c 100644
  		NetCache.Get().RegisterCollectionManager(OnNetCacheReady);
  		LoginManager.Get().OnAchievesLoaded += OnAchievesLoaded;
  	}
-@@ -3840,6 +3914,7 @@ public class CollectionManager
+@@ -3849,6 +3923,7 @@ public class CollectionManager
  		m_collectionLoaded = false;
  		m_duelsSessionInfoLoaded = false;
  		HearthstoneApplication.Get().WillReset -= s_instance.WillReset;
@@ -48054,7 +48059,7 @@ index 32ad5e90..aa7d697c 100644
  		NetCache.Get().FavoriteBattlegroundsGuideSkinChanged -= s_instance.OnFavoriteBattlegroundsGuideSkinChanged;
  		NetCache.Get().RemoveUpdatedListener(typeof(NetCache.NetCacheDecks), s_instance.NetCache_OnDecksReceived);
  		if (HearthstoneApplication.IsInternal())
-@@ -6267,18 +6342,88 @@ public class CollectionManager
+@@ -6278,18 +6353,88 @@ public class CollectionManager
  			{
  				break;
  			}
@@ -48151,7 +48156,7 @@ index 32ad5e90..aa7d697c 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/CollectionManagerDisplay.cs b/Assembly-CSharp/CollectionManagerDisplay.cs
-index b13541e2..b86157b0 100644
+index dec7de52..a738309a 100644
 --- a/Assembly-CSharp/CollectionManagerDisplay.cs
 +++ b/Assembly-CSharp/CollectionManagerDisplay.cs
 @@ -13,6 +13,7 @@ using Hearthstone.Util;
@@ -48678,7 +48683,7 @@ index 59bfb8f2..1c9e818a 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/CollectionPageManager.cs b/Assembly-CSharp/CollectionPageManager.cs
-index d846ab35..d6fea2eb 100644
+index 21172221..fb37cbf6 100644
 --- a/Assembly-CSharp/CollectionPageManager.cs
 +++ b/Assembly-CSharp/CollectionPageManager.cs
 @@ -10,195 +10,195 @@ using UnityEngine;
@@ -52628,49 +52633,6 @@ index d846ab35..d6fea2eb 100644
 -
 -	protected override void OnPageTurnComplete(object callbackData, int operationId)
 -	{
--		if (m_numPageFlipsThisSession % CollectiblePageManager.NUM_PAGE_FLIPS_UNTIL_UNLOAD_UNUSED_ASSETS == 0)
--		{
--			HearthstoneApplication hearthstoneApplication = HearthstoneApplication.Get();
--			if (hearthstoneApplication != null)
--			{
--				hearthstoneApplication.UnloadUnusedAssets();
--			}
--		}
--		TransitionReadyCallbackData transitionReadyCallbackData = callbackData as TransitionReadyCallbackData;
--		CollectionPageDisplay collectionPageDisplay = PageAsCollectionPage(transitionReadyCallbackData.m_otherPage);
--		CollectionUtils.ViewMode viewMode = CollectionManager.Get().GetCollectibleDisplay().GetViewMode();
--		bool num = collectionPageDisplay != PageAsCollectionPage(GetCurrentPage());
--		if (num || viewMode != CollectionUtils.ViewMode.HERO_SKINS)
--		{
--			collectionPageDisplay.HideHeroSkinsDecor();
--		}
--		if (num || viewMode != CollectionUtils.ViewMode.HERO_PICKER)
--		{
--			collectionPageDisplay.HideHeroPicker();
--		}
--		base.OnPageTurnComplete(callbackData, operationId);
--	}
--
--	private void ShowSetFilterTutorialIfNeeded()
--	{
--		if (!Options.Get().GetBool(Option.HAS_SEEN_SET_FILTER_TUTORIAL) && !CollectionManager.Get().IsInEditMode() && CollectionManager.Get().GetCollectibleDisplay().GetViewMode() == CollectionUtils.ViewMode.CARDS && m_cardsCollection.CardSetFilterIsAllStandardSets())
--		{
--			CollectionManagerDisplay collectionManagerDisplay = CollectionManager.Get().GetCollectibleDisplay() as CollectionManagerDisplay;
--			if (!(collectionManagerDisplay == null) && !collectionManagerDisplay.IsShowingSetFilterTray() && CollectionManager.Get().AccountHasWildCards() && RankMgr.Get().WildCardsAllowedInCurrentLeague() && m_numPageFlipsThisSession >= NUM_PAGE_FLIPS_BEFORE_SET_FILTER_TUTORIAL && collectionManagerDisplay != null)
--			{
--				collectionManagerDisplay.ShowSetFilterTutorial(UserAttentionBlocker.SET_ROTATION_CM_TUTORIALS);
--				Options.Get().SetBool(Option.HAS_SEEN_SET_FILTER_TUTORIAL, val: true);
--			}
--		}
--	}
--
--	protected override void OnCollectionManagerViewModeChanged(CollectionUtils.ViewMode prevMode, CollectionUtils.ViewMode mode, CollectionUtils.ViewModeData userdata, bool triggerResponse)
--	{
--		if (!triggerResponse)
--		{
--			return;
--		}
--		Log.CollectionManager.Print("transitionPageId={0} pagesTurning={1} mode={2}-->{3} triggerResponse={4}", m_transitionPageId, m_pagesCurrentlyTurning, prevMode, mode, triggerResponse);
 +        {
 +            int collectionPage;
 +            List<CollectibleCard> pageContentsForCard = m_classCardsCollection.GetPageContentsForCard(collectibleCard.CardId, collectibleCard.PremiumType, out collectionPage, m_currentClassContext);
@@ -52770,7 +52732,49 @@ index d846ab35..d6fea2eb 100644
 +
 +    protected override void OnPageTurnComplete(object callbackData, int operationId)
 +    {
-+        if (m_numPageFlipsThisSession % CollectiblePageManager.NUM_PAGE_FLIPS_UNTIL_UNLOAD_UNUSED_ASSETS == 0)
+ 		if (m_numPageFlipsThisSession % CollectiblePageManager.NUM_PAGE_FLIPS_UNTIL_UNLOAD_UNUSED_ASSETS == 0 && m_numPageFlipsThisSession > 1)
+-		{
+-			HearthstoneApplication hearthstoneApplication = HearthstoneApplication.Get();
+-			if (hearthstoneApplication != null)
+-			{
+-				hearthstoneApplication.UnloadUnusedAssets();
+-			}
+-		}
+-		TransitionReadyCallbackData transitionReadyCallbackData = callbackData as TransitionReadyCallbackData;
+-		CollectionPageDisplay collectionPageDisplay = PageAsCollectionPage(transitionReadyCallbackData.m_otherPage);
+-		CollectionUtils.ViewMode viewMode = CollectionManager.Get().GetCollectibleDisplay().GetViewMode();
+-		bool num = collectionPageDisplay != PageAsCollectionPage(GetCurrentPage());
+-		if (num || viewMode != CollectionUtils.ViewMode.HERO_SKINS)
+-		{
+-			collectionPageDisplay.HideHeroSkinsDecor();
+-		}
+-		if (num || viewMode != CollectionUtils.ViewMode.HERO_PICKER)
+-		{
+-			collectionPageDisplay.HideHeroPicker();
+-		}
+-		base.OnPageTurnComplete(callbackData, operationId);
+-	}
+-
+-	private void ShowSetFilterTutorialIfNeeded()
+-	{
+-		if (!Options.Get().GetBool(Option.HAS_SEEN_SET_FILTER_TUTORIAL) && !CollectionManager.Get().IsInEditMode() && CollectionManager.Get().GetCollectibleDisplay().GetViewMode() == CollectionUtils.ViewMode.CARDS && m_cardsCollection.CardSetFilterIsAllStandardSets())
+-		{
+-			CollectionManagerDisplay collectionManagerDisplay = CollectionManager.Get().GetCollectibleDisplay() as CollectionManagerDisplay;
+-			if (!(collectionManagerDisplay == null) && !collectionManagerDisplay.IsShowingSetFilterTray() && CollectionManager.Get().AccountHasWildCards() && RankMgr.Get().WildCardsAllowedInCurrentLeague() && m_numPageFlipsThisSession >= NUM_PAGE_FLIPS_BEFORE_SET_FILTER_TUTORIAL && collectionManagerDisplay != null)
+-			{
+-				collectionManagerDisplay.ShowSetFilterTutorial(UserAttentionBlocker.SET_ROTATION_CM_TUTORIALS);
+-				Options.Get().SetBool(Option.HAS_SEEN_SET_FILTER_TUTORIAL, val: true);
+-			}
+-		}
+-	}
+-
+-	protected override void OnCollectionManagerViewModeChanged(CollectionUtils.ViewMode prevMode, CollectionUtils.ViewMode mode, CollectionUtils.ViewModeData userdata, bool triggerResponse)
+-	{
+-		if (!triggerResponse)
+-		{
+-			return;
+-		}
+-		Log.CollectionManager.Print("transitionPageId={0} pagesTurning={1} mode={2}-->{3} triggerResponse={4}", m_transitionPageId, m_pagesCurrentlyTurning, prevMode, mode, triggerResponse);
 +        {
 +            HearthstoneApplication hearthstoneApplication = HearthstoneApplication.Get();
 +            if (hearthstoneApplication != null)
@@ -57484,7 +57488,7 @@ index add1d1b8..1d697949 100644
  	}
  }
 diff --git a/Assembly-CSharp/CurrencyConversionPage.cs b/Assembly-CSharp/CurrencyConversionPage.cs
-index d05443d4..5a44deef 100644
+index 21096e4b..af95bc6c 100644
 --- a/Assembly-CSharp/CurrencyConversionPage.cs
 +++ b/Assembly-CSharp/CurrencyConversionPage.cs
 @@ -4,9 +4,12 @@ using Blizzard.T5.Services;
@@ -58063,7 +58067,7 @@ index 7b454e5f..42d73a7f 100644
 +		#endregion
  }
 diff --git a/Assembly-CSharp/DeckPickerTrayDisplay.cs b/Assembly-CSharp/DeckPickerTrayDisplay.cs
-index b17fb7a5..f939d0f7 100644
+index 0d56b44f..a7bd5012 100644
 --- a/Assembly-CSharp/DeckPickerTrayDisplay.cs
 +++ b/Assembly-CSharp/DeckPickerTrayDisplay.cs
 @@ -4,6 +4,7 @@ using System.Collections.Generic;
@@ -60556,7 +60560,7 @@ index 87d08f4b..21c441ff 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/DeckTrayDeckListContent.cs b/Assembly-CSharp/DeckTrayDeckListContent.cs
-index 87db39f7..7e22789f 100644
+index 151ed74d..828e6e24 100644
 --- a/Assembly-CSharp/DeckTrayDeckListContent.cs
 +++ b/Assembly-CSharp/DeckTrayDeckListContent.cs
 @@ -8,6 +8,7 @@ using Hearthstone.Core;
@@ -61104,7 +61108,7 @@ index d4fcf9af..4b2f58ef 100644
  			}
  			m_chosen = true;
 diff --git a/Assembly-CSharp/DraftDisplay.cs b/Assembly-CSharp/DraftDisplay.cs
-index fb2861bc..1ccb5468 100644
+index 1de54646..41c78cb8 100644
 --- a/Assembly-CSharp/DraftDisplay.cs
 +++ b/Assembly-CSharp/DraftDisplay.cs
 @@ -7,7 +7,7 @@ using Hearthstone;
@@ -61125,7 +61129,7 @@ index fb2861bc..1ccb5468 100644
  	{
  		public string m_cardID = string.Empty;
  
-@@ -242,6 +242,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -238,6 +238,7 @@ public class DraftDisplay : MonoBehaviour
  			Options.Get().SetBool(Option.HAS_SEEN_FORGE_CARD_CHOICE2, val: false);
  		}
  		m_screenEffectsHandle = new ScreenEffectsHandle(this);
@@ -61133,7 +61137,7 @@ index fb2861bc..1ccb5468 100644
  	}
  
  	private void OnDestroy()
-@@ -281,6 +282,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -277,6 +278,7 @@ public class DraftDisplay : MonoBehaviour
  		{
  			m_draftDeckTray.gameObject.SetActive(value: true);
  		}
@@ -61141,7 +61145,7 @@ index fb2861bc..1ccb5468 100644
  	}
  
  	private void Update()
-@@ -396,14 +398,14 @@ public class DraftDisplay : MonoBehaviour
+@@ -392,14 +394,14 @@ public class DraftDisplay : MonoBehaviour
  			DraftChoice draftChoice = m_choices[j];
  			if (draftChoice.m_cardID != null)
  			{
@@ -61162,16 +61166,7 @@ index fb2861bc..1ccb5468 100644
  
  	public void SetDraftMode(DraftMode mode)
  	{
-@@ -508,7 +510,7 @@ public class DraftDisplay : MonoBehaviour
- 		}
- 		else
- 		{
--			m_heroPower = ((heroPremium == TAG_PREMIUM.GOLDEN) ? m_goldenHeroPowerSkin : m_defaultHeroPowerSkin);
-+		m_heroPower = ((heroPremium == TAG_PREMIUM.GOLDEN) ? m_goldenHeroPowerSkin : m_defaultHeroPowerSkin);
- 		}
- 		m_heroPower.SetCardDef(heroPowerDef.DisposableCardDef);
- 		m_heroPower.SetEntityDef(entityDef);
-@@ -558,7 +560,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -546,7 +548,7 @@ public class DraftDisplay : MonoBehaviour
  		{
  			if (choice.m_actor != null)
  			{
@@ -61180,7 +61175,7 @@ index fb2861bc..1ccb5468 100644
  			}
  		});
  		if (m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO_POWER)
-@@ -670,7 +672,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -658,7 +660,7 @@ public class DraftDisplay : MonoBehaviour
  		return m_zoomedHero != null;
  	}
  
@@ -61189,7 +61184,7 @@ index fb2861bc..1ccb5468 100644
  	{
  		bool flag = m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO_POWER;
  		RemoveListeners();
-@@ -829,6 +831,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -817,6 +819,7 @@ public class DraftDisplay : MonoBehaviour
  		component.AddEventListener(UIEventType.ROLLOUT, DeckHeaderOut);
  		SceneMgr.Get().NotifySceneLoaded();
  	}
@@ -61197,7 +61192,7 @@ index fb2861bc..1ccb5468 100644
  
  	private IEnumerator InitializeDraftScreen()
  	{
-@@ -836,7 +839,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -824,7 +827,7 @@ public class DraftDisplay : MonoBehaviour
  		{
  			yield return null;
  		}
@@ -61206,7 +61201,7 @@ index fb2861bc..1ccb5468 100644
  		{
  			while (SceneMgr.Get().IsTransitioning())
  			{
-@@ -845,7 +848,8 @@ public class DraftDisplay : MonoBehaviour
+@@ -833,7 +836,8 @@ public class DraftDisplay : MonoBehaviour
  			PresenceMgr.Get().SetStatus(Global.PresenceStatus.ARENA_PURCHASE);
  			m_firstTimeIntroComplete = true;
  			DoFirstTimeIntro();
@@ -61216,7 +61211,7 @@ index fb2861bc..1ccb5468 100644
  		}
  		switch (m_currentMode)
  		{
-@@ -855,6 +859,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -843,6 +847,7 @@ public class DraftDisplay : MonoBehaviour
  			{
  				yield return null;
  			}
@@ -61224,7 +61219,7 @@ index fb2861bc..1ccb5468 100644
  			int numTicketsOwned = m_draftManager.GetNumTicketsOwned();
  			if (StoreManager.Get().HasOutstandingPurchaseNotices(ProductType.PRODUCT_TYPE_DRAFT))
  			{
-@@ -863,11 +868,13 @@ public class DraftDisplay : MonoBehaviour
+@@ -851,11 +856,13 @@ public class DraftDisplay : MonoBehaviour
  			}
  			if (numTicketsOwned > 0)
  			{
@@ -61238,7 +61233,7 @@ index fb2861bc..1ccb5468 100644
  			break;
  		}
  		case DraftMode.DRAFTING:
-@@ -880,6 +887,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -868,6 +875,7 @@ public class DraftDisplay : MonoBehaviour
  				ShowPurchaseScreen();
  			}
  			PresenceMgr.Get().SetStatus(Global.PresenceStatus.ARENA_FORGE);
@@ -61246,7 +61241,7 @@ index fb2861bc..1ccb5468 100644
  			if (m_draftManager.ShouldShowFreeArenaWinScreen())
  			{
  				ShowFreeArenaWinScreen();
-@@ -1298,7 +1306,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -1262,7 +1270,7 @@ public class DraftDisplay : MonoBehaviour
  
  	public void ShowInnkeeperInstructions()
  	{
@@ -61255,7 +61250,7 @@ index fb2861bc..1ccb5468 100644
  		{
  			if (!m_draftManager.HasSlotType(DraftSlotType.DRAFT_SLOT_HERO_POWER))
  			{
-@@ -1306,13 +1314,13 @@ public class DraftDisplay : MonoBehaviour
+@@ -1270,13 +1278,13 @@ public class DraftDisplay : MonoBehaviour
  				Options.Get().SetBool(Option.HAS_SEEN_FORGE_HERO_CHOICE, val: true);
  			}
  		}
@@ -61271,7 +61266,7 @@ index fb2861bc..1ccb5468 100644
  		{
  			NotificationManager.Get().CreateInnkeeperQuote(UserAttentionBlocker.NONE, GameStrings.Get("VO_INNKEEPER_FORGE_INST3_21"), "VO_INNKEEPER_FORGE_INST3_21.prefab:06182dd3360965d4ea48952a6dd4a720", 3f);
  			Options.Get().SetBool(Option.HAS_SEEN_FORGE_CARD_CHOICE2, val: true);
-@@ -1387,6 +1395,9 @@ public class DraftDisplay : MonoBehaviour
+@@ -1351,6 +1359,9 @@ public class DraftDisplay : MonoBehaviour
  		{
  			m_instructionText.Text = "";
  		}
@@ -61281,7 +61276,7 @@ index fb2861bc..1ccb5468 100644
  	}
  
  	private void DoFirstTimeIntro()
-@@ -1522,7 +1533,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -1486,7 +1497,7 @@ public class DraftDisplay : MonoBehaviour
  			yield return new WaitForSeconds(0.3f);
  		}
  		ArenaTrayDisplay.Get().UpdateTray();
@@ -61290,7 +61285,7 @@ index fb2861bc..1ccb5468 100644
  		{
  			yield break;
  		}
-@@ -1548,6 +1559,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -1512,6 +1523,7 @@ public class DraftDisplay : MonoBehaviour
  			NotificationManager.Get().CreateInnkeeperQuote(UserAttentionBlocker.NONE, new Vector3(133.1f, NotificationManager.DEPTH, 54.2f), GameStrings.Get("VO_INNKEEPER_FORGE_1WIN"), "VO_INNKEEPER_ARENA_1WIN.prefab:31bb13e800c74c0439ee1a7bfc1e3499");
  			Options.Get().SetBool(Option.HAS_SEEN_FORGE_1WIN, val: true);
  		}
@@ -61298,7 +61293,7 @@ index fb2861bc..1ccb5468 100644
  	}
  
  	private void ShowDraftRewardsScreen()
-@@ -1567,7 +1579,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -1531,7 +1543,7 @@ public class DraftDisplay : MonoBehaviour
  		if (m_draftManager.ShouldActivateKey())
  		{
  			int maxWins = m_draftManager.GetMaxWins();
@@ -61307,7 +61302,7 @@ index fb2861bc..1ccb5468 100644
  			{
  				NotificationManager.Get().CreateInnkeeperQuote(UserAttentionBlocker.NONE, GameStrings.Get("VO_INNKEEPER_MAX_ARENA_WINS_04"), "VO_INNKEEPER_MAX_ARENA_WINS_04.prefab:cdf8e488f2d17604499f2cc358cb35f6");
  				Options.Get().SetBool(Option.HAS_SEEN_FORGE_MAX_WIN, val: true);
-@@ -1582,8 +1594,12 @@ public class DraftDisplay : MonoBehaviour
+@@ -1546,8 +1558,12 @@ public class DraftDisplay : MonoBehaviour
  		else
  		{
  			ArenaTrayDisplay.Get().ShowRewardsOpenAtStart();
@@ -61320,7 +61315,7 @@ index fb2861bc..1ccb5468 100644
  	}
  
  	private IEnumerator RestartArena()
-@@ -1876,6 +1892,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -1840,6 +1856,7 @@ public class DraftDisplay : MonoBehaviour
  	{
  		if (!CanAutoDraft())
  		{
@@ -61328,7 +61323,7 @@ index fb2861bc..1ccb5468 100644
  			yield break;
  		}
  		int frameStart2 = Time.frameCount;
-@@ -2030,8 +2047,8 @@ public class DraftDisplay : MonoBehaviour
+@@ -1976,8 +1993,8 @@ public class DraftDisplay : MonoBehaviour
  			if (collider != null)
  			{
  				DraftCardVisual draftCardVisual = collider.gameObject.AddComponent<DraftCardVisual>();
@@ -61339,7 +61334,7 @@ index fb2861bc..1ccb5468 100644
  			}
  			if (HaveActorsForAllChoices())
  			{
-@@ -2055,26 +2072,26 @@ public class DraftDisplay : MonoBehaviour
+@@ -2001,26 +2018,26 @@ public class DraftDisplay : MonoBehaviour
  	{
  		ChoiceCallback choiceCallback = (ChoiceCallback)callbackData;
  		using DefLoader.DisposableFullDef disposableFullDef = choiceCallback.fullDef;
@@ -61385,7 +61380,7 @@ index fb2861bc..1ccb5468 100644
  
  	private void OnCardDefLoaded(string cardId, DefLoader.DisposableCardDef def, object callbackData)
  	{
-@@ -2189,7 +2206,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -2135,7 +2152,7 @@ public class DraftDisplay : MonoBehaviour
  		}
  		ShowPhonePlayButton(show: false);
  		StoreManager.Get().HideStore(ShopType.ARENA_STORE);
@@ -64838,10 +64833,19 @@ index ec641343..507281e1 100644
  
  	private void HideEnemyEmote(EnemyEmote emote)
 diff --git a/Assembly-CSharp/Entity.cs b/Assembly-CSharp/Entity.cs
-index f66f4eb4..b2cdd748 100644
+index 1aaa8dc3..5e68b2b4 100644
 --- a/Assembly-CSharp/Entity.cs
 +++ b/Assembly-CSharp/Entity.cs
-@@ -292,8 +292,14 @@ public class Entity : EntityBase
+@@ -210,7 +210,7 @@ public class Entity : EntityBase
+ 		m_loadState = LoadState.PENDING;
+ 		if (GameMgr.Get()?.IsBattlegrounds() ?? false)
+ 		{
+-			LoadCard(fullEntity.Entity.CardID);
++		LoadCard(fullEntity.Entity.CardID);
+ 			await UniTask.NextFrame();
+ 		}
+ 		else
+@@ -302,8 +302,14 @@ public class Entity : EntityBase
  		}, fromShowEntity: true);
  	}
  
@@ -64856,7 +64860,7 @@ index f66f4eb4..b2cdd748 100644
  		SetTagAndHandleChange(GAME_TAG.ZONE, hideEntity.Zone);
  		EntityDef entityDef = GetEntityDef();
  		SetTag(GAME_TAG.ATK, entityDef.GetATK());
-@@ -472,7 +478,7 @@ public class Entity : EntityBase
+@@ -482,7 +488,7 @@ public class Entity : EntityBase
  			SetRealTimePlayerLeaderboardPlace(change.Value);
  			if (!(GameState.Get().GetGameEntity() is TB_BaconShop_Tutorial) || GetControllerSide() != Player.Side.OPPOSING)
  			{
@@ -64865,7 +64869,7 @@ index f66f4eb4..b2cdd748 100644
  			}
  			break;
  		case GAME_TAG.BACON_DUO_PLAYER_FIGHTS_FIRST_NEXT_COMBAT:
-@@ -481,8 +487,8 @@ public class Entity : EntityBase
+@@ -491,8 +497,8 @@ public class Entity : EntityBase
  		case GAME_TAG.PLAYER_TECH_LEVEL:
  			if (!GetRealTimeBaconCombatPhaseHero())
  			{
@@ -64876,7 +64880,7 @@ index f66f4eb4..b2cdd748 100644
  			}
  			break;
  		case GAME_TAG.BACON_DUO_PASSABLE:
-@@ -514,13 +520,13 @@ public class Entity : EntityBase
+@@ -524,13 +530,13 @@ public class Entity : EntityBase
  		case GAME_TAG.BACON_MUKLA_BANANA_SPAWN_COUNT:
  			if (!GetRealTimeBaconCombatPhaseHero())
  			{
@@ -64892,7 +64896,7 @@ index f66f4eb4..b2cdd748 100644
  			}
  			break;
  		case GAME_TAG.BACON_COMBAT_PHASE_HERO:
-@@ -885,7 +891,7 @@ public class Entity : EntityBase
+@@ -895,7 +901,7 @@ public class Entity : EntityBase
  			}
  			else if (change.newValue != 0)
  			{
@@ -64901,7 +64905,7 @@ index f66f4eb4..b2cdd748 100644
  			}
  			break;
  		}
-@@ -898,8 +904,8 @@ public class Entity : EntityBase
+@@ -908,8 +914,8 @@ public class Entity : EntityBase
  				{
  					if (parentEntity.GetZone() != TAG_ZONE.PLAY)
  					{
@@ -64912,7 +64916,7 @@ index f66f4eb4..b2cdd748 100644
  				}
  				else
  				{
-@@ -991,9 +997,9 @@ public class Entity : EntityBase
+@@ -1001,9 +1007,9 @@ public class Entity : EntityBase
  			{
  				break;
  			}
@@ -64923,10 +64927,10 @@ index f66f4eb4..b2cdd748 100644
 +				{
 +				case 1:
  			{
- 				SpellUtils.ActivateBirthIfNecessary(actor5.GetLoadedSpell(SpellType.HERO_BUDDY_SINGLE));
- 				HeroBuddyWidgetCoinBased component2 = actor5.GetComponent<HeroBuddyWidgetCoinBased>();
-@@ -1002,18 +1008,18 @@ public class Entity : EntityBase
- 					component2.EnterStage2();
+ 				SpellUtils.ActivateBirthIfNecessary(actor2.GetLoadedSpell(SpellType.HERO_BUDDY_SINGLE));
+ 				HeroBuddyWidgetCoinBased component = actor2.GetComponent<HeroBuddyWidgetCoinBased>();
+@@ -1012,18 +1018,18 @@ public class Entity : EntityBase
+ 					component.EnterStage2();
  					heroBuddyCard.GetEntity()?.SetTagAndHandleChange(GAME_TAG.EXHAUSTED, 0);
  				}
 -				break;
@@ -64934,7 +64938,7 @@ index f66f4eb4..b2cdd748 100644
  			}
 -			case 2:
 +				case 2:
- 				SpellUtils.ActivateBirthIfNecessary(actor5.GetLoadedSpell(SpellType.HERO_BUDDY_DOUBLE));
+ 				SpellUtils.ActivateBirthIfNecessary(actor2.GetLoadedSpell(SpellType.HERO_BUDDY_DOUBLE));
 -				break;
 -			default:
 -				PlayerLeaderboardManager.Get().NotifyPlayerTileEvent(GetTag(GAME_TAG.PLAYER_ID), PlayerLeaderboardManager.PlayerTileEvent.DOUBLE_HERO_BUDDY);
@@ -64954,7 +64958,7 @@ index f66f4eb4..b2cdd748 100644
  			break;
  		}
  		case GAME_TAG.BACON_HERO_QUEST_REWARD_DATABASE_ID:
-@@ -1105,41 +1111,41 @@ public class Entity : EntityBase
+@@ -1144,41 +1150,41 @@ public class Entity : EntityBase
  			return false;
  		}
  		using DefLoader.DisposableCardDef disposableCardDef = DefLoader.Get().GetCardDef(enchantmentPortraitCardID);
@@ -65022,7 +65026,7 @@ index f66f4eb4..b2cdd748 100644
  
  	public string GetEnchantmentCreatorCardIDForPortrait()
  	{
-@@ -1158,10 +1164,10 @@ public class Entity : EntityBase
+@@ -1197,10 +1203,10 @@ public class Entity : EntityBase
  			}
  			else
  			{
@@ -65035,7 +65039,7 @@ index f66f4eb4..b2cdd748 100644
  
  	private void ResolveEnchantmentPortraitCardID(int creatorDBID)
  	{
-@@ -1412,7 +1418,7 @@ public class Entity : EntityBase
+@@ -1451,7 +1457,7 @@ public class Entity : EntityBase
  
  	public override void GetClasses(IList<TAG_CLASS> classes)
  	{
@@ -65044,7 +65048,7 @@ index f66f4eb4..b2cdd748 100644
  		if (classes.Count == 0)
  		{
  			GetEntityDef().GetClasses(classes);
-@@ -1498,8 +1504,8 @@ public class Entity : EntityBase
+@@ -1537,8 +1543,8 @@ public class Entity : EntityBase
  		if (!(enchantmentBannerText == null) && GetCardId() == "ETC_335")
  		{
  			enchantmentBannerText.transform.localScale *= 0.8f;
@@ -65055,7 +65059,7 @@ index f66f4eb4..b2cdd748 100644
  				enchantmentBannerText.transform.localPosition += new Vector3(0.14f, 0.084f, 0f);
  			}
  			else if (IsControlledByFriendlySidePlayer())
-@@ -1728,13 +1734,13 @@ public class Entity : EntityBase
+@@ -1767,13 +1773,13 @@ public class Entity : EntityBase
  		{
  			int tag = GetTag(GAME_TAG.BACON_SKIN_PARENT_ID);
  			using DefLoader.DisposableFullDef disposableFullDef = DefLoader.Get().GetFullDef(tag);
@@ -65075,7 +65079,7 @@ index f66f4eb4..b2cdd748 100644
  		return GetTag(GAME_TAG.BACON_COMPANION_ID);
  	}
  
-@@ -1825,35 +1831,35 @@ public class Entity : EntityBase
+@@ -1864,35 +1870,35 @@ public class Entity : EntityBase
  	public string GetCardTextInHand()
  	{
  		using DefLoader.DisposableCardDef disposableCardDef = ShareDisposableCardDef();
@@ -65129,7 +65133,7 @@ index f66f4eb4..b2cdd748 100644
  
  	public void AddAttachment(Entity entity)
  	{
-@@ -2142,6 +2148,22 @@ public class Entity : EntityBase
+@@ -2181,6 +2187,22 @@ public class Entity : EntityBase
  		return entity;
  	}
  
@@ -65152,7 +65156,7 @@ index f66f4eb4..b2cdd748 100644
  	public bool IsHistoryDupe()
  	{
  		return m_duplicateForHistory;
-@@ -2181,9 +2203,9 @@ public class Entity : EntityBase
+@@ -2220,9 +2242,9 @@ public class Entity : EntityBase
  				return lettuceAbilityOwner.GetController();
  			}
  		}
@@ -65164,7 +65168,27 @@ index f66f4eb4..b2cdd748 100644
  			Entity parentEntity2 = GetParentEntity();
  			if (parentEntity2 != null)
  			{
-@@ -2884,9 +2906,9 @@ public class Entity : EntityBase
+@@ -2851,7 +2873,7 @@ public class Entity : EntityBase
+ 			}
+ 			else
+ 			{
+-				DefLoader.Get().LoadCardDef("HiddenCard", OnCardDefLoaded);
++			DefLoader.Get().LoadCardDef("HiddenCard", OnCardDefLoaded);
+ 			}
+ 			return;
+ 		}
+@@ -2863,8 +2885,8 @@ public class Entity : EntityBase
+ 		}
+ 		else
+ 		{
+-			DefLoader.Get().LoadCardDef(cardId, OnCardDefLoaded, data, @default);
+-		}
++		DefLoader.Get().LoadCardDef(cardId, OnCardDefLoaded, data, @default);
++	}
+ 	}
+ 
+ 	private void OnCardDefLoaded(string cardId, DefLoader.DisposableCardDef cardDef, object callbackData)
+@@ -2937,9 +2959,9 @@ public class Entity : EntityBase
  				return SpellType.TRIGGER_UPBEAT;
  			}
  			if (gameState.IsUsingFastActorTriggers() && !IsHeroPower())
@@ -65177,7 +65201,7 @@ index f66f4eb4..b2cdd748 100644
  		}
  		return SpellType.TRIGGER;
  	}
-@@ -3194,4 +3216,18 @@ public class Entity : EntityBase
+@@ -3247,4 +3269,18 @@ public class Entity : EntityBase
  		}
  		return false;
  	}
@@ -65466,7 +65490,7 @@ index dcc4e28e..fc57fee6 100644
  	public class Info
  	{
 diff --git a/Assembly-CSharp/FriendChallengeMgr.cs b/Assembly-CSharp/FriendChallengeMgr.cs
-index 196aabf2..3e893323 100644
+index ac7149ca..7eb6da59 100644
 --- a/Assembly-CSharp/FriendChallengeMgr.cs
 +++ b/Assembly-CSharp/FriendChallengeMgr.cs
 @@ -1,3 +1,4 @@
@@ -68567,15 +68591,15 @@ index cae4e3d6..53d1dd45 100644
  	public static FriendlyChallengeHelper Get()
  	{
 diff --git a/Assembly-CSharp/GAME_TAG.cs b/Assembly-CSharp/GAME_TAG.cs
-index 843a62ad..66f6ee63 100644
+index cd069669..0c491529 100644
 --- a/Assembly-CSharp/GAME_TAG.cs
 +++ b/Assembly-CSharp/GAME_TAG.cs
-@@ -986,5 +986,6 @@ public enum GAME_TAG
- 	IMBUE = 3626,
- 	DARK_GIFT = 3627,
+@@ -1001,5 +1001,6 @@ public enum GAME_TAG
  	BACON_TRINKET = 3407,
--	BONUS_KEYWORDS = 3423
-+	BONUS_KEYWORDS = 3423,
+ 	BONUS_KEYWORDS = 3423,
+ 	DYNAMIC_KEYWORD1 = 4161,
+-	DYNAMIC_KEYWORD2 = 4162
++	DYNAMIC_KEYWORD2 = 4162,
 +	EOE
  }
 diff --git a/Assembly-CSharp/Game/PackOpening/HiddenCards.cs b/Assembly-CSharp/Game/PackOpening/HiddenCards.cs
@@ -69314,7 +69338,7 @@ index 81106226..1e11b2d8 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/GameState.cs b/Assembly-CSharp/GameState.cs
-index 236b7582..5becdeae 100644
+index 2fadcc0e..ce129a40 100644
 --- a/Assembly-CSharp/GameState.cs
 +++ b/Assembly-CSharp/GameState.cs
 @@ -11,6 +11,7 @@ using Blizzard.T5.Core;
@@ -69763,7 +69787,7 @@ index d55637ab..a8643431 100644
 +    #endregion
  }
 diff --git a/Assembly-CSharp/GameUtils.cs b/Assembly-CSharp/GameUtils.cs
-index a6fa77e3..3090f2f4 100644
+index e4ed2eec..df0519af 100644
 --- a/Assembly-CSharp/GameUtils.cs
 +++ b/Assembly-CSharp/GameUtils.cs
 @@ -13,369 +13,370 @@ using PegasusLettuce;
@@ -71218,7 +71242,7 @@ index a6fa77e3..3090f2f4 100644
  
  	public static List<CounterpartCardsDbfRecord> GetCounterpartCards(int cardDbId)
  	{
-@@ -1133,31 +1134,41 @@ public class GameUtils
+@@ -1127,31 +1128,41 @@ public class GameUtils
  		return fallback;
  	}
  
@@ -71285,7 +71309,7 @@ index a6fa77e3..3090f2f4 100644
  
  	public static string GetHeroPassiveCardIdFromHero(string heroCardId)
  	{
-@@ -1169,206 +1180,211 @@ public class GameUtils
+@@ -1163,206 +1174,211 @@ public class GameUtils
  		return TranslateDbIdToCardId(cardTagValue);
  	}
  
@@ -71669,7 +71693,7 @@ index a6fa77e3..3090f2f4 100644
  
  	public static bool HasUnlockedClasses(List<TAG_CLASS> heroClasses)
  	{
-@@ -1406,107 +1422,107 @@ public class GameUtils
+@@ -1400,107 +1416,107 @@ public class GameUtils
  		return true;
  	}
  
@@ -71873,7 +71897,7 @@ index a6fa77e3..3090f2f4 100644
  
  	public static bool GetJoustAllowTies(Network.HistMetaData metaData)
  	{
-@@ -1525,2272 +1541,2356 @@ public class GameUtils
+@@ -1519,2272 +1535,2356 @@ public class GameUtils
  		return false;
  	}
  
@@ -76534,10 +76558,10 @@ index 30538373..8b9f10ea 100644
  	[SerializeField]
  	private Spell m_successRingSpell;
 diff --git a/Assembly-CSharp/GraphicsManager.cs b/Assembly-CSharp/GraphicsManager.cs
-index 6a34c7c5..9aaed654 100644
+index 9bd5a27b..466755dc 100644
 --- a/Assembly-CSharp/GraphicsManager.cs
 +++ b/Assembly-CSharp/GraphicsManager.cs
-@@ -540,7 +540,7 @@ public class GraphicsManager : IGraphicsManager, IHasUpdate, IService
+@@ -558,7 +558,7 @@ public class GraphicsManager : IGraphicsManager, IHasUpdate, IService
  		}
  		if (i < 0)
  		{
@@ -76546,7 +76570,7 @@ index 6a34c7c5..9aaed654 100644
  		}
  		else
  		{
-@@ -550,29 +550,29 @@ public class GraphicsManager : IGraphicsManager, IHasUpdate, IService
+@@ -568,29 +568,29 @@ public class GraphicsManager : IGraphicsManager, IHasUpdate, IService
  
  	private void LogSystemInfo()
  	{
@@ -77044,7 +77068,7 @@ index a168aca6..f865d23f 100644
  	}
  }
 diff --git a/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs b/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs
-index fc3b24c8..dc5951e1 100644
+index 881d8363..029013d9 100644
 --- a/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs
 +++ b/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs
 @@ -179,9 +179,9 @@ namespace Hearthstone.Core.Streaming
@@ -77218,7 +77242,7 @@ index be2b52ca..1e2f3332 100644
  		}
  
 diff --git a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
-index e9a9492b..3eb00a91 100644
+index 76820176..489af250 100644
 --- a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 +++ b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 @@ -1,5 +1,6 @@
@@ -77275,7 +77299,7 @@ index e9a9492b..3eb00a91 100644
  			catch (Exception ex)
  			{
 diff --git a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
-index 90836b53..15be42a5 100644
+index 74bca079..f364f176 100644
 --- a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 +++ b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 @@ -5,6 +5,7 @@ using System.IO;
@@ -77320,8 +77344,8 @@ index 90836b53..15be42a5 100644
  			PreviousInstanceStatus.ReportAppStatus();
  			new JobQueueTelemetry(Processor.JobQueue, Processor.JobQueueAlerts, TestType);
  			Application.runInBackground = true;
--			Application.backgroundLoadingPriority = ThreadPriority.Normal;
-+			Application.backgroundLoadingPriority = UnityEngine.ThreadPriority.Normal;
+-			Application.backgroundLoadingPriority = ThreadPriority.High;
++			Application.backgroundLoadingPriority = UnityEngine.ThreadPriority.High;
  			if (PlatformSettings.IsMobile())
  			{
 -				GameStrings.LoadNative();
@@ -77337,18 +77361,27 @@ index 90836b53..15be42a5 100644
 +			// ExceptionReporterControl.Get().ExceptionReportInitialize(); // Remove so we don't send Blizzard exceptions that may be caused by us
 +			ExceptionReporterControl.Get().ExceptionReportInitializeDebug();
  			TelemetryManager.Client().SendSystemDetail(TelemetryUtil.GetUnitySystemInfo());
- 			HearthstonePerformance.Initialize(TestType, 4078598.ToString(), 217964);
+ 			HearthstonePerformance.Initialize(TestType, 4120707.ToString(), 219846);
  			HearthstonePerformance.Get()?.CaptureAppStartTime();
-@@ -304,6 +309,8 @@ namespace Hearthstone
+@@ -271,7 +276,7 @@ namespace Hearthstone
+ 			{
+ 				yield return null;
+ 			}
+-			Application.backgroundLoadingPriority = ThreadPriority.Normal;
++			Application.backgroundLoadingPriority = UnityEngine.ThreadPriority.Normal;
+ 			if (!IsHearthstoneClosing)
+ 			{
+ 				try
+@@ -305,6 +310,8 @@ namespace Hearthstone
  
  		private void OnApplicationQuit()
  		{
 +			AccessibleHearthstoneApplication.OnClosing();
 +			AccessibilityMgr.Shutdown();
  			IsHearthstoneClosing = true;
- 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 217964, Log.UberText);
+ 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 219846, Log.UberText);
  			if (this.OnShutdown != null)
-@@ -550,7 +557,7 @@ namespace Hearthstone
+@@ -551,7 +558,7 @@ namespace Hearthstone
  
  		private ServiceLocator RegisterRuntimeServices()
  		{
@@ -77357,7 +77390,7 @@ index 90836b53..15be42a5 100644
  			{
  				ExceptionReporter.Get()?.ReportCaughtException(exception);
  			});
-@@ -619,7 +626,7 @@ namespace Hearthstone
+@@ -620,7 +627,7 @@ namespace Hearthstone
  			runtimeServices.RegisterService<HearthstoneCheckout>();
  			runtimeServices.RegisterService<NetworkReachabilityManager>();
  			runtimeServices.RegisterService<VersionConfigurationService>();
@@ -77366,7 +77399,7 @@ index 90836b53..15be42a5 100644
  			runtimeServices.RegisterService<PartyManager>();
  			runtimeServices.RegisterService<PlayerMigrationManager>();
  			runtimeServices.RegisterService<CosmeticCoinManager>();
-@@ -633,8 +640,8 @@ namespace Hearthstone
+@@ -634,8 +641,8 @@ namespace Hearthstone
  			runtimeServices.RegisterService<DiamondRenderToTextureService>();
  			runtimeServices.RegisterService<MessagePopupDisplay>();
  			runtimeServices.RegisterService<PrivacyGate>();
@@ -77377,7 +77410,7 @@ index 90836b53..15be42a5 100644
  			runtimeServices.RegisterService<IGameStringsService>(new GameStringsService());
  			runtimeServices.RegisterService<LuckyDrawManager>();
  			runtimeServices.RegisterService<CameraManager>();
-@@ -691,7 +698,8 @@ namespace Hearthstone
+@@ -692,7 +699,8 @@ namespace Hearthstone
  			WaitForGameDownloadManagerAvailable waitForGameDownloadManagerAvailable = new WaitForGameDownloadManagerAvailable();
  			WaitForGameDownloadManagerState waitForGameDownloadManagerState = new WaitForGameDownloadManagerState();
  			JobDefinition jobDefinition = new JobDefinition("GameStrings.LoadAll", GameStrings.Job_LoadAll(), waitForGameDownloadManagerState);
@@ -77385,9 +77418,9 @@ index 90836b53..15be42a5 100644
 +			jobDefinition.AddJobFinishedEventListener(OnGameStringsLoaded);
 +			Processor.QueueJob("HearthstoneApplication.InitializeMode", Job_InitializeMode(), Array.Empty<IJobDependency>());
  			Processor.QueueJob(jobDefinition);
- 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 217964, Log.UberText));
+ 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 219846, Log.UberText));
  			Processor.QueueJob(HearthstoneJobs.CreateJobFromAction("HearthstoneApplication.SetWindowText", SetWindowText, jobDefinition.CreateDependency()));
-@@ -739,7 +747,12 @@ namespace Hearthstone
+@@ -740,7 +748,12 @@ namespace Hearthstone
  			}
  		}
  
@@ -77401,7 +77434,7 @@ index 90836b53..15be42a5 100644
  		{
  			DataContext dataContext = GlobalDataContext.Get();
  			dataContext.BindDataModel(new DeviceDataModel
-@@ -856,6 +869,7 @@ namespace Hearthstone
+@@ -858,6 +871,7 @@ namespace Hearthstone
  			TelemetryManager.Reset();
  			TelemetryManager.SetAppUserContext(TelemetryManager.ProgramId, TelemetryManager.ProgramName, TelemetryManager.ProgramVersion, TelemetryManager.SessionId);
  			Navigation.Clear();
@@ -77409,7 +77442,7 @@ index 90836b53..15be42a5 100644
  			Processor.QueueJob("HearthstoneApplication.OnResetDownloadComplete", Job_OnResetDownloadComplete(), new WaitForGameDownloadManagerAvailable());
  		}
  
-@@ -1007,7 +1021,7 @@ namespace Hearthstone
+@@ -1010,7 +1024,7 @@ namespace Hearthstone
  				}
  				else if (!string.IsNullOrEmpty(str))
  				{
@@ -77418,7 +77451,7 @@ index 90836b53..15be42a5 100644
  				}
  				if (float.TryParse(str2, out result))
  				{
-@@ -1015,7 +1029,7 @@ namespace Hearthstone
+@@ -1018,7 +1032,7 @@ namespace Hearthstone
  				}
  				else if (!string.IsNullOrEmpty(str2))
  				{
@@ -78103,7 +78136,7 @@ index cf385658..2b01050b 100644
 +}
 \ No newline at end of file
 diff --git a/Assembly-CSharp/Hearthstone/Progression/JournalPopup.cs b/Assembly-CSharp/Hearthstone/Progression/JournalPopup.cs
-index 0b596ffc..4329e7ee 100644
+index d4500706..b7ebe13a 100644
 --- a/Assembly-CSharp/Hearthstone/Progression/JournalPopup.cs
 +++ b/Assembly-CSharp/Hearthstone/Progression/JournalPopup.cs
 @@ -7,6 +7,7 @@ using Hearthstone.DataModels;
@@ -78143,7 +78176,29 @@ index 0b596ffc..4329e7ee 100644
  				Box box = Box.Get();
  				if (box != null)
  				{
-@@ -327,7 +332,10 @@ namespace Hearthstone.Progression
+@@ -256,15 +261,15 @@ namespace Hearthstone.Progression
+ 				{
+ 					if (!BaconDisplay.TryShowUnavailableInCountryPopup())
+ 					{
+-						BaconDisplay.Get()?.OpenBattlegroundsShop();
+-					}
++					BaconDisplay.Get()?.OpenBattlegroundsShop();
++				}
+ 				}
+ 				else
+ 				{
+-					RewardTrackManager.Get().GetRewardTrack(m_rewardTrackType);
+-					Log.Store.Print("[JournalPopup::HandleEvent] " + eventName + " - Network ONLINE");
+-					ProductPageJobs.OpenToSeasonPassPageWhenReady(m_rewardTrackType, productId);
+-				}
++				RewardTrackManager.Get().GetRewardTrack(m_rewardTrackType);
++				Log.Store.Print("[JournalPopup::HandleEvent] " + eventName + " - Network ONLINE");
++				ProductPageJobs.OpenToSeasonPassPageWhenReady(m_rewardTrackType, productId);
++			}
+ 			}
+ 			else
+ 			{
+@@ -332,7 +337,10 @@ namespace Hearthstone.Progression
  			GameSaveDataManager.Get().GetSubkeyValue(GameSaveKeyId.FTUE, GameSaveKeySubkeyId.FTUE_HAS_SEEN_TAVERN_GUIDE_INTRODUCTION, out long value);
  			if (value != 1)
  			{
@@ -79178,7 +79233,7 @@ index 496570aa..da871ac1 100644
  	}
  }
 diff --git a/Assembly-CSharp/Hearthstone/Progression/RewardTrack.cs b/Assembly-CSharp/Hearthstone/Progression/RewardTrack.cs
-index 77ac34e1..7e34b12f 100644
+index 40802fdf..7e34b12f 100644
 --- a/Assembly-CSharp/Hearthstone/Progression/RewardTrack.cs
 +++ b/Assembly-CSharp/Hearthstone/Progression/RewardTrack.cs
 @@ -2,12 +2,14 @@ using System;
@@ -79231,14 +79286,19 @@ index 77ac34e1..7e34b12f 100644
  			if (rewardTrackId == RewardTrackId)
  			{
  				if (!RewardExistsAtLevel(level, paidType))
-@@ -217,18 +232,15 @@ namespace Hearthstone.Progression
+@@ -217,23 +232,15 @@ namespace Hearthstone.Progression
  			RewardTrackPaidType[] allValidRewardTrackPaidType = ProgressUtils.AllValidRewardTrackPaidType;
  			foreach (RewardTrackPaidType paidType in allValidRewardTrackPaidType)
  			{
--				if (HasOwnedRewardTrackPaidType(paidType))
+-				if (!HasOwnedRewardTrackPaidType(paidType))
 +				if (HasUnclaimedRewardsForTier(record, state, paidType))
  				{
--					int? num = ProgressUtils.GetRewardListRecord(record, paidType)?.RewardItems?.Count;
+-					continue;
+-				}
+-				RewardListDbfRecord rewardListRecord = ProgressUtils.GetRewardListRecord(record, paidType);
+-				if (rewardListRecord != null && !rewardListRecord.Locked)
+-				{
+-					int? num = rewardListRecord.RewardItems?.Count;
 -					if (num.HasValue && num.Value != 0 && !ProgressUtils.HasClaimedRewardTrackReward(ProgressUtils.GetRewardStatus(state, paidType)))
 -					{
 -						return true;
@@ -79253,7 +79313,7 @@ index 77ac34e1..7e34b12f 100644
  		public RewardTrackLevelDbfRecord GetRewardTrackLevelRecord(int level)
  		{
  			return GameUtils.GetRewardTrackLevelsForRewardTrack(RewardTrackId).Find((RewardTrackLevelDbfRecord cur) => cur.Level == level);
-@@ -470,16 +482,16 @@ namespace Hearthstone.Progression
+@@ -475,16 +482,16 @@ namespace Hearthstone.Progression
  					}
  					bool isClaimed = (nodeRewards.IsClaimed = ProgressUtils.HasClaimedRewardTrackReward(ProgressUtils.GetRewardStatus(state, rewardTrackPaidType)));
  					if (rewardTrackPaidType != RewardTrackPaidType.RTPT_FREE || node.AdditionalRewards?.RewardLists == null)
@@ -79277,7 +79337,7 @@ index 77ac34e1..7e34b12f 100644
  
  		private void UpdateUnclaimedRewards()
  		{
-@@ -504,10 +516,10 @@ namespace Hearthstone.Progression
+@@ -509,10 +516,10 @@ namespace Hearthstone.Progression
  			if (newState == null)
  			{
  				return;
@@ -79290,7 +79350,7 @@ index 77ac34e1..7e34b12f 100644
  				if ((oldState == null || ProgressUtils.GetRewardStatus(oldState, paidType) != ProgressUtils.GetRewardStatus(newState, paidType)) && ProgressUtils.GetRewardStatus(newState, paidType) == RewardStatus.GRANTED)
  				{
  					HandleRewardGranted(rewardTrackId, newState.Level, paidType, newState.RewardItemOutput);
-@@ -529,20 +541,20 @@ namespace Hearthstone.Progression
+@@ -534,20 +541,20 @@ namespace Hearthstone.Progression
  			}
  			int rewardListAssetId = ProgressUtils.GetRewardListAssetId(rewardTrackLevelDbfRecord, paidType);
  			(int, int, RewardTrackPaidType) key = (rewardTrackLevelDbfRecord.RewardTrackId, level, paidType);
@@ -79325,7 +79385,7 @@ index 77ac34e1..7e34b12f 100644
  			RewardScrollDataModel rewardScrollDataModel = RewardTrackFactory.CreateAdditionalRewardScrollDataModel(rewardListAssetId, level, displayName, value, rewardItemOutput);
  			if (rewardScrollDataModel != null)
  			{
-@@ -556,11 +568,11 @@ namespace Hearthstone.Progression
+@@ -561,11 +568,11 @@ namespace Hearthstone.Progression
  					AckReward(rewardTrackId, level, paidType);
  				});
  			}
@@ -79340,7 +79400,7 @@ index 77ac34e1..7e34b12f 100644
  
  		private RewardStatus GetRewardStatus(int level, RewardTrackPaidType paidType)
  		{
-@@ -596,10 +608,10 @@ namespace Hearthstone.Progression
+@@ -601,10 +608,10 @@ namespace Hearthstone.Progression
  						continue;
  					}
  					foreach (RewardTrackPaidType item2 in ownedRewardTrackPaidTypes)
@@ -79353,7 +79413,7 @@ index 77ac34e1..7e34b12f 100644
  							continue;
  						}
  						foreach (RewardItemDbfRecord item3 in list)
-@@ -616,8 +628,8 @@ namespace Hearthstone.Progression
+@@ -621,8 +628,8 @@ namespace Hearthstone.Progression
  					}
  				}
  			}
@@ -79364,7 +79424,7 @@ index 77ac34e1..7e34b12f 100644
  
  		public string GetRewardTrackDebugHudString()
  		{
-@@ -650,5 +662,31 @@ namespace Hearthstone.Progression
+@@ -655,5 +662,31 @@ namespace Hearthstone.Progression
  			}
  			return "n/a";
  		}
@@ -79895,7 +79955,7 @@ index 13c027af..fac32090 100644
  	}
  }
 diff --git a/Assembly-CSharp/Hearthstone/Store/ProductInfo.cs b/Assembly-CSharp/Hearthstone/Store/ProductInfo.cs
-index b948b645..282062c9 100644
+index 9d35a547..ff3565b7 100644
 --- a/Assembly-CSharp/Hearthstone/Store/ProductInfo.cs
 +++ b/Assembly-CSharp/Hearthstone/Store/ProductInfo.cs
 @@ -17,9 +17,6 @@ namespace Hearthstone.Store
@@ -79990,7 +80050,7 @@ index b948b645..282062c9 100644
  		}
  
  		public bool TryGetBundlePrice(CurrencyType currencyType, out double value)
-@@ -517,8 +507,8 @@ namespace Hearthstone.Store
+@@ -513,8 +503,8 @@ namespace Hearthstone.Store
  				}
  				else
  				{
@@ -80001,7 +80061,7 @@ index b948b645..282062c9 100644
  			}
  			if (product.prices != null)
  			{
-@@ -528,8 +518,8 @@ namespace Hearthstone.Store
+@@ -524,8 +514,8 @@ namespace Hearthstone.Store
  				}
  				else
  				{
@@ -80012,7 +80072,7 @@ index b948b645..282062c9 100644
  			}
  			if (price2 != null)
  			{
-@@ -546,14 +536,14 @@ namespace Hearthstone.Store
+@@ -542,14 +532,14 @@ namespace Hearthstone.Store
  					m_realMoneyPrice = new RealPriceInfo
  					{
  						CurrentPrice = new RealPriceInfo.Price
@@ -80033,7 +80093,7 @@ index b948b645..282062c9 100644
  						},
  						CurrencyCode = currencyCode
  					};
-@@ -563,14 +553,14 @@ namespace Hearthstone.Store
+@@ -559,14 +549,14 @@ namespace Hearthstone.Store
  					m_realMoneyPrice = new RealPriceInfo
  					{
  						CurrentPrice = new RealPriceInfo.Price
@@ -80054,7 +80114,7 @@ index b948b645..282062c9 100644
  						},
  						CurrencyCode = (price?.currencyCode ?? price2.currencyCode)
  					};
-@@ -588,14 +578,14 @@ namespace Hearthstone.Store
+@@ -584,14 +574,14 @@ namespace Hearthstone.Store
  					m_vcPrices[CurrencyType.GOLD] = new PriceInfo
  					{
  						CurrentPrice = new PriceInfo.Price
@@ -80075,7 +80135,7 @@ index b948b645..282062c9 100644
  						}
  					};
  				}
-@@ -622,14 +612,14 @@ namespace Hearthstone.Store
+@@ -618,14 +608,14 @@ namespace Hearthstone.Store
  				m_vcPrices[currencyTypeFromCode] = new PriceInfo
  				{
  					CurrentPrice = new PriceInfo.Price
@@ -80096,7 +80156,7 @@ index b948b645..282062c9 100644
  					}
  				};
  			}
-@@ -650,14 +640,14 @@ namespace Hearthstone.Store
+@@ -646,14 +636,14 @@ namespace Hearthstone.Store
  				m_vcPrices[CurrencyType.GOLD] = new PriceInfo
  				{
  					CurrentPrice = new PriceInfo.Price
@@ -80117,7 +80177,7 @@ index b948b645..282062c9 100644
  					}
  				};
  			}
-@@ -669,14 +659,14 @@ namespace Hearthstone.Store
+@@ -665,14 +655,14 @@ namespace Hearthstone.Store
  					m_vcPrices[currencyTypeFromCode] = new PriceInfo
  					{
  						CurrentPrice = new PriceInfo.Price
@@ -80347,7 +80407,7 @@ index c070437b..f918d5cb 100644
  					num3 = 0.0;
  				}
 diff --git a/Assembly-CSharp/Hearthstone/UI/Clickable.cs b/Assembly-CSharp/Hearthstone/UI/Clickable.cs
-index 50b4a9a9..c304cfbd 100644
+index 570ec64a..2e1cc19f 100644
 --- a/Assembly-CSharp/Hearthstone/UI/Clickable.cs
 +++ b/Assembly-CSharp/Hearthstone/UI/Clickable.cs
 @@ -580,5 +580,14 @@ namespace Hearthstone.UI
@@ -80521,7 +80581,7 @@ index c5f0d460..4c1b9ff2 100644
  			string result = "";
  			ReadOnlySpanExtensions.SplitEnumerator enumerator = splitEnumerator.GetEnumerator();
 diff --git a/Assembly-CSharp/Hearthstone/UI/Spawnable.cs b/Assembly-CSharp/Hearthstone/UI/Spawnable.cs
-index 6a2296e5..085ecc7b 100644
+index 09bb5237..bf3856b9 100644
 --- a/Assembly-CSharp/Hearthstone/UI/Spawnable.cs
 +++ b/Assembly-CSharp/Hearthstone/UI/Spawnable.cs
 @@ -360,13 +360,13 @@ namespace Hearthstone.UI
@@ -80658,7 +80718,7 @@ index 6a2296e5..085ecc7b 100644
  			managedSprite.SpriteRenderer.flipX = spriteItemParameters.FlipX;
  			managedSprite.SpriteRenderer.flipY = spriteItemParameters.FlipY;
 diff --git a/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs b/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs
-index 26c28cef..9ca5d861 100644
+index 5098c710..b3cfdae6 100644
 --- a/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs
 +++ b/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs
 @@ -35,7 +35,7 @@ namespace Hearthstone.UI
@@ -80680,7 +80740,7 @@ index 26c28cef..9ca5d861 100644
  		private WidgetTemplate m_parentWidgetTemplate;
  
 diff --git a/Assembly-CSharp/HearthstoneCheckout.cs b/Assembly-CSharp/HearthstoneCheckout.cs
-index 6f5e2b24..dfa8f905 100644
+index 5a2fb0ca..1556aa7d 100644
 --- a/Assembly-CSharp/HearthstoneCheckout.cs
 +++ b/Assembly-CSharp/HearthstoneCheckout.cs
 @@ -191,9 +191,6 @@ public class HearthstoneCheckout : blz_commerce_log_hook, ISceneEventObserver, I
@@ -80944,7 +81004,7 @@ index 3a09dc01..2dda20b4 100644
  		{
  			return m_heroEntity.HasTag(GAME_TAG.UNTOUCHABLE);
 diff --git a/Assembly-CSharp/HistoryCard.cs b/Assembly-CSharp/HistoryCard.cs
-index d91aa880..a7991a4c 100644
+index 6e150259..1ac0daae 100644
 --- a/Assembly-CSharp/HistoryCard.cs
 +++ b/Assembly-CSharp/HistoryCard.cs
 @@ -1,3 +1,4 @@
@@ -80963,7 +81023,7 @@ index d91aa880..a7991a4c 100644
  
  	public void LoadMainCardActor()
  	{
-@@ -161,7 +164,7 @@ public class HistoryCard : HistoryItem
+@@ -170,7 +173,7 @@ public class HistoryCard : HistoryItem
  			return;
  		}
  		string displayedCreatorName = m_entity.GetDisplayedCreatorName();
@@ -80972,7 +81032,7 @@ index d91aa880..a7991a4c 100644
  		if (string.IsNullOrEmpty(displayedCreatorName))
  		{
  			if (!(m_owner != null) || m_owner.GetEntity() == null)
-@@ -175,10 +178,10 @@ public class HistoryCard : HistoryItem
+@@ -184,10 +187,10 @@ public class HistoryCard : HistoryItem
  				return;
  			}
  		}
@@ -80987,7 +81047,7 @@ index d91aa880..a7991a4c 100644
  		else
  		{
  			m_createdByText.Text = GameStrings.Format("GAMEPLAY_HISTORY_CREATED_BY", displayedCreatorName);
-@@ -291,13 +294,13 @@ public class HistoryCard : HistoryItem
+@@ -300,13 +303,13 @@ public class HistoryCard : HistoryItem
  		{
  			return;
  		}
@@ -81008,7 +81068,7 @@ index d91aa880..a7991a4c 100644
  			if (m_mainCardActor != null)
  			{
  				LayerUtils.SetLayer(m_mainCardActor, GameLayer.Tooltip);
-@@ -563,23 +566,23 @@ public class HistoryCard : HistoryItem
+@@ -572,23 +575,23 @@ public class HistoryCard : HistoryItem
  			return null;
  		}
  		using DefLoader.DisposableCardDef disposableCardDef = duplicatedEntity.ShareDisposableCardDef();
@@ -81047,7 +81107,7 @@ index d91aa880..a7991a4c 100644
  
  	private void ShowTile()
  	{
-@@ -737,8 +740,10 @@ public class HistoryCard : HistoryItem
+@@ -746,8 +749,10 @@ public class HistoryCard : HistoryItem
  		return -1.404475f + num2 * (float)num3;
  	}
  
@@ -81059,7 +81119,7 @@ index d91aa880..a7991a4c 100644
  		m_entity = info.m_entity;
  		m_historyInfoType = info.m_historyInfoType;
  		m_portraitTexture = info.m_portraitTexture;
-@@ -857,10 +862,11 @@ public class HistoryCard : HistoryItem
+@@ -866,10 +871,11 @@ public class HistoryCard : HistoryItem
  			{
  				ShowDisplayedCreator();
  			}
@@ -81087,7 +81147,7 @@ index 23926a83..8ba672cd 100644
 +	EOE
  }
 diff --git a/Assembly-CSharp/HistoryManager.cs b/Assembly-CSharp/HistoryManager.cs
-index 04740704..62827a26 100644
+index 97162dff..d6735239 100644
 --- a/Assembly-CSharp/HistoryManager.cs
 +++ b/Assembly-CSharp/HistoryManager.cs
 @@ -4,6 +4,7 @@ using System.Collections.Generic;
@@ -81113,7 +81173,29 @@ index 04740704..62827a26 100644
  	}
  
  	private enum BigCardTransformState
-@@ -720,18 +729,18 @@ public class HistoryManager : CardTileListDisplay
+@@ -614,8 +623,8 @@ public class HistoryManager : CardTileListDisplay
+ 					}
+ 					else
+ 					{
+-						GameUtils.ApplyTagChange(duplicatedEntity, histTagChange);
+-					}
++					GameUtils.ApplyTagChange(duplicatedEntity, histTagChange);
++				}
+ 				}
+ 				if (entityId2 == histTagChange.Entity)
+ 				{
+@@ -625,8 +634,8 @@ public class HistoryManager : CardTileListDisplay
+ 					}
+ 					else
+ 					{
+-						GameUtils.ApplyTagChange(duplicatedEntity2, histTagChange);
+-					}
++					GameUtils.ApplyTagChange(duplicatedEntity2, histTagChange);
++				}
+ 				}
+ 				break;
+ 			}
+@@ -734,18 +743,18 @@ public class HistoryManager : CardTileListDisplay
  			{
  				continue;
  			}
@@ -81139,7 +81221,7 @@ index 04740704..62827a26 100644
  		if (NotifyEntityAffected(entity, allowDuplicates: false, fromMetaData: false))
  		{
  			NotifyDamageChanged(entity, damage);
-@@ -786,18 +795,18 @@ public class HistoryManager : CardTileListDisplay
+@@ -800,18 +809,18 @@ public class HistoryManager : CardTileListDisplay
  			{
  				continue;
  			}
@@ -81165,7 +81247,7 @@ index 04740704..62827a26 100644
  		if (NotifyEntityAffected(entity, allowDuplicates: false, fromMetaData: false))
  		{
  			NotifyArmorChanged(entity, newArmor);
-@@ -1318,7 +1327,7 @@ public class HistoryManager : CardTileListDisplay
+@@ -1332,7 +1341,7 @@ public class HistoryManager : CardTileListDisplay
  				};
  				tileLoadedCallbackData.m_childInfos.Add(historyInfo2);
  				AssetLoader.Get().InstantiatePrefab("HistoryCard.prefab:f8193c3e146b62342b8fb2c0494ec447", TileLoadedCallback, tileLoadedCallbackData, AssetLoadingOptions.IgnorePrefabPosition);
@@ -81174,7 +81256,7 @@ index 04740704..62827a26 100644
  		}
  	}
  
-@@ -1530,10 +1539,10 @@ public class HistoryManager : CardTileListDisplay
+@@ -1544,10 +1553,10 @@ public class HistoryManager : CardTileListDisplay
  				}
  				else
  				{
@@ -81189,7 +81271,7 @@ index 04740704..62827a26 100644
  			}
  			historyTileInitInfo.m_splatAmount = sourceInfo.GetSplatAmount();
  			historyTileInitInfo.m_dead = sourceInfo.HasDied();
-@@ -1753,26 +1762,27 @@ public class HistoryManager : CardTileListDisplay
+@@ -1767,26 +1776,27 @@ public class HistoryManager : CardTileListDisplay
  		return m_pendingBigCardEntry.m_info.GetOriginalEntity();
  	}
  
@@ -81225,7 +81307,7 @@ index 04740704..62827a26 100644
  		bigCardEntry.m_info = new HistoryInfo();
  		bigCardEntry.m_info.SetOriginalEntity(entity);
  		if (entity.IsWeapon())
-@@ -1791,16 +1801,17 @@ public class HistoryManager : CardTileListDisplay
+@@ -1805,16 +1815,17 @@ public class HistoryManager : CardTileListDisplay
  		StartCoroutine("WaitForCardLoadedAndCreateBigCard", bigCardEntry);
  	}
  
@@ -81247,7 +81329,7 @@ index 04740704..62827a26 100644
  		bigCardEntry.m_info = new HistoryInfo();
  		bigCardEntry.m_info.SetOriginalEntity(entity);
  		bigCardEntry.m_info.m_infoType = HistoryInfoType.TRIGGER;
-@@ -1949,7 +1960,7 @@ public class HistoryManager : CardTileListDisplay
+@@ -1968,7 +1979,7 @@ public class HistoryManager : CardTileListDisplay
  			historyBigCardInitInfo.m_postTransformedEntity = postTransformedEntity;
  			historyBigCardInitInfo.m_displayTimeMS = bigCardEntry.m_displayTimeMS;
  			HistoryCard component = go.GetComponent<HistoryCard>();
@@ -81256,7 +81338,7 @@ index 04740704..62827a26 100644
  			if ((bool)m_currentBigCard)
  			{
  				InterruptCurrentBigCard();
-@@ -2020,11 +2031,11 @@ public class HistoryManager : CardTileListDisplay
+@@ -2039,11 +2050,11 @@ public class HistoryManager : CardTileListDisplay
  				Card card = entity.GetCard();
  				if (!entity.IsTitan() || entity.IsControlledByFriendlySidePlayer())
  				{
@@ -81271,7 +81353,7 @@ index 04740704..62827a26 100644
  		if (!GameState.Get().GetBooleanGameOption(GameEntityOption.DISABLE_DELAY_BETWEEN_BIG_CARD_DISPLAY_AND_POWER_PROCESSING))
  		{
  			yield return new WaitForSeconds(1f);
-@@ -2073,8 +2084,8 @@ public class HistoryManager : CardTileListDisplay
+@@ -2092,8 +2103,8 @@ public class HistoryManager : CardTileListDisplay
  			}
  			yield break;
  		}
@@ -81296,7 +81378,7 @@ index 086e355c..321d621f 100644
  	}
  }
 diff --git a/Assembly-CSharp/Hub.cs b/Assembly-CSharp/Hub.cs
-index 23749790..783c07bc 100644
+index 2f25d0c1..1ea4eef6 100644
 --- a/Assembly-CSharp/Hub.cs
 +++ b/Assembly-CSharp/Hub.cs
 @@ -10,6 +10,7 @@ using Hearthstone.Store;
@@ -81405,7 +81487,7 @@ index 23749790..783c07bc 100644
  	}
  
 diff --git a/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs b/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
-index a9a9458a..4b8df783 100644
+index a74c819e..93022db2 100644
 --- a/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
 +++ b/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
 @@ -75,18 +75,19 @@ namespace HutongGames.PlayMaker.Actions
@@ -82066,7 +82148,7 @@ index 755b8a02..33d18045 100644
  	}
  
 diff --git a/Assembly-CSharp/InputManager.cs b/Assembly-CSharp/InputManager.cs
-index 63db9adc..b03c3adb 100644
+index 90b7c122..3a62eadb 100644
 --- a/Assembly-CSharp/InputManager.cs
 +++ b/Assembly-CSharp/InputManager.cs
 @@ -7,6 +7,7 @@ using Blizzard.T5.Game.Spells;
@@ -82283,7 +82365,7 @@ index 63db9adc..b03c3adb 100644
  				actor = cardStandIn.linkedCard.GetActor();
  				if (actor == null || actor.GetCard() == null)
  				{
-@@ -2385,7 +2392,7 @@ public class InputManager : MonoBehaviour
+@@ -2400,7 +2407,7 @@ public class InputManager : MonoBehaviour
  					DropCanceledHeldCard(heldCard);
  					return true;
  				}
@@ -82292,7 +82374,7 @@ index 63db9adc..b03c3adb 100644
  			else if (flag2)
  			{
  				bool cancelDrop2 = false;
-@@ -2460,9 +2467,9 @@ public class InputManager : MonoBehaviour
+@@ -2475,9 +2482,9 @@ public class InputManager : MonoBehaviour
  		{
  			GameState gameState = m_gameState;
  			if (gameState == null || gameState.GetResponseMode() != GameState.ResponseMode.SUB_OPTION)
@@ -82305,7 +82387,7 @@ index 63db9adc..b03c3adb 100644
  		}
  		return true;
  	}
-@@ -2888,9 +2895,9 @@ public class InputManager : MonoBehaviour
+@@ -2903,9 +2910,9 @@ public class InputManager : MonoBehaviour
  			return;
  		}
  		if ((clickedEntity.IsHeroPower() || clickedEntity.IsGameModeButton()) && card != null && card.GetActor() != null)
@@ -82318,7 +82400,7 @@ index 63db9adc..b03c3adb 100644
  		GameEntity gameEntity = m_gameState.GetGameEntity();
  		if (!gameEntity.NotifyOfBattlefieldCardClicked(clickedEntity, m_gameState.IsInTargetMode()))
  		{
-@@ -2966,44 +2973,44 @@ public class InputManager : MonoBehaviour
+@@ -2982,44 +2989,44 @@ public class InputManager : MonoBehaviour
  				return;
  			}
  			if (clickedEntity.IsStarship() && clickedEntity.IsControlledByOpposingSidePlayer() && clickedEntity.HasTag(GAME_TAG.LAUNCHPAD))
@@ -82393,7 +82475,7 @@ index 63db9adc..b03c3adb 100644
  						return;
  					}
  					if (!clickedEntity.HasSubCards())
-@@ -3013,68 +3020,68 @@ public class InputManager : MonoBehaviour
+@@ -3029,68 +3036,68 @@ public class InputManager : MonoBehaviour
  					if (clickedEntity.IsHeroPower() || clickedEntity.IsGameModeButton() || (clickedEntity.IsCoinBasedHeroBuddy() && clickedEntity.GetTag(GAME_TAG.TAG_SCRIPT_DATA_ENT_2) == 0))
  					{
  						if (!clickedEntity.HasTag(GAME_TAG.HEROPOWER_UNLIMITED_USES))
@@ -82505,7 +82587,7 @@ index 63db9adc..b03c3adb 100644
  
  	private void ManuallyDismissMercenariesAbilityTray()
  	{
-@@ -3516,7 +3523,7 @@ public class InputManager : MonoBehaviour
+@@ -3532,7 +3539,7 @@ public class InputManager : MonoBehaviour
  		{
  			if (!entity2.HasTag(GAME_TAG.HEROPOWER_UNLIMITED_USES))
  			{
@@ -82514,7 +82596,7 @@ index 63db9adc..b03c3adb 100644
  			}
  			PredictSpentMana(entity2);
  		}
-@@ -3587,7 +3594,7 @@ public class InputManager : MonoBehaviour
+@@ -3603,7 +3610,7 @@ public class InputManager : MonoBehaviour
  			}
  			if (!entity.IsTitan())
  			{
@@ -82523,7 +82605,7 @@ index 63db9adc..b03c3adb 100644
  			}
  			DropSubOptionParentCard();
  		}
-@@ -3637,6 +3644,8 @@ public class InputManager : MonoBehaviour
+@@ -3653,6 +3660,8 @@ public class InputManager : MonoBehaviour
  				m_targetReticleManager.CreateFriendlyTargetArrow(entity, showDamageIndicatorText: true);
  			}
  		}
@@ -82532,7 +82614,7 @@ index 63db9adc..b03c3adb 100644
  	}
  
  	public void FinishPendingChoiceTarget()
-@@ -3969,42 +3978,42 @@ public class InputManager : MonoBehaviour
+@@ -3985,42 +3994,42 @@ public class InputManager : MonoBehaviour
  		{
  			return;
  		}
@@ -82597,7 +82679,7 @@ index 63db9adc..b03c3adb 100644
  				else if (m_isShowingStarshipUI)
  				{
  					TooltipPanelManager.TooltipBoneSource boneSource3 = TooltipPanelManager.TooltipBoneSource.TOP_RIGHT;
-@@ -4012,9 +4021,9 @@ public class InputManager : MonoBehaviour
+@@ -4028,9 +4037,9 @@ public class InputManager : MonoBehaviour
  				}
  			}
  		}
@@ -82610,7 +82692,7 @@ index 63db9adc..b03c3adb 100644
  
  	private bool ShowTooltipOnRight()
  	{
-@@ -4040,7 +4049,7 @@ public class InputManager : MonoBehaviour
+@@ -4056,7 +4065,7 @@ public class InputManager : MonoBehaviour
  		{
  			PegCursor.Get().SetMode(PegCursor.Mode.UP);
  			Card mousedOverCard = m_mousedOverCard;
@@ -82619,7 +82701,7 @@ index 63db9adc..b03c3adb 100644
  			mousedOverCard.HideTooltip();
  			mousedOverCard.NotifyMousedOut();
  			ShowBullseyeIfNeeded();
-@@ -4329,11 +4338,11 @@ public class InputManager : MonoBehaviour
+@@ -4345,11 +4354,11 @@ public class InputManager : MonoBehaviour
  			for (int i = 1; i < zoneTooltipSettings.FriendlyDeck.GetTooltipCount(); i++)
  			{
  				if (zoneTooltipSettings.FriendlyDeck.GetTooltipOverrideContent(ref headline2, ref description2, i))
@@ -82634,7 +82716,7 @@ index 63db9adc..b03c3adb 100644
  		ShowFriendlyHandSizeTooltipWhenHoveringDeck(zoneTooltipSettings);
  	}
  
-@@ -4377,9 +4386,9 @@ public class InputManager : MonoBehaviour
+@@ -4393,9 +4402,9 @@ public class InputManager : MonoBehaviour
  			for (int i = 1; i < zoneTooltipSettings.EnemyDeck.GetTooltipCount(); i++)
  			{
  				if (zoneTooltipSettings.EnemyDeck.GetTooltipOverrideContent(ref headline2, ref description2, i))
@@ -82647,7 +82729,7 @@ index 63db9adc..b03c3adb 100644
  			}
  		}
  		if (zoneTooltipSettings.ShowFriendlyHandWhenHoveringOpponentDeck)
-@@ -4774,4 +4783,12 @@ public class InputManager : MonoBehaviour
+@@ -4790,4 +4799,12 @@ public class InputManager : MonoBehaviour
  	{
  		return NetCache.Get().GetNetObject<NetCache.NetCacheFeatures>().EnablePlayingFromMiniHand;
  	}
@@ -83979,7 +84061,7 @@ index d28f40dd..263f7fd0 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/MassPackOpeningHighlights.cs b/Assembly-CSharp/MassPackOpeningHighlights.cs
-index 65b0e447..d49e8a03 100644
+index 3f181922..39585734 100644
 --- a/Assembly-CSharp/MassPackOpeningHighlights.cs
 +++ b/Assembly-CSharp/MassPackOpeningHighlights.cs
 @@ -53,7 +53,7 @@ public class MassPackOpeningHighlights : MonoBehaviour
@@ -84595,7 +84677,7 @@ index 912c7bd5..e068a7a0 100644
  
  	public MountType Mount { get; set; }
 diff --git a/Assembly-CSharp/MulliganManager.cs b/Assembly-CSharp/MulliganManager.cs
-index 1ba39547..1e18230d 100644
+index ff2a104e..c09c3eba 100644
 --- a/Assembly-CSharp/MulliganManager.cs
 +++ b/Assembly-CSharp/MulliganManager.cs
 @@ -1,6 +1,7 @@
@@ -84885,7 +84967,58 @@ index 1ba39547..1e18230d 100644
  			else if (!isConfirmation)
  			{
  				tentativeFallbackChooseOneEntityId = 0;
-@@ -2949,8 +2989,8 @@ public class MulliganManager : MonoBehaviour
+@@ -2878,25 +2918,25 @@ public class MulliganManager : MonoBehaviour
+ 	{
+ 		if (!(GameState.Get().GetGameEntity() is TB_BaconShop tB_BaconShop) || !tB_BaconShop.IsAllHeroesTheSameThisGame())
+ 		{
+-			GameSaveDataManager.Get().GetSubkeyValue(GameSaveKeyId.FTUE, GameSaveKeySubkeyId.FTUE_HAS_SEEN_BG_SEASON_PASS_POPUP, out long value);
+-			if (value == 0L)
++		GameSaveDataManager.Get().GetSubkeyValue(GameSaveKeyId.FTUE, GameSaveKeySubkeyId.FTUE_HAS_SEEN_BG_SEASON_PASS_POPUP, out long value);
++		if (value == 0L)
++		{
++			DialogManager.Get().ClearAllImmediatelyDontDestroy();
++			AlertPopup.PopupInfo info = new AlertPopup.PopupInfo
+ 			{
+-				DialogManager.Get().ClearAllImmediatelyDontDestroy();
+-				AlertPopup.PopupInfo info = new AlertPopup.PopupInfo
+-				{
+-					m_headerText = GameStrings.Get("GLUE_SEASONPASS_FTUE_HEADER"),
+-					m_text = GameStrings.Get("GLUE_SEASONPASS_FTUE_BODY"),
+-					m_confirmText = GameStrings.Get("GLUE_SEASONPASS_FTUE_CONFIRM"),
+-					m_showAlertIcon = false,
+-					m_alertTextAlignmentAnchor = UberText.AnchorOptions.Middle,
+-					m_responseDisplay = AlertPopup.ResponseDisplay.CONFIRM_CANCEL,
+-					m_responseCallback = OnBGSeasonPassFTUEPopupResponse
+-				};
+-				GameSaveDataManager.Get().SaveSubkey(new GameSaveDataManager.SubkeySaveRequest(GameSaveKeyId.FTUE, GameSaveKeySubkeyId.FTUE_HAS_SEEN_BG_SEASON_PASS_POPUP, 1L));
+-				DialogManager.Get().ShowPopup(info);
+-			}
++				m_headerText = GameStrings.Get("GLUE_SEASONPASS_FTUE_HEADER"),
++				m_text = GameStrings.Get("GLUE_SEASONPASS_FTUE_BODY"),
++				m_confirmText = GameStrings.Get("GLUE_SEASONPASS_FTUE_CONFIRM"),
++				m_showAlertIcon = false,
++				m_alertTextAlignmentAnchor = UberText.AnchorOptions.Middle,
++				m_responseDisplay = AlertPopup.ResponseDisplay.CONFIRM_CANCEL,
++				m_responseCallback = OnBGSeasonPassFTUEPopupResponse
++			};
++			GameSaveDataManager.Get().SaveSubkey(new GameSaveDataManager.SubkeySaveRequest(GameSaveKeyId.FTUE, GameSaveKeySubkeyId.FTUE_HAS_SEEN_BG_SEASON_PASS_POPUP, 1L));
++			DialogManager.Get().ShowPopup(info);
+ 		}
+ 	}
++	}
+ 
+ 	private void OnBGSeasonPassFTUEPopupResponse(AlertPopup.Response response, object userData)
+ 	{
+@@ -2942,7 +2982,7 @@ public class MulliganManager : MonoBehaviour
+ 				}
+ 				else
+ 				{
+-					ToggleHoldState(j);
++				ToggleHoldState(j);
+ 				}
+ 				entityId = m_startingCards[j].GetEntity().GetEntityId();
+ 			}
+@@ -2959,8 +2999,8 @@ public class MulliganManager : MonoBehaviour
  		if (GameState.Get().GetBooleanGameOption(GameEntityOption.MULLIGAN_IS_CHOOSE_ONE))
  		{
  			Network.Get().SendMulliganChooseOneTentativeSelect(entityId, isConfirmation: false);
@@ -84896,7 +85029,7 @@ index 1ba39547..1e18230d 100644
  		else
  		{
  			if (mulliganButton != null)
-@@ -2970,11 +3010,11 @@ public class MulliganManager : MonoBehaviour
+@@ -2980,11 +3020,11 @@ public class MulliganManager : MonoBehaviour
  		{
  			return;
  		}
@@ -84912,7 +85045,7 @@ index 1ba39547..1e18230d 100644
  
  	public void ServerHasDealtReplacementCards(bool isFriendlySide)
  	{
-@@ -3015,7 +3055,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3025,7 +3065,7 @@ public class MulliganManager : MonoBehaviour
  			ShowMulliganCardRefreshButton(show: false);
  			if (destroyTimer)
  			{
@@ -84921,7 +85054,7 @@ index 1ba39547..1e18230d 100644
  			}
  			BeginDealNewCards();
  		}
-@@ -3049,6 +3089,8 @@ public class MulliganManager : MonoBehaviour
+@@ -3061,6 +3101,8 @@ public class MulliganManager : MonoBehaviour
  			}
  			HideRerollPopups();
  			Network.Get().RequestReplaceBattlegroundsMulliganHero(entity.GetEntityId());
@@ -84930,7 +85063,7 @@ index 1ba39547..1e18230d 100644
  		}
  	}
  
-@@ -3104,7 +3146,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3120,7 +3162,7 @@ public class MulliganManager : MonoBehaviour
  		}
  	}
  
@@ -84939,7 +85072,7 @@ index 1ba39547..1e18230d 100644
  	{
  		if (!InputManager.Get().PermitDecisionMakingInput())
  		{
-@@ -3119,17 +3161,17 @@ public class MulliganManager : MonoBehaviour
+@@ -3135,17 +3177,17 @@ public class MulliganManager : MonoBehaviour
  				return;
  			}
  		}
@@ -84967,7 +85100,7 @@ index 1ba39547..1e18230d 100644
  
  	private void OnMulliganCancelConfirmationButtonReleased(UIEvent e)
  	{
-@@ -3419,12 +3461,12 @@ public class MulliganManager : MonoBehaviour
+@@ -3435,12 +3477,12 @@ public class MulliganManager : MonoBehaviour
  					yield return new WaitForSeconds(0.5f);
  					if (topCard != null)
  					{
@@ -84985,7 +85118,7 @@ index 1ba39547..1e18230d 100644
  				}
  				xOffset += spaceForEachCard;
  			}
-@@ -3494,10 +3536,12 @@ public class MulliganManager : MonoBehaviour
+@@ -3510,10 +3552,12 @@ public class MulliganManager : MonoBehaviour
  
  	private IEnumerator WaitForOpponentToFinishMulligan()
  	{
@@ -85000,7 +85133,7 @@ index 1ba39547..1e18230d 100644
  		}
  		else
  		{
-@@ -3527,9 +3571,9 @@ public class MulliganManager : MonoBehaviour
+@@ -3543,9 +3587,9 @@ public class MulliganManager : MonoBehaviour
  		}
  		if (!GameMgr.Get().IsBattlegrounds())
  		{
@@ -85013,7 +85146,7 @@ index 1ba39547..1e18230d 100644
  		}
  		CreateTagConditionalVFXs(position2);
  		Actor yourHeroActor = null;
-@@ -3887,7 +3931,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3903,7 +3947,7 @@ public class MulliganManager : MonoBehaviour
  				if (GameMgr.Get().IsBattlegrounds() && GetBaconAnomaly() != 0)
  				{
  					component.SetBaconAnomalyBannerText(title, subtitle, GetBaconAnomaly(), GameState.Get().GetGameEntity().GetMulliganDetailTextPositionOverride());
@@ -85022,7 +85155,7 @@ index 1ba39547..1e18230d 100644
  				else
  				{
  					component.SetBaconBannerText(title, subtitle);
-@@ -3895,14 +3939,14 @@ public class MulliganManager : MonoBehaviour
+@@ -3911,14 +3955,14 @@ public class MulliganManager : MonoBehaviour
  			}
  		}
  		else if (subtitle != null)
@@ -85044,7 +85177,7 @@ index 1ba39547..1e18230d 100644
  
  	private void SetMulliganDetailLabelText(string title)
  	{
-@@ -3952,7 +3996,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3968,7 +4012,7 @@ public class MulliganManager : MonoBehaviour
  		return GetAnomalies().Count > 0;
  	}
  
@@ -85053,7 +85186,7 @@ index 1ba39547..1e18230d 100644
  	{
  		List<int> list = new List<int>();
  		GameEntity gameEntity = GameState.Get().GetGameEntity();
-@@ -4004,7 +4048,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4020,7 +4064,7 @@ public class MulliganManager : MonoBehaviour
  				if (IsBaconAnomalyActive())
  				{
  					component.SetBaconAnomalyBannerText(gameEntity.GetMulliganBannerText(), gameEntity.GetMulliganDetailText(), GetBaconAnomaly(), gameEntity.GetMulliganDetailTextPositionOverride());
@@ -85062,7 +85195,7 @@ index 1ba39547..1e18230d 100644
  				else
  				{
  					component.SetBaconBannerText(gameEntity.GetMulliganBannerText(), gameEntity.GetMulliganDetailText());
-@@ -4013,8 +4057,8 @@ public class MulliganManager : MonoBehaviour
+@@ -4029,8 +4073,8 @@ public class MulliganManager : MonoBehaviour
  			return;
  		}
  		string mulliganDetailText = GameState.Get().GetGameEntity().GetMulliganDetailText();
@@ -85073,7 +85206,7 @@ index 1ba39547..1e18230d 100644
  			if (mulliganDetailLabel == null)
  			{
  				mulliganDetailLabel = UnityEngine.Object.Instantiate(mulliganDetailLabelPrefab);
-@@ -4280,8 +4324,8 @@ public class MulliganManager : MonoBehaviour
+@@ -4296,8 +4340,8 @@ public class MulliganManager : MonoBehaviour
  					GameState.Get().GetGameEntity().ToggleAlternateMulliganActorHighlight(card, highlighted: false);
  					GameState.Get().GetGameEntity().ToggleAlternateMulliganActorConfirmHighlight(card, highlighted: false);
  					if (actor is PlayerLeaderboardMainCardActor)
@@ -85084,7 +85217,7 @@ index 1ba39547..1e18230d 100644
  					}
  				}
  			}
-@@ -4360,6 +4404,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4376,6 +4420,7 @@ public class MulliganManager : MonoBehaviour
  
  	public void EndMulligan()
  	{
@@ -85092,7 +85225,7 @@ index 1ba39547..1e18230d 100644
  		m_waitingForUserInput = false;
  		if (m_replaceLabels != null)
  		{
-@@ -4509,7 +4554,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4525,7 +4570,7 @@ public class MulliganManager : MonoBehaviour
  				coinObject.GetComponentInChildren<PlayMakerFSM>().SendEvent("Birth");
  				yield return new WaitForSeconds(0.1f);
  			}
@@ -85101,7 +85234,7 @@ index 1ba39547..1e18230d 100644
  			{
  				NotificationManager.Get().CreateInnkeeperQuote(UserAttentionBlocker.NONE, new Vector3(155.3f, NotificationManager.DEPTH, 34.5f), GameStrings.Get("VO_INNKEEPER_COIN_INTRO"), "VO_INNKEEPER_COIN_INTRO.prefab:6fb1b3b124d474c4c84e392646caada4");
  				Options.Get().SetBool(Option.HAS_SEEN_THE_COIN, val: true);
-@@ -4568,6 +4613,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4584,6 +4629,7 @@ public class MulliganManager : MonoBehaviour
  
  	private void CoinCardSummonFinishedCallback(Spell spell, object userData)
  	{
@@ -85109,7 +85242,7 @@ index 1ba39547..1e18230d 100644
  		Card card = GameObjectUtils.FindComponentInParents<Card>(spell);
  		card.RefreshActor();
  		card.UpdateActorComponents();
-@@ -4707,7 +4753,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4723,7 +4769,7 @@ public class MulliganManager : MonoBehaviour
  		InputManager.Get().OnMulliganEnded();
  		if (EndTurnButton.Get() != null)
  		{
@@ -85290,7 +85423,7 @@ index 512213c6..f358a523 100644
  			return false;
  		}
 diff --git a/Assembly-CSharp/NetCache.cs b/Assembly-CSharp/NetCache.cs
-index 6bd9cd14..40633ab1 100644
+index e156d0d5..e3a45d16 100644
 --- a/Assembly-CSharp/NetCache.cs
 +++ b/Assembly-CSharp/NetCache.cs
 @@ -19,6 +19,7 @@ using PegasusLettuce;
@@ -85348,7 +85481,7 @@ index 6bd9cd14..40633ab1 100644
  
  			public bool SimpleCheckoutIOS { get; set; }
  
-@@ -224,101 +205,21 @@ public class NetCache : IService, IHasUpdate
+@@ -226,101 +207,21 @@ public class NetCache : IService, IHasUpdate
  
  		public class CacheHeroes
  		{
@@ -85458,7 +85591,7 @@ index 6bd9cd14..40633ab1 100644
  		}
  
  		public class CacheMercenaries
-@@ -371,18 +272,6 @@ public class NetCache : IService, IHasUpdate
+@@ -373,18 +274,6 @@ public class NetCache : IService, IHasUpdate
  
  		public bool SendTelemetryPresence;
  
@@ -85477,7 +85610,7 @@ index 6bd9cd14..40633ab1 100644
  		public CacheMisc Misc { get; set; }
  
  		public CacheGames Games { get; set; }
-@@ -403,14 +292,7 @@ public class NetCache : IService, IHasUpdate
+@@ -405,14 +294,7 @@ public class NetCache : IService, IHasUpdate
  
  		public int MaxHeroLevel { get; set; }
  
@@ -85493,7 +85626,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public int FriendWeekConcederMaxDefense { get; set; }
  
-@@ -420,14 +302,7 @@ public class NetCache : IService, IHasUpdate
+@@ -422,14 +304,7 @@ public class NetCache : IService, IHasUpdate
  
  		public uint ArenaClosedToNewSessionsSeconds { get; set; }
  
@@ -85509,7 +85642,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public bool QuickOpenEnabled { get; set; }
  
-@@ -439,14 +314,7 @@ public class NetCache : IService, IHasUpdate
+@@ -441,14 +316,7 @@ public class NetCache : IService, IHasUpdate
  
  		public bool AllowOfflineClientDeckDeletion { get; set; }
  
@@ -85525,7 +85658,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public int BattlegroundsMaxRankedPartySize { get; set; }
  
-@@ -454,14 +322,7 @@ public class NetCache : IService, IHasUpdate
+@@ -456,14 +324,7 @@ public class NetCache : IService, IHasUpdate
  
  		public bool AchievementToastDisabled { get; set; }
  
@@ -85541,7 +85674,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public bool ContentstackEnabled { get; set; }
  
-@@ -559,9 +420,9 @@ public class NetCache : IService, IHasUpdate
+@@ -561,9 +422,9 @@ public class NetCache : IService, IHasUpdate
  
  		public bool ShopButtonOnPackOpeningScreenEnabled { get; set; }
  
@@ -85553,7 +85686,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public int MassPackOpeningGoldenPackLimit { get; set; }
  
-@@ -939,19 +800,9 @@ public class NetCache : IService, IHasUpdate
+@@ -941,19 +802,9 @@ public class NetCache : IService, IHasUpdate
  
  	public class BoosterCard
  	{
@@ -85574,7 +85707,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public BoosterCard()
  		{
-@@ -995,9 +846,6 @@ public class NetCache : IService, IHasUpdate
+@@ -997,9 +848,6 @@ public class NetCache : IService, IHasUpdate
  
  	public class PlayerRecord
  	{
@@ -85584,7 +85717,7 @@ index 6bd9cd14..40633ab1 100644
  		public PegasusShared.GameType RecordType { get; set; }
  
  		public int Data { get; set; }
-@@ -1006,14 +854,7 @@ public class NetCache : IService, IHasUpdate
+@@ -1008,14 +856,7 @@ public class NetCache : IService, IHasUpdate
  
  		public int Losses { get; set; }
  
@@ -85600,7 +85733,7 @@ index 6bd9cd14..40633ab1 100644
  	}
  
  	public class NetCachePlayerRecords
-@@ -1264,9 +1105,6 @@ public class NetCache : IService, IHasUpdate
+@@ -1266,9 +1107,6 @@ public class NetCache : IService, IHasUpdate
  
  	public class NetCacheMercenariesVillageInfo
  	{
@@ -85610,7 +85743,7 @@ index 6bd9cd14..40633ab1 100644
  		private readonly List<int> m_emptyTierList = new List<int>();
  
  		private Dictionary<int, List<int>> m_tierTreeCache = new Dictionary<int, List<int>>();
-@@ -1279,14 +1117,7 @@ public class NetCache : IService, IHasUpdate
+@@ -1281,14 +1119,7 @@ public class NetCache : IService, IHasUpdate
  
  		public List<MercenariesBuildingState> BuildingStates { get; set; }
  
@@ -85626,7 +85759,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public List<MercenariesRenownConvertRate> ConversionRates { get; private set; }
  
-@@ -1831,6 +1662,8 @@ public class NetCache : IService, IHasUpdate
+@@ -1833,6 +1664,8 @@ public class NetCache : IService, IHasUpdate
  	public class ProfileNoticeEvent : ProfileNotice
  	{
  		public int EventType { get; }
@@ -85635,7 +85768,7 @@ index 6bd9cd14..40633ab1 100644
  	}
  
  	public class ProfileNoticeDisconnectedGame : ProfileNotice
-@@ -1936,29 +1769,9 @@ public class NetCache : IService, IHasUpdate
+@@ -1938,29 +1771,9 @@ public class NetCache : IService, IHasUpdate
  
  	public class ProfileNoticeTavernBrawlTicket : ProfileNotice
  	{
@@ -85667,7 +85800,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public ProfileNoticeTavernBrawlTicket()
  			: base(NoticeType.TAVERN_BRAWL_TICKET)
-@@ -2767,19 +2580,9 @@ public class NetCache : IService, IHasUpdate
+@@ -2769,19 +2582,9 @@ public class NetCache : IService, IHasUpdate
  
  	public class ErrorInfo
  	{
@@ -85688,7 +85821,7 @@ index 6bd9cd14..40633ab1 100644
  
  		public RequestFunc RequestingFunction { get; set; }
  
-@@ -3073,24 +2876,50 @@ public class NetCache : IService, IHasUpdate
+@@ -3075,24 +2878,50 @@ public class NetCache : IService, IHasUpdate
  		return GetNetObject<T>() != null;
  	}
  
@@ -85746,7 +85879,7 @@ index 6bd9cd14..40633ab1 100644
  	{
  		Type typeFromHandle = typeof(T);
  		m_netCache[typeFromHandle] = null;
-@@ -3108,6 +2937,11 @@ public class NetCache : IService, IHasUpdate
+@@ -3110,6 +2939,11 @@ public class NetCache : IService, IHasUpdate
  
  	public long GetArcaneDustBalance()
  	{
@@ -85758,7 +85891,7 @@ index 6bd9cd14..40633ab1 100644
  		NetCacheArcaneDustBalance netObject = GetNetObject<NetCacheArcaneDustBalance>();
  		if (netObject == null)
  		{
-@@ -3948,10 +3782,10 @@ public class NetCache : IService, IHasUpdate
+@@ -3950,10 +3784,10 @@ public class NetCache : IService, IHasUpdate
  		List<DeckInfo> list = new List<DeckInfo>();
  		if (IsNetObjectAvailable<NetCacheDecks>())
  		{
@@ -85773,7 +85906,7 @@ index 6bd9cd14..40633ab1 100644
  		}
  		return list;
  	}
-@@ -4478,37 +4312,37 @@ public class NetCache : IService, IHasUpdate
+@@ -4480,37 +4314,37 @@ public class NetCache : IService, IHasUpdate
  		}
  		if (visitorInfo.VisitorStates != null)
  		{
@@ -85833,7 +85966,7 @@ index 6bd9cd14..40633ab1 100644
  		}
  		if (visitorInfo.ActiveRenownOffers != null)
  		{
-@@ -4864,7 +4698,7 @@ public class NetCache : IService, IHasUpdate
+@@ -4867,7 +4701,7 @@ public class NetCache : IService, IHasUpdate
  			netCacheRenownBalance.Balance = currencyState.RenownBalance;
  			OnNetCacheObjReceived(netCacheRenownBalance);
  			foreach (DelRenownBalanceListener renownBalanceListener in m_renownBalanceListeners)
@@ -85842,7 +85975,7 @@ index 6bd9cd14..40633ab1 100644
  				renownBalanceListener(netCacheRenownBalance);
  			}
  		}
-@@ -4950,7 +4784,7 @@ public class NetCache : IService, IHasUpdate
+@@ -4953,7 +4787,7 @@ public class NetCache : IService, IHasUpdate
  		{
  			return;
  		}
@@ -85851,7 +85984,7 @@ index 6bd9cd14..40633ab1 100644
  		{
  			CollectionManager.Get().GetCollectibleDisplay().GetPageManager()
  				.RefreshCurrentPageContents();
-@@ -4996,15 +4830,15 @@ public class NetCache : IService, IHasUpdate
+@@ -4999,15 +4833,15 @@ public class NetCache : IService, IHasUpdate
  				if (num3 > 0)
  				{
  					list.Add(new CollectionManager.CardModification
@@ -85869,7 +86002,7 @@ index 6bd9cd14..40633ab1 100644
  			else if (item.Quantity < 0)
  			{
  				list.Add(new CollectionManager.CardModification
-@@ -5390,8 +5224,8 @@ public class NetCache : IService, IHasUpdate
+@@ -5393,8 +5227,8 @@ public class NetCache : IService, IHasUpdate
  			netObject.BattlegroundsFavoriteHeroSkins.Add(num, value);
  		}
  		value.Add(newBattlegroundsHeroSkinId.ToValue());
@@ -85880,7 +86013,7 @@ index 6bd9cd14..40633ab1 100644
  			this.FavoriteBattlegroundsHeroSkinChanged(num, newBattlegroundsHeroSkinId.ToValue());
  		}
  	}
-@@ -5404,10 +5238,10 @@ public class NetCache : IService, IHasUpdate
+@@ -5407,10 +5241,10 @@ public class NetCache : IService, IHasUpdate
  			Debug.LogWarning($"NetCache.ProcessNewFavoriteBattlegroundsBoardSkin(): trying to access NetCacheBattlegroundsBoardSkins before it has been loaded.");
  		}
  		else if (netObject.BattlegroundsFavoriteBoardSkins.Add(newFavoriteBattlegroundsBoardSkinID) && this.FavoriteBattlegroundsBoardSkinChanged != null)
@@ -85894,7 +86027,7 @@ index 6bd9cd14..40633ab1 100644
  
  	public void ProcessNewFavoriteBattlegroundsFinisher(BattlegroundsFinisherId newFavoriteBattlegroundsFinisherID)
  	{
-@@ -5455,8 +5289,8 @@ public class NetCache : IService, IHasUpdate
+@@ -5458,8 +5292,8 @@ public class NetCache : IService, IHasUpdate
  		{
  			netObject.FavoriteCoins.Remove(coinId);
  		}
@@ -85905,7 +86038,7 @@ index 6bd9cd14..40633ab1 100644
  			this.FavoriteCoinChanged(coinId, isFavorite);
  		}
  	}
-@@ -5559,15 +5393,15 @@ public class NetCache : IService, IHasUpdate
+@@ -5562,15 +5396,15 @@ public class NetCache : IService, IHasUpdate
  			return;
  		}
  		List<int> favoriteCoins = coinsPacket.FavoriteCoins;
@@ -85927,7 +86060,7 @@ index 6bd9cd14..40633ab1 100644
  
  	private void OnBattlegroundsHeroSkinsResponse()
  	{
-@@ -5588,12 +5422,12 @@ public class NetCache : IService, IHasUpdate
+@@ -5591,12 +5425,12 @@ public class NetCache : IService, IHasUpdate
  				item = record.ID;
  				string cardId = GameUtils.TranslateDbIdToCardId(record.SkinCardId);
  				if (!collectionManager.IsBattlegroundsHeroCard(cardId))
@@ -85946,7 +86079,7 @@ index 6bd9cd14..40633ab1 100644
  					netCacheBattlegroundsHeroSkins.UnseenSkinIds.Add(item2);
  				}
  			}
-@@ -5628,7 +5462,7 @@ public class NetCache : IService, IHasUpdate
+@@ -5631,7 +5465,7 @@ public class NetCache : IService, IHasUpdate
  			{
  				value = new HashSet<int>();
  				netObject.BattlegroundsFavoriteHeroSkins.Add(baseHeroCardId, value);
@@ -85955,7 +86088,7 @@ index 6bd9cd14..40633ab1 100644
  			int item = heroSkinId;
  			value.Add(item);
  			if (this.FavoriteBattlegroundsHeroSkinChanged != null)
-@@ -5797,10 +5631,10 @@ public class NetCache : IService, IHasUpdate
+@@ -5800,10 +5634,10 @@ public class NetCache : IService, IHasUpdate
  		}
  		NetCacheBattlegroundsBoardSkins netObject = Get().GetNetObject<NetCacheBattlegroundsBoardSkins>();
  		if (netObject != null && netObject.BattlegroundsFavoriteBoardSkins.Add(battlegroundsBoardSkinId.Value) && this.FavoriteBattlegroundsBoardSkinChanged != null)
@@ -85969,7 +86102,7 @@ index 6bd9cd14..40633ab1 100644
  
  	private void OnClearBattlegroundsFavoriteBoardSkinResponse()
  	{
-@@ -5822,10 +5656,10 @@ public class NetCache : IService, IHasUpdate
+@@ -5825,10 +5659,10 @@ public class NetCache : IService, IHasUpdate
  		}
  		NetCacheBattlegroundsBoardSkins netObject = Get().GetNetObject<NetCacheBattlegroundsBoardSkins>();
  		if (netObject != null && netObject.BattlegroundsFavoriteBoardSkins.Remove(battlegroundsBoardSkinId.Value) && this.FavoriteBattlegroundsBoardSkinChanged != null)
@@ -85983,7 +86116,7 @@ index 6bd9cd14..40633ab1 100644
  
  	private void OnBattlegroundsFinishersResponse()
  	{
-@@ -6093,14 +5927,14 @@ public class NetCache : IService, IHasUpdate
+@@ -6096,14 +5930,14 @@ public class NetCache : IService, IHasUpdate
  		}
  		else
  		{
@@ -86004,7 +86137,7 @@ index 6bd9cd14..40633ab1 100644
  	}
  
 diff --git a/Assembly-CSharp/Network.cs b/Assembly-CSharp/Network.cs
-index 8185c031..d5c450c3 100644
+index edf5864e..b02cc121 100644
 --- a/Assembly-CSharp/Network.cs
 +++ b/Assembly-CSharp/Network.cs
 @@ -37,6 +37,7 @@ using PegasusUtil;
@@ -86745,7 +86878,7 @@ index 8185c031..d5c450c3 100644
  		if (netObject != null)
  		{
 diff --git a/Assembly-CSharp/NotificationManager.cs b/Assembly-CSharp/NotificationManager.cs
-index 6c07dd9a..9bbd2ba5 100644
+index 43913d5e..ebb138cb 100644
 --- a/Assembly-CSharp/NotificationManager.cs
 +++ b/Assembly-CSharp/NotificationManager.cs
 @@ -1,3 +1,4 @@
@@ -86783,11 +86916,6 @@ index 6c07dd9a..9bbd2ba5 100644
 -		popUpDialog = gameObject.GetComponent<Notification>();
 -		popUpDialog.ChangeDialogText(headlineText, bodyText, yesOrOKButtonText, noButtonText);
 -		popUpDialog.PlayBirth();
--		UniversalInputManager.Get().SetGameDialogActive(active: true);
--		return popUpDialog;
--	}
--
--	public Notification CreateSpeechBubble(string speechText, Actor actor)
 +    public Notification CreatePopupDialog(bool accessible, string headlineText, string bodyText, string yesOrOKButtonText, string noButtonText)
 +    {
 +        return CreatePopupDialog(accessible, headlineText, bodyText, yesOrOKButtonText, noButtonText, new Vector3(0f, 0f, 0f));
@@ -86805,10 +86933,13 @@ index 6c07dd9a..9bbd2ba5 100644
 +        popUpDialog = gameObject.GetComponent<Notification>();
 +        popUpDialog.ChangeDialogText(headlineText, bodyText, yesOrOKButtonText, noButtonText);
 +        popUpDialog.PlayBirth();
-+        UniversalInputManager.Get().SetGameDialogActive(active: true);
+ 		UniversalInputManager.Get().SetNotificationDialogActive(active: true);
+-		return popUpDialog;
+-	}
 +        return popUpDialog;
 +    }
-+
+ 
+-	public Notification CreateSpeechBubble(string speechText, Actor actor)
 +    public Notification CreateSpeechBubble(string speechText, Actor actor)
  	{
  		return CreateSpeechBubble(speechText, Notification.SpeechBubbleDirection.BottomLeft, actor, bDestroyWhenNewCreated: false);
@@ -86998,7 +87129,7 @@ index 0fc03415..31611d34 100644
  			Option.DEBUG_SHOW_BATTLEGROUND_SKIN_IDS,
  			false
 diff --git a/Assembly-CSharp/OptionsMenu.cs b/Assembly-CSharp/OptionsMenu.cs
-index 9edb494a..40e14c29 100644
+index 3ef1c20f..a6c421c8 100644
 --- a/Assembly-CSharp/OptionsMenu.cs
 +++ b/Assembly-CSharp/OptionsMenu.cs
 @@ -6,9 +6,11 @@ using Blizzard.T5.Services;
@@ -87042,7 +87173,7 @@ index 9edb494a..40e14c29 100644
  		ShowOrHide(showOrHide: false);
  		if (m_hideHandler != null && callHideHandler)
  		{
-@@ -382,7 +394,7 @@ public class OptionsMenu : MonoBehaviour
+@@ -383,7 +395,7 @@ public class OptionsMenu : MonoBehaviour
  
  	private bool CanShowOtherMenuOptions()
  	{
@@ -87051,7 +87182,7 @@ index 9edb494a..40e14c29 100644
  		{
  			return false;
  		}
-@@ -694,4 +706,151 @@ public class OptionsMenu : MonoBehaviour
+@@ -695,4 +707,151 @@ public class OptionsMenu : MonoBehaviour
  		m_soundOptionsMenu.Show();
  		m_soundOptionsMenuLoading = false;
  	}
@@ -87821,7 +87952,7 @@ index b9b0c5f1..748eac9a 100644
  		{
  			if (packs <= 0)
 diff --git a/Assembly-CSharp/PackOpeningCard.cs b/Assembly-CSharp/PackOpeningCard.cs
-index 2b4dc4b0..599f446d 100644
+index ca11e725..b26d2a3a 100644
 --- a/Assembly-CSharp/PackOpeningCard.cs
 +++ b/Assembly-CSharp/PackOpeningCard.cs
 @@ -39,13 +39,13 @@ public class PackOpeningCard : MonoBehaviour
@@ -87888,7 +88019,18 @@ index 2b4dc4b0..599f446d 100644
  		if (component == null)
  		{
  			Debug.LogError($"PackOpeningCard.OnActorLoaded() - ERROR actor \"{base.name}\" has no Actor component");
-@@ -878,7 +878,7 @@ public class PackOpeningCard : MonoBehaviour
+@@ -492,8 +492,8 @@ public class PackOpeningCard : MonoBehaviour
+ 		{
+ 			return;
+ 		}
+-		gameObject.transform.parent = m_CardParent.transform;
+-		m_rarityInfo = gameObject.GetComponent<PackOpeningCardRarityInfo>();
++			gameObject.transform.parent = m_CardParent.transform;
++			m_rarityInfo = gameObject.GetComponent<PackOpeningCardRarityInfo>();
+ 		if (!(m_rarityInfo.m_RarityObject == null) && !(m_rarityInfo.m_HiddenCardObject == null))
+ 		{
+ 			m_rarityInfo.m_RarityObject.SetActive(value: true);
+@@ -882,7 +882,7 @@ public class PackOpeningCard : MonoBehaviour
  
  	private void ShowClassName()
  	{
@@ -87897,7 +88039,7 @@ index 2b4dc4b0..599f446d 100644
  		UberText[] componentsInChildren = m_ClassNameSpell.GetComponentsInChildren<UberText>(includeInactive: true);
  		foreach (UberText uberText in componentsInChildren)
  		{
-@@ -899,12 +899,12 @@ public class PackOpeningCard : MonoBehaviour
+@@ -903,12 +903,12 @@ public class PackOpeningCard : MonoBehaviour
  		}
  	}
  
@@ -87914,7 +88056,7 @@ index 2b4dc4b0..599f446d 100644
  		}
  		if (@class == TAG_CLASS.NEUTRAL)
  		{
-@@ -913,10 +913,10 @@ public class PackOpeningCard : MonoBehaviour
+@@ -917,10 +917,10 @@ public class PackOpeningCard : MonoBehaviour
  		return GameStrings.GetClassName(@class);
  	}
  
@@ -88644,7 +88786,7 @@ index 4df8e57f..29ed8a05 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs b/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs
-index 26a4a38f..bae23a8b 100644
+index c5fb9193..d9d32fa2 100644
 --- a/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs
 +++ b/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs
 @@ -85,9 +85,9 @@ public class PlayerLeaderboardPlayerOverlay : MonoBehaviour
@@ -89023,7 +89165,7 @@ index 2b4ed4db..9b32e982 100644
 +    #endregion
  }
 diff --git a/Assembly-CSharp/PowerTaskList.cs b/Assembly-CSharp/PowerTaskList.cs
-index e6646e84..9cf10114 100644
+index 86a46dae..7827d925 100644
 --- a/Assembly-CSharp/PowerTaskList.cs
 +++ b/Assembly-CSharp/PowerTaskList.cs
 @@ -4,12 +4,13 @@ using Cysharp.Threading.Tasks;
@@ -89848,12 +89990,12 @@ index 079f8e60..fc27e13b 100644
  	public delegate void ResponseCallback(bool confirmedPrivacyPolicy);
  
 diff --git a/Assembly-CSharp/ProductCatalog.cs b/Assembly-CSharp/ProductCatalog.cs
-index de5858e3..22a41062 100644
+index e3b3069f..7ccda52c 100644
 --- a/Assembly-CSharp/ProductCatalog.cs
 +++ b/Assembly-CSharp/ProductCatalog.cs
-@@ -127,14 +127,14 @@ public class ProductCatalog
- 	public void PopulateWithNetData(List<ProductInfo> netBundles, List<Network.GoldCostBooster> netGoldBoosters, CatalogNetworkPages networkPages)
- 	{
+@@ -160,14 +160,14 @@ public class ProductCatalog
+ 			}
+ 		}
  		HasData = true;
 -		m_products.Capacity = Math.Max(m_products.Capacity, netBundles.Count() + netGoldBoosters.Count());
 -		AddNetGoldBoosterProducts(netGoldBoosters);
@@ -89874,7 +90016,7 @@ index de5858e3..22a41062 100644
  
  	public ProductDataModel GetProductByPmtId(ProductId productId)
  	{
-@@ -157,30 +157,30 @@ public class ProductCatalog
+@@ -190,30 +190,30 @@ public class ProductCatalog
  	public List<ProductTierDataModel> GetTiers_Tab(string tabId)
  	{
  		return m_catalogTabs.GetTiers(tabId);
@@ -89915,7 +90057,7 @@ index de5858e3..22a41062 100644
  		return m_catalogTabs.TryGetSubTabData(parentTabId, subTabId, out tabData);
  	}
  
-@@ -205,10 +205,10 @@ public class ProductCatalog
+@@ -238,10 +238,10 @@ public class ProductCatalog
  			{
  				product2.Availability = ProductAvailability.UNDEFINED;
  				if (product2.Prices.Count == 1 && product2.GetBuyProductArgs(product2.Prices[0], 1) is BuyNoGTAPPEventArgs buyNoGTAPPEventArgs && m_storeManager.GetGoldCostNoGTAPP(buyNoGTAPPEventArgs.transactionData, out var _))
@@ -89929,7 +90071,7 @@ index de5858e3..22a41062 100644
  			else
  			{
  				if (m_productDataStorageService.TryGetProduct(product2.GetProductId(), out var product))
-@@ -321,10 +321,10 @@ public class ProductCatalog
+@@ -354,10 +354,10 @@ public class ProductCatalog
  			{
  				error = $"Product {pmtProductId} not received from server.";
  				return null;
@@ -89942,7 +90084,7 @@ index de5858e3..22a41062 100644
  		PopulateVariantsForProduct(productByPmtId, miniSetProducts);
  		error = string.Empty;
  		return productByPmtId;
-@@ -377,10 +377,10 @@ public class ProductCatalog
+@@ -410,10 +410,10 @@ public class ProductCatalog
  		{
  			if (!m_goldBoosterProductIds.Contains(netGoldBooster.ID))
  			{
@@ -89957,7 +90099,7 @@ index de5858e3..22a41062 100644
  					m_goldBoosterProductIds.Add(netGoldBooster.ID);
  				}
  			}
-@@ -430,7 +430,7 @@ public class ProductCatalog
+@@ -463,7 +463,7 @@ public class ProductCatalog
  					{
  						Log.Store.PrintError("Cannot handle tab section - " + item3.InternalName + " - Null/Empty tab ID");
  						continue;
@@ -89966,7 +90108,7 @@ index de5858e3..22a41062 100644
  					text = value;
  					m_catalogTabs.AddTab(GetShopTabData(value, item3));
  					continue;
-@@ -472,7 +472,7 @@ public class ProductCatalog
+@@ -505,7 +505,7 @@ public class ProductCatalog
  				{
  					if (value5 != "true")
  					{
@@ -89975,7 +90117,7 @@ index de5858e3..22a41062 100644
  					}
  					flag2 = value5 == "true" || list2.Count > 0;
  				}
-@@ -611,7 +611,7 @@ public class ProductCatalog
+@@ -644,7 +644,7 @@ public class ProductCatalog
  				}
  				if (item3.Attributes.GetValue("layout_size").TryGetValue(out var value8))
  				{
@@ -89984,7 +90126,7 @@ index de5858e3..22a41062 100644
  					if (array.Length == 2 && int.TryParse(array[0], out var result2) && int.TryParse(array[1], out var result3))
  					{
  						layoutWidth = result2;
-@@ -638,15 +638,15 @@ public class ProductCatalog
+@@ -671,15 +671,15 @@ public class ProductCatalog
  				}
  				if (item3.Attributes.GetValue("divider_options").TryGetValue(out var value10))
  				{
@@ -90003,7 +90145,7 @@ index de5858e3..22a41062 100644
  				}
  				DataModelList<string> dataModelList = item3.Attributes.GetTags().Tags.ToDataModelList();
  				if (result)
-@@ -731,12 +731,12 @@ public class ProductCatalog
+@@ -764,12 +764,12 @@ public class ProductCatalog
  				{
  					DataModelList<string> tags = displayProduct.Tags;
  					if (tags != null && tags.Contains("sellable_deck"))
@@ -90020,7 +90162,7 @@ index de5858e3..22a41062 100644
  		m_boosterCurrencyProduct = null;
  		m_tavernTicketProduct = null;
 diff --git a/Assembly-CSharp/ProductExtensions.cs b/Assembly-CSharp/ProductExtensions.cs
-index 92b89693..6ca50970 100644
+index d88e0be1..0cb2f658 100644
 --- a/Assembly-CSharp/ProductExtensions.cs
 +++ b/Assembly-CSharp/ProductExtensions.cs
 @@ -1,6 +1,7 @@
@@ -90072,7 +90214,7 @@ index 92b89693..6ca50970 100644
  			else if (item.ItemType == RewardItemType.MINI_SET)
  			{
  				MiniSetDbfRecord record = GameDbf.MiniSet.GetRecord(item.ItemId);
-@@ -631,50 +632,50 @@ public static class ProductExtensions
+@@ -630,50 +631,50 @@ public static class ProductExtensions
  	{
  		if (StoreManager.Get().IsKoreanCustomer())
  		{
@@ -90164,10 +90306,10 @@ index 92b89693..6ca50970 100644
  		else if (StoreManager.Get().IsChineseCustomer() && product.Tags.Contains("cn_disclaimer_one_dust"))
  		{
 diff --git a/Assembly-CSharp/ProductFactory.cs b/Assembly-CSharp/ProductFactory.cs
-index 46e7aff3..76093afa 100644
+index 5f963b1d..d257648e 100644
 --- a/Assembly-CSharp/ProductFactory.cs
 +++ b/Assembly-CSharp/ProductFactory.cs
-@@ -78,7 +78,7 @@ public static class ProductFactory
+@@ -82,7 +82,7 @@ public static class ProductFactory
  			Queue<CurrencyType> queue = new Queue<CurrencyType>();
  			if (tags.TryGetData("promote_price", out var data))
  			{
@@ -90176,7 +90318,7 @@ index 46e7aff3..76093afa 100644
  				foreach (string text in array)
  				{
  					if (text.ToLower() == "gold")
-@@ -138,15 +138,15 @@ public static class ProductFactory
+@@ -142,15 +142,15 @@ public static class ProductFactory
  			{
  				MiniSetDbfRecord record = GameDbf.MiniSet.GetRecord(item2.ProductData);
  				if (record != null && record.HideOnClient)
@@ -90200,7 +90342,7 @@ index 46e7aff3..76093afa 100644
  			bool isValidItem;
  			RewardItemDataModel rewardItemDataModel = RewardFactory.CreateShopRewardItemDataModel(netBundle, item2, out isValidItem);
 diff --git a/Assembly-CSharp/ProductPage.cs b/Assembly-CSharp/ProductPage.cs
-index aeb9add1..935e7d9b 100644
+index d996bc73..a6c58d37 100644
 --- a/Assembly-CSharp/ProductPage.cs
 +++ b/Assembly-CSharp/ProductPage.cs
 @@ -7,6 +7,7 @@ using Blizzard.T5.Services;
@@ -90271,7 +90413,18 @@ index aeb9add1..935e7d9b 100644
  			return true;
  		}
  		return false;
-@@ -560,4 +580,282 @@ public class ProductPage : MonoBehaviour
+@@ -506,8 +526,8 @@ public class ProductPage : MonoBehaviour
+ 				}
+ 				else
+ 				{
+-					Log.Store.PrintError("Error modifying product price {0}, where immutable product = [{1}], mutable product = [{2}]", j, immutableVariant.Name, productDataModel.Name);
+-				}
++				Log.Store.PrintError("Error modifying product price {0}, where immutable product = [{1}], mutable product = [{2}]", j, immutableVariant.Name, productDataModel.Name);
++			}
+ 			}
+ 			RefreshVariant(productDataModel);
+ 			BindProductDataModel();
+@@ -563,4 +583,282 @@ public class ProductPage : MonoBehaviour
  			m_openWhenReadyCoroutine = null;
  		}
  	}
@@ -90555,7 +90708,7 @@ index aeb9add1..935e7d9b 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/ProductPageContainer.cs b/Assembly-CSharp/ProductPageContainer.cs
-index 96faef0b..c7b33284 100644
+index 28e20174..2ca2a027 100644
 --- a/Assembly-CSharp/ProductPageContainer.cs
 +++ b/Assembly-CSharp/ProductPageContainer.cs
 @@ -7,8 +7,9 @@ using Hearthstone.DataModels;
@@ -93475,7 +93628,7 @@ index 24521c0a..7c8d7744 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/RewardBoxesDisplay.cs b/Assembly-CSharp/RewardBoxesDisplay.cs
-index 06be8351..f5022bd5 100644
+index 7bb91980..0d6d75f2 100644
 --- a/Assembly-CSharp/RewardBoxesDisplay.cs
 +++ b/Assembly-CSharp/RewardBoxesDisplay.cs
 @@ -3,9 +3,10 @@ using System.Collections;
@@ -93490,7 +93643,7 @@ index 06be8351..f5022bd5 100644
  {
  	[Serializable]
  	public class RewardPackageData
-@@ -136,6 +137,11 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -134,6 +135,11 @@ public class RewardBoxesDisplay : MonoBehaviour
  		}
  	}
  
@@ -93502,7 +93655,7 @@ index 06be8351..f5022bd5 100644
  	public bool IsClosing { get; private set; }
  
  	private void Awake()
-@@ -175,23 +181,23 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -173,23 +179,23 @@ public class RewardBoxesDisplay : MonoBehaviour
  		if (rewards != null)
  		{
  			using List<RewardData>.Enumerator enumerator = rewards.GetEnumerator();
@@ -93540,7 +93693,7 @@ index 06be8351..f5022bd5 100644
  		return "RewardBoxes.prefab:f136fead3d6a148c6801f1e3bd2e8267";
  	}
  
-@@ -280,6 +286,8 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -278,6 +284,8 @@ public class RewardBoxesDisplay : MonoBehaviour
  
  	public void AnimateRewards()
  	{
@@ -93549,7 +93702,7 @@ index 06be8351..f5022bd5 100644
  		List<RewardData> currentPageRewards = CurrentPageRewards;
  		int count = currentPageRewards.Count;
  		m_RewardPackages = GetPackageData(count);
-@@ -349,6 +357,8 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -347,6 +355,8 @@ public class RewardBoxesDisplay : MonoBehaviour
  			}
  		}
  		m_rewardPackageInstances.Clear();
@@ -93558,7 +93711,7 @@ index 06be8351..f5022bd5 100644
  		for (int i = 0; i < m_RewardPackages.Count; i++)
  		{
  			RewardPackageData rewardPackageData = m_RewardPackages[i];
-@@ -384,6 +394,8 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -382,6 +392,8 @@ public class RewardBoxesDisplay : MonoBehaviour
  			rewardBoxData.m_RewardPackage = component2;
  			rewardBoxData.m_FSM = component;
  			rewardBoxData.m_Index = i;
@@ -93567,7 +93720,7 @@ index 06be8351..f5022bd5 100644
  			iTween.MoveTo(gameObject, iTween.Hash("position", rewardPackageData.m_TargetBone.transform.position, "time", m_RewardSet.m_AnimationTime, "delay", rewardPackageData.m_StartDelay, "easetype", iTween.EaseType.linear, "onstarttarget", base.gameObject, "onstart", "RewardPackageOnStart", "onstartparams", rewardBoxData, "oncompletetarget", base.gameObject, "oncomplete", "RewardPackageOnComplete", "oncompleteparams", rewardBoxData));
  		}
  	}
-@@ -403,9 +415,10 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -401,9 +413,10 @@ public class RewardBoxesDisplay : MonoBehaviour
  		yield return new WaitForSeconds(0.5f);
  		RenderUtils.EnableColliders(boxData.m_GameObject, enable: true);
  		boxData.m_RewardPackage.AddEventListener(UIEventType.PRESS, RewardPackagePressed);
@@ -93579,7 +93732,7 @@ index 06be8351..f5022bd5 100644
  	{
  		Log.RewardBox.Print("box clicked!");
  	}
-@@ -648,6 +661,7 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -634,6 +647,7 @@ public class RewardBoxesDisplay : MonoBehaviour
  		{
  			FadeFullscreenEffectsOut();
  			Navigation.GoBack();
@@ -93587,7 +93740,7 @@ index 06be8351..f5022bd5 100644
  			return;
  		}
  		m_currentPageNum++;
-@@ -839,4 +853,109 @@ public class RewardBoxesDisplay : MonoBehaviour
+@@ -825,4 +839,109 @@ public class RewardBoxesDisplay : MonoBehaviour
  			Debug.Log($"  reward {i}={arg}");
  		}
  	}
@@ -94087,23 +94240,61 @@ index ea344ab9..11b29af1 100644
 +	EOE
  }
 diff --git a/Assembly-CSharp/SceneMgr.cs b/Assembly-CSharp/SceneMgr.cs
-index ba54fd02..ff9f1716 100644
+index 4a46d18f..f25f4161 100644
 --- a/Assembly-CSharp/SceneMgr.cs
 +++ b/Assembly-CSharp/SceneMgr.cs
-@@ -736,9 +736,9 @@ public class SceneMgr : IService, IHasUpdate
- 		}
- 		if (m_scene != null)
+@@ -708,13 +708,13 @@ public class SceneMgr : IService, IHasUpdate
+ 	{
+ 		try
  		{
--			m_scene.Unload();
--			m_scene = null;
--			m_sceneLoaded = false;
+-			if (m_scene.IsUnloading())
+-			{
+-				yield break;
+-			}
+-			m_previousScene = m_scene;
+-			m_previousScene.PreUnload();
+-			FireScenePreUnloadEvent(m_previousScene);
++		if (m_scene.IsUnloading())
++		{
++			yield break;
++		}
++		m_previousScene = m_scene;
++		m_previousScene.PreUnload();
++		FireScenePreUnloadEvent(m_previousScene);
+ 		}
+ 		catch (Exception exception)
+ 		{
+@@ -746,18 +746,18 @@ public class SceneMgr : IService, IHasUpdate
+ 		}
+ 		try
+ 		{
+-			if (m_scene != null)
+-			{
+-				m_scene.Unload();
+-				m_scene = null;
+-				m_sceneLoaded = false;
+-			}
+-			FireSceneUnloadedEvent(m_previousScene);
+-			PostUnloadCleanup(m_previousScene.SceneName);
+-			LoadModeFromModeSwitch();
+-			m_switchModeCoroutine = null;
+-			m_switchModeContextTask = UniTask.CompletedTask;
++		if (m_scene != null)
++		{
 +		m_scene.Unload();
 +		m_scene = null;
 +		m_sceneLoaded = false;
  		}
- 		FireSceneUnloadedEvent(m_previousScene);
- 		PostUnloadCleanup(m_previousScene.SceneName);
-@@ -770,16 +770,16 @@ public class SceneMgr : IService, IHasUpdate
++		FireSceneUnloadedEvent(m_previousScene);
++		PostUnloadCleanup(m_previousScene.SceneName);
++		LoadModeFromModeSwitch();
++		m_switchModeCoroutine = null;
++		m_switchModeContextTask = UniTask.CompletedTask;
++	}
+ 		catch (Exception exception2)
+ 		{
+ 			Log.All.PrintError("SwitchMode2 cannot complete because of null.");
+@@ -788,16 +788,16 @@ public class SceneMgr : IService, IHasUpdate
  	{
  		if (!(sceneName == ""))
  		{
@@ -94125,7 +94316,7 @@ index ba54fd02..ff9f1716 100644
  
  	private bool IsValidUnitySceneToUnload(string unitySceneName)
  	{
-@@ -1023,7 +1023,7 @@ public class SceneMgr : IService, IHasUpdate
+@@ -1041,7 +1041,7 @@ public class SceneMgr : IService, IHasUpdate
  
  	private void OnFatalError(FatalErrorMessage message, object userData)
  	{
@@ -94134,7 +94325,7 @@ index ba54fd02..ff9f1716 100644
  		{
  			Log.Offline.Print("SceneMgr.OnFatalError: Error blocked by set rotation.");
  			SetNextMode(Mode.FATAL_ERROR);
-@@ -1109,7 +1109,7 @@ public class SceneMgr : IService, IHasUpdate
+@@ -1127,7 +1127,7 @@ public class SceneMgr : IService, IHasUpdate
  		SetNextMode(Mode.HUB);
  	}
  
@@ -94419,7 +94610,7 @@ index 7f8a7622..a0647e09 100644
 +    }
  }
 diff --git a/Assembly-CSharp/SellableDeckProductPage.cs b/Assembly-CSharp/SellableDeckProductPage.cs
-index 91950edf..b5d34e4a 100644
+index 238403b6..b466de9e 100644
 --- a/Assembly-CSharp/SellableDeckProductPage.cs
 +++ b/Assembly-CSharp/SellableDeckProductPage.cs
 @@ -1,6 +1,7 @@
@@ -95053,7 +95244,7 @@ index 68b720ae..fac8653e 100644
  	public LettuceTeam Team { get; set; }
  
 diff --git a/Assembly-CSharp/Shop.cs b/Assembly-CSharp/Shop.cs
-index 96d5c8c6..9ca4aae3 100644
+index 66ab8b95..d7d433c0 100644
 --- a/Assembly-CSharp/Shop.cs
 +++ b/Assembly-CSharp/Shop.cs
 @@ -11,14 +11,15 @@ using Hearthstone.DataModels;
@@ -95092,7 +95283,7 @@ index 96d5c8c6..9ca4aae3 100644
  				return m_browser.IsReady();
  			}
  			return false;
-@@ -160,33 +161,37 @@ public class Shop : MonoBehaviour, IStore
+@@ -162,33 +163,37 @@ public class Shop : MonoBehaviour, IStore
  		{
  			return;
  		}
@@ -95153,7 +95344,7 @@ index 96d5c8c6..9ca4aae3 100644
  		}
  		m_productPageController.HandleShopOpen();
  		this.OnOpened?.Invoke();
-@@ -231,8 +236,10 @@ public class Shop : MonoBehaviour, IStore
+@@ -234,8 +239,10 @@ public class Shop : MonoBehaviour, IStore
  			DontFullyOpenShop = false;
  			UpdateScrollerEnabled();
  			this.OnClosed?.Invoke(new StoreClosedArgs());
@@ -95165,7 +95356,7 @@ index 96d5c8c6..9ca4aae3 100644
  
  	public void RaiseShopButtonStatusEvent()
  	{
-@@ -266,9 +273,9 @@ public class Shop : MonoBehaviour, IStore
+@@ -269,9 +276,9 @@ public class Shop : MonoBehaviour, IStore
  		if (TryGetCurrentTabs(out var tab, out var subTab))
  		{
  			if (tab.Id == "battlegrounds")
@@ -95178,7 +95369,7 @@ index 96d5c8c6..9ca4aae3 100644
  			if (tab.Id == "other" && subTab.Id == "tickets")
  			{
  				hashSet.Add(CurrencyType.TAVERN_TICKET);
-@@ -415,18 +422,18 @@ public class Shop : MonoBehaviour, IStore
+@@ -418,18 +425,18 @@ public class Shop : MonoBehaviour, IStore
  			{
  				StopCoroutine(m_moveToProductCoroutine);
  				m_moveToProductCoroutine = null;
@@ -95202,7 +95393,7 @@ index 96d5c8c6..9ca4aae3 100644
  		mainTabId = string.Empty;
  		subTabId = string.Empty;
  		if (m_shopData != null && m_shopData.CurrentTab != null)
-@@ -435,8 +442,8 @@ public class Shop : MonoBehaviour, IStore
+@@ -438,8 +445,8 @@ public class Shop : MonoBehaviour, IStore
  			if (m_shopData.CurrentSubTab != null)
  			{
  				subTabId = m_shopData.CurrentSubTab.Id;
@@ -95213,7 +95404,19 @@ index 96d5c8c6..9ca4aae3 100644
  		}
  		return false;
  	}
-@@ -626,7 +633,7 @@ public class Shop : MonoBehaviour, IStore
+@@ -623,16 +630,16 @@ public class Shop : MonoBehaviour, IStore
+ 		if (!(m_browserScroller == null))
+ 		{
+ 			bool flag = m_productPageController != null && m_isOpen && !m_productPageController.IsOpen && !m_isAnimatingOpenOrClose;
+-			m_browserScroller.enabled = flag;
+-			m_browserScroller.SetHideThumb(!flag);
+-		}
++		m_browserScroller.enabled = flag;
++		m_browserScroller.SetHideThumb(!flag);
++	}
+ 	}
+ 
+ 	private void EnsureShopMovedToOverlayUI()
  	{
  		OverlayUI overlayUI = OverlayUI.Get();
  		if ((bool)overlayUI && (bool)m_widget && !overlayUI.HasObject(m_widget.gameObject))
@@ -95222,7 +95425,7 @@ index 96d5c8c6..9ca4aae3 100644
  			overlayUI.AddGameObject(m_widget.gameObject);
  		}
  	}
-@@ -636,11 +643,11 @@ public class Shop : MonoBehaviour, IStore
+@@ -642,11 +649,11 @@ public class Shop : MonoBehaviour, IStore
  		if (ServiceManager.TryGet<CurrencyManager>(out var service))
  		{
  			if (ShopUtils.TryGetMainVirtualCurrencyType(out var currencyType))
@@ -95238,7 +95441,7 @@ index 96d5c8c6..9ca4aae3 100644
  				m_shopData.VirtualCurrencyBalance = service.GetPriceDataModel(CurrencyType.NONE);
  			}
  			if (ShopUtils.TryGetBoosterVirtualCurrencyType(out var currencyType2))
-@@ -648,11 +655,11 @@ public class Shop : MonoBehaviour, IStore
+@@ -654,11 +661,11 @@ public class Shop : MonoBehaviour, IStore
  				m_shopData.BoosterCurrencyBalance = service.GetPriceDataModel(currencyType2);
  			}
  			else
@@ -95252,7 +95455,7 @@ index 96d5c8c6..9ca4aae3 100644
  
  	private void OnPageOpening(ProductPage page)
  	{
-@@ -663,6 +670,8 @@ public class Shop : MonoBehaviour, IStore
+@@ -669,6 +676,8 @@ public class Shop : MonoBehaviour, IStore
  	private void OnPageOpened(ProductPage page)
  	{
  		UpdateScrollerEnabled();
@@ -95261,7 +95464,7 @@ index 96d5c8c6..9ca4aae3 100644
  	}
  
  	private void OnPageClosed(ProductPage page)
-@@ -679,6 +688,8 @@ public class Shop : MonoBehaviour, IStore
+@@ -685,6 +694,8 @@ public class Shop : MonoBehaviour, IStore
  	private void OnTabChanged(int tabIndex, int subTabIndex)
  	{
  		RefreshContent(tabIndex, subTabIndex);
@@ -95270,7 +95473,7 @@ index 96d5c8c6..9ca4aae3 100644
  	}
  
  	private bool OnNavigateBack()
-@@ -705,10 +716,10 @@ public class Shop : MonoBehaviour, IStore
+@@ -711,10 +722,10 @@ public class Shop : MonoBehaviour, IStore
  		this.OnOpenCompleted?.Invoke();
  		UpdateScrollerEnabled();
  		MusicManager.Get().StartPlaylist(MusicPlaylistType.UI_Store);
@@ -95283,7 +95486,7 @@ index 96d5c8c6..9ca4aae3 100644
  		m_isAnimatingOpenOrClose = false;
  		this.OnCloseCompleted?.Invoke();
  		UpdateScrollerEnabled();
-@@ -733,10 +744,10 @@ public class Shop : MonoBehaviour, IStore
+@@ -739,10 +750,10 @@ public class Shop : MonoBehaviour, IStore
  		if (ServiceManager.TryGet<IProductDataService>(out var service) && service.TryGetSubTabFromProductId(product.PmtId, out var parentTab, out var subTab))
  		{
  			if (!parentTab.Enabled || parentTab.Locked || !subTab.Enabled || subTab.Locked)
@@ -95297,7 +95500,7 @@ index 96d5c8c6..9ca4aae3 100644
  			m_shopTabController.SelectTab(parentTab.Id, subTab.Id, instant: true);
  		}
  		if (TryGetActiveShopSlot(product, out var shopSlot))
-@@ -757,9 +768,9 @@ public class Shop : MonoBehaviour, IStore
+@@ -763,9 +774,9 @@ public class Shop : MonoBehaviour, IStore
  				{
  					shopSlot = activeSlot;
  					return true;
@@ -95308,7 +95511,7 @@ index 96d5c8c6..9ca4aae3 100644
  		Log.Store.PrintWarning($"[Shop::TryGetActiveShopSlot] Product {product.PmtId} not found");
  		return false;
  	}
-@@ -771,13 +782,13 @@ public class Shop : MonoBehaviour, IStore
+@@ -777,13 +788,13 @@ public class Shop : MonoBehaviour, IStore
  			return null;
  		}
  		if (StoreManager.Get() == null)
@@ -95326,7 +95529,7 @@ index 96d5c8c6..9ca4aae3 100644
  		return new ShopVisit
  		{
  			Cards = m_browser.GetShopCardTelemetry(),
-@@ -787,4 +798,238 @@ public class Shop : MonoBehaviour, IStore
+@@ -793,4 +804,238 @@ public class Shop : MonoBehaviour, IStore
  			LoadTimeSeconds = 0f
  		};
  	}
@@ -95566,7 +95769,7 @@ index 96d5c8c6..9ca4aae3 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/ShopBrowser.cs b/Assembly-CSharp/ShopBrowser.cs
-index c9b77ffc..276e882f 100644
+index eb816100..0a818880 100644
 --- a/Assembly-CSharp/ShopBrowser.cs
 +++ b/Assembly-CSharp/ShopBrowser.cs
 @@ -9,6 +9,7 @@ using Hearthstone.UI;
@@ -95686,7 +95889,7 @@ index ea491b96..7144d84f 100644
  {
  	[Serializable]
 diff --git a/Assembly-CSharp/ShopSlot.cs b/Assembly-CSharp/ShopSlot.cs
-index 1854b2d3..0623277c 100644
+index c29088ca..c2eff651 100644
 --- a/Assembly-CSharp/ShopSlot.cs
 +++ b/Assembly-CSharp/ShopSlot.cs
 @@ -55,7 +55,7 @@ public class ShopSlot : ShopBrowserElement
@@ -95753,7 +95956,7 @@ index 1854b2d3..0623277c 100644
  		{
  			ProductDataModel vcVariant = displayProduct;
 @@ -421,7 +421,7 @@ public class ShopSlot : ShopBrowserElement
- 			if (config == null || config.Texture == null)
+ 			if (config == null || config.Texture == null || m_marketingImageFitter == null)
  			{
  				productDataModel.ShowMarketingImage = false;
 -			}
@@ -95775,7 +95978,7 @@ index 1854b2d3..0623277c 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/ShopTab.cs b/Assembly-CSharp/ShopTab.cs
-index 6881c8fb..67f287e2 100644
+index 7a2285c1..a40cdc7a 100644
 --- a/Assembly-CSharp/ShopTab.cs
 +++ b/Assembly-CSharp/ShopTab.cs
 @@ -23,13 +23,7 @@ public class ShopTab : ShopTabBase
@@ -95994,7 +96197,7 @@ index fa844486..38998996 100644
  	}
  
 diff --git a/Assembly-CSharp/SoundOptionsMenu.cs b/Assembly-CSharp/SoundOptionsMenu.cs
-index 8d6bedaa..d9aa77d2 100644
+index 38b3f75f..b64c7349 100644
 --- a/Assembly-CSharp/SoundOptionsMenu.cs
 +++ b/Assembly-CSharp/SoundOptionsMenu.cs
 @@ -1,6 +1,7 @@
@@ -96019,7 +96222,7 @@ index 8d6bedaa..d9aa77d2 100644
  		ShowOrHide(showOrHide: false);
  	}
  
-@@ -183,4 +186,101 @@ public class SoundOptionsMenu : MonoBehaviour
+@@ -184,4 +187,101 @@ public class SoundOptionsMenu : MonoBehaviour
  			optionCheckbox.SetChecked(Options.Get().GetBool(option));
  		}
  	}
@@ -96205,7 +96408,7 @@ index 1a5323bc..5ae6c599 100644
  
  	private bool IsPlayerInGame(BnetGameAccountId gameAccountId)
 diff --git a/Assembly-CSharp/SplashScreen.cs b/Assembly-CSharp/SplashScreen.cs
-index 1ec0b825..4dab0155 100644
+index 71fbc12f..0bf99259 100644
 --- a/Assembly-CSharp/SplashScreen.cs
 +++ b/Assembly-CSharp/SplashScreen.cs
 @@ -14,6 +14,7 @@ using Hearthstone.Login;
@@ -96229,7 +96432,7 @@ index 1ec0b825..4dab0155 100644
  		string str = Vars.Key("Debug.ForceRatingScreen").GetStr(string.Empty);
  		if (!string.IsNullOrEmpty(str))
 diff --git a/Assembly-CSharp/StarshipHUDManager.cs b/Assembly-CSharp/StarshipHUDManager.cs
-index d384c298..97e3b132 100644
+index a8ada858..65d145de 100644
 --- a/Assembly-CSharp/StarshipHUDManager.cs
 +++ b/Assembly-CSharp/StarshipHUDManager.cs
 @@ -1,7 +1,9 @@
@@ -97223,7 +97426,7 @@ index 412e709d..6f1d091d 100644
 +	EOE
  }
 diff --git a/Assembly-CSharp/TB_BaconShop.cs b/Assembly-CSharp/TB_BaconShop.cs
-index d372211e..6b39edfc 100644
+index 2d1c6970..15d4aac5 100644
 --- a/Assembly-CSharp/TB_BaconShop.cs
 +++ b/Assembly-CSharp/TB_BaconShop.cs
 @@ -10,6 +10,7 @@ using Blizzard.T5.Game.Spells.SuperSpells;
@@ -97506,7 +97709,20 @@ index d372211e..6b39edfc 100644
  	private void StartBGCombatSpeedManager()
  	{
  		if (!NetCache.Get().GetNetObject<NetCache.NetCacheFeatures>().BGCombatSpeedDisabled)
-@@ -2810,4 +2792,96 @@ public class TB_BaconShop : MissionEntity
+@@ -2763,9 +2745,9 @@ public class TB_BaconShop : MissionEntity
+ 					remainingEvents++;
+ 				}
+ 				if (blockStart.BlockType == HistoryBlock.Type.ATTACK)
+-				{
+-					remainingAttacks++;
+-				}
++			{
++				remainingAttacks++;
++			}
+ 			}
+ 		});
+ 		outRemainingEvents = remainingEvents;
+@@ -2821,4 +2803,96 @@ public class TB_BaconShop : MissionEntity
  			yield return null;
  		}
  	}
@@ -97604,7 +97820,7 @@ index d372211e..6b39edfc 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/TB_BaconShop_Tutorial.cs b/Assembly-CSharp/TB_BaconShop_Tutorial.cs
-index 44caf108..08f3dc1f 100644
+index 0f106d22..bb2a37dd 100644
 --- a/Assembly-CSharp/TB_BaconShop_Tutorial.cs
 +++ b/Assembly-CSharp/TB_BaconShop_Tutorial.cs
 @@ -1,3 +1,4 @@
@@ -97696,7 +97912,7 @@ index 44caf108..08f3dc1f 100644
  			if (buttonHandler != null)
  			{
  				buttonHandler(e);
-@@ -789,6 +797,7 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -790,6 +798,7 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  		});
  		m_popupTutorialNotification.PlayBirth();
  		UniversalInputManager.Get().SetGameDialogActive(active: true);
@@ -97704,7 +97920,7 @@ index 44caf108..08f3dc1f 100644
  		return notification;
  	}
  
-@@ -805,6 +814,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -806,6 +815,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  				NotificationManager.Get().DestroyNotification(notification, 0f);
  			}
  		}
@@ -97717,7 +97933,7 @@ index 44caf108..08f3dc1f 100644
  	}
  
  	protected void ShowDragBuyTutorial(Card card, string textID = "GAMEPLAY_BACON_PLAY_MINION_TUTORIAL", bool hideImmediately = false)
-@@ -827,6 +842,7 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -828,6 +843,7 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  			m_dragBuyTutorialNotification = NotificationManager.Get().CreatePopupText(UserAttentionBlocker.NONE, position2, TutorialEntity.GetTextScale(), GameStrings.Get(textID));
  			m_dragBuyTutorialNotification.ShowPopUpArrow(direction);
  			m_dragBuyTutorialNotification.PulseReminderEveryXSeconds(2f);
@@ -97725,7 +97941,7 @@ index 44caf108..08f3dc1f 100644
  		}
  	}
  
-@@ -873,6 +889,7 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -874,6 +890,7 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  			m_dragBuyTutorialNotification = NotificationManager.Get().CreatePopupText(UserAttentionBlocker.NONE, position2, TutorialEntity.GetTextScale(), GameStrings.Get(textID));
  			m_dragBuyTutorialNotification.ShowPopUpArrow(direction);
  			m_dragBuyTutorialNotification.PulseReminderEveryXSeconds(2f);
@@ -97733,7 +97949,7 @@ index 44caf108..08f3dc1f 100644
  		}
  	}
  
-@@ -906,14 +923,16 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -907,14 +924,16 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  			Vector3 position = GameState.Get().GetOpposingSidePlayer().GetBattlefieldZone()
  				.transform.position;
  			position += new Vector3(0f, 0f, 2.25f);
@@ -97753,7 +97969,7 @@ index 44caf108..08f3dc1f 100644
  	{
  		List<Zone> list = ZoneMgr.Get().FindZonesForSide(Player.Side.FRIENDLY);
  		Zone zone = null;
-@@ -924,11 +943,14 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -925,11 +944,14 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  				zone = item;
  			}
  		}
@@ -97769,7 +97985,7 @@ index 44caf108..08f3dc1f 100644
  	}
  
  	protected void ShowTavernUpgradeButtonTutorial(bool hideImmediately = false)
-@@ -944,10 +966,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -945,10 +967,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  		}
  		Vector3 position = zone.transform.position;
  		Vector3 position2 = new Vector3(position.x, position.y, position.z - 2.25f);
@@ -97784,7 +98000,7 @@ index 44caf108..08f3dc1f 100644
  	}
  
  	protected void ShowMinionMoveTutorial()
-@@ -957,10 +981,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -958,10 +982,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  		{
  			Vector3 position = leftMostMinionInFriendlyPlay.transform.position;
  			Vector3 position2 = ((!UniversalInputManager.UsePhoneUI) ? new Vector3(position.x, position.y, position.z + 2.5f) : new Vector3(position.x + 0.05f, position.y, position.z + 2.6f));
@@ -97799,7 +98015,7 @@ index 44caf108..08f3dc1f 100644
  		}
  	}
  
-@@ -991,10 +1017,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -992,10 +1018,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  			card.GetActor().SetActorState(ActorStateType.CARD_SELECTABLE);
  			Vector3 position = card.transform.position;
  			Vector3 position2 = ((!UniversalInputManager.UsePhoneUI) ? new Vector3(position.x - 3.2f, position.y, position.z) : new Vector3(position.x - 3.3f, position.y, position.z - 0f));
@@ -97814,7 +98030,7 @@ index 44caf108..08f3dc1f 100644
  		}
  	}
  
-@@ -1011,10 +1039,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -1012,10 +1040,12 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  		}
  		Vector3 position = zone.transform.position;
  		Vector3 position2 = ((!UniversalInputManager.UsePhoneUI) ? new Vector3(position.x, position.y, position.z - 2.1f) : new Vector3(position.x, position.y, position.z - 2.5f));
@@ -97829,7 +98045,7 @@ index 44caf108..08f3dc1f 100644
  	}
  
  	protected IEnumerator ShowManaArrowWithText(string textID)
-@@ -1034,7 +1064,9 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -1035,7 +1065,9 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  		}
  		m_manaNotifier = NotificationManager.Get().CreatePopupText(UserAttentionBlocker.NONE, position, TutorialEntity.GetTextScale(), GameStrings.Get(textID));
  		m_manaNotifier.ShowPopUpArrow(direction);
@@ -97839,7 +98055,7 @@ index 44caf108..08f3dc1f 100644
  		if (m_manaNotifier != null)
  		{
  			iTween.PunchScale(m_manaNotifier.gameObject, iTween.Hash("amount", new Vector3(1f, 1f, 1f), "time", 1f));
-@@ -1057,14 +1089,14 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -1058,14 +1090,14 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  			Card mousedOverCard = InputManager.Get().GetMousedOverCard();
  			if (!(mousedOverCard != null) || mousedOverCard.GetEntity().GetZone() != TAG_ZONE.HAND)
  			{
@@ -97860,7 +98076,7 @@ index 44caf108..08f3dc1f 100644
  
  	public override void NotifyOfCardMousedOver(Entity mousedOverEntity)
  	{
-@@ -1132,4 +1164,30 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
+@@ -1133,4 +1165,30 @@ public class TB_BaconShop_Tutorial : TB_BaconShop
  		}
  		return null;
  	}
@@ -98376,7 +98592,7 @@ index 1e925f3d..77e86584 100644
  			{
  			case '$':
 diff --git a/Assembly-CSharp/TooltipPanelManager.cs b/Assembly-CSharp/TooltipPanelManager.cs
-index 0c1c7e00..9f435f1a 100644
+index 6a2d6279..de6f9087 100644
 --- a/Assembly-CSharp/TooltipPanelManager.cs
 +++ b/Assembly-CSharp/TooltipPanelManager.cs
 @@ -152,23 +152,23 @@ public class TooltipPanelManager : MonoBehaviour
@@ -99040,7 +99256,7 @@ index 0c1c7e00..9f435f1a 100644
  
  	private void PrepareToUpdateKeywordHelp(Actor actor)
  	{
-@@ -1509,29 +1509,29 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -1524,29 +1524,29 @@ public class TooltipPanelManager : MonoBehaviour
  			switch (gAME_TAG)
  			{
  			case GAME_TAG.SECRET:
@@ -99079,7 +99295,7 @@ index 0c1c7e00..9f435f1a 100644
  
  	private void GetEntityTagValuesForKeywordPanel(EntityBase entityInfo, GAME_TAG tag, out int tagValue, out int referenceTagValue)
  	{
-@@ -1659,38 +1659,38 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -1706,38 +1706,38 @@ public class TooltipPanelManager : MonoBehaviour
  			switch (mode)
  			{
  			case SceneMgr.Mode.GAMEPLAY:
@@ -99144,7 +99360,7 @@ index 0c1c7e00..9f435f1a 100644
  		}
  		if (tagValue != 0 && tag == GAME_TAG.HAS_DARK_GIFT && mode == SceneMgr.Mode.GAMEPLAY)
  		{
-@@ -1767,73 +1767,73 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -1814,73 +1814,73 @@ public class TooltipPanelManager : MonoBehaviour
  			if (flag)
  			{
  				if (tag == GAME_TAG.EMPOWER)
@@ -99190,12 +99406,12 @@ index 0c1c7e00..9f435f1a 100644
  				{
 -					if (tag == gAME_TAG)
 -					{
- 						int num7 = entityBase.GetTag(tag);
+ 						int num9 = entityBase.GetTag(tag);
 -						string empty = string.Empty;
 +					string empty = string.Empty;
- 						empty = ((num7 <= 0) ? GameStrings.Get(GameStrings.GetRefKeywordTextKey(tag)) : GameStrings.Format(GameStrings.GetKeywordTextKey(tag), num7));
- 						string keywordName4 = GameStrings.GetKeywordName(tag);
- 						SetupTooltipPanel(keywordName4, empty);
+ 						empty = ((num9 <= 0) ? GameStrings.Get(GameStrings.GetRefKeywordTextKey(tag)) : GameStrings.Format(GameStrings.GetKeywordTextKey(tag), num9));
+ 						string keywordName5 = GameStrings.GetKeywordName(tag);
+ 						SetupTooltipPanel(keywordName5, empty);
 -						return true;
 -					}
 -				}
@@ -99247,29 +99463,29 @@ index 0c1c7e00..9f435f1a 100644
  				if (tag == GAME_TAG.SHIFTING_MINION || tag == GAME_TAG.SHIFTING_WEAPON || tag == GAME_TAG.SHIFTING_SPELL || tag == GAME_TAG.SHIFTING_TOP || tag == GAME_TAG.SHIFTING)
 -				{
 +			{
- 					int num8 = entityBase.GetTag(GAME_TAG.TRANSFORMED_FROM_CARD);
- 					if (num8 == 0)
+ 					int num10 = entityBase.GetTag(GAME_TAG.TRANSFORMED_FROM_CARD);
+ 					if (num10 == 0)
 -					{
 -						return false;
 -					}
 +				{
 +					return false;
 +				}
- 					EntityDef entityDef = DefLoader.Get().GetEntityDef(num8);
- 					string text8 = GameStrings.Get(GameStrings.GetKeywordTextKey(tag));
- 					if (num8 == 102614)
-@@ -1849,8 +1849,8 @@ public class TooltipPanelManager : MonoBehaviour
- 						text8 = text8 + " " + GameStrings.Get("GLOBAL_KEYWORD_SHIFTING_ADDS_POISONOUS_TEXT");
+ 					EntityDef entityDef = DefLoader.Get().GetEntityDef(num10);
+ 					string text9 = GameStrings.Get(GameStrings.GetKeywordTextKey(tag));
+ 					if (num10 == 102614)
+@@ -1896,8 +1896,8 @@ public class TooltipPanelManager : MonoBehaviour
+ 						text9 = text9 + " " + GameStrings.Get("GLOBAL_KEYWORD_SHIFTING_ADDS_POISONOUS_TEXT");
  					}
- 					SetupTooltipPanel(entityDef.GetName(), text8);
+ 					SetupTooltipPanel(entityDef.GetName(), text9);
 -					return true;
 -				}
 +				return true;
 +			}
  				if (tag == GAME_TAG.AI_MUST_PLAY && SceneMgr.Get().GetMode() == SceneMgr.Mode.GAMEPLAY)
  				{
- 					int controllerId3 = entityBase.GetControllerId();
-@@ -1860,16 +1860,16 @@ public class TooltipPanelManager : MonoBehaviour
+ 					int controllerId4 = entityBase.GetControllerId();
+@@ -1907,16 +1907,16 @@ public class TooltipPanelManager : MonoBehaviour
  						return false;
  					}
  				}
@@ -99277,12 +99493,12 @@ index 0c1c7e00..9f435f1a 100644
 -				{
 +			if (tag == GAME_TAG.EMPOWER && SceneMgr.Get().GetMode() == SceneMgr.Mode.GAMEPLAY)
 +			{
- 					int controllerId4 = entityBase.GetControllerId();
- 					Player player4 = GameState.Get().GetPlayer(controllerId4);
- 					if (player4 != null && player4.HasTag(GAME_TAG.PROXY_GALAKROND))
+ 					int controllerId5 = entityBase.GetControllerId();
+ 					Player player5 = GameState.Get().GetPlayer(controllerId5);
+ 					if (player5 != null && player5.HasTag(GAME_TAG.PROXY_GALAKROND))
 -					{
 +				{
- 						Entity entity4 = GameState.Get().GetEntity(player4.GetTag(GAME_TAG.PROXY_GALAKROND));
+ 						Entity entity4 = GameState.Get().GetEntity(player5.GetTag(GAME_TAG.PROXY_GALAKROND));
  						tag = GetEmpowerTagByClass(entity4.GetClass());
 -					}
  				}
@@ -99290,7 +99506,7 @@ index 0c1c7e00..9f435f1a 100644
  				if (record.IsCollectionOnly)
  				{
  					return true;
-@@ -1879,14 +1879,14 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -1926,14 +1926,14 @@ public class TooltipPanelManager : MonoBehaviour
  					SetupKeywordPanelFactionMultiClass(tag, entityBase);
  					return true;
  				}
@@ -99313,7 +99529,7 @@ index 0c1c7e00..9f435f1a 100644
  			SetupKeywordPanel(tag);
  			return true;
  		}
-@@ -1965,7 +1965,7 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -2012,7 +2012,7 @@ public class TooltipPanelManager : MonoBehaviour
  	}
  
  	private TooltipPanel SetupTooltipPanel(string headline, string description, TooltipPanel panel)
@@ -99322,7 +99538,7 @@ index 0c1c7e00..9f435f1a 100644
  		return SetupTooltipPanel(headline, description, panel, 0.4f);
  	}
  
-@@ -1975,11 +1975,11 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -2022,11 +2022,11 @@ public class TooltipPanelManager : MonoBehaviour
  		{
  			return panel;
  		}
@@ -99339,7 +99555,7 @@ index 0c1c7e00..9f435f1a 100644
  		return panel;
  	}
  
-@@ -2008,10 +2008,10 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -2055,10 +2055,10 @@ public class TooltipPanelManager : MonoBehaviour
  		{
  			if (!(tooltipPanel is SignatureTooltipPanel))
  			{
@@ -99352,7 +99568,7 @@ index 0c1c7e00..9f435f1a 100644
  
  	public void ShowKeywordHelp()
  	{
-@@ -2043,11 +2043,11 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -2090,11 +2090,11 @@ public class TooltipPanelManager : MonoBehaviour
  				tooltipPanel.gameObject.SetActive(value: false);
  				if (!(tooltipPanel is SignatureTooltipPanel))
  				{
@@ -99366,7 +99582,7 @@ index 0c1c7e00..9f435f1a 100644
  
  	public Card GetCard()
  	{
-@@ -2134,4 +2134,13 @@ public class TooltipPanelManager : MonoBehaviour
+@@ -2181,4 +2181,13 @@ public class TooltipPanelManager : MonoBehaviour
  		}
  		return result;
  	}
@@ -100856,7 +101072,7 @@ index 86291887..5e9359d8 100644
  		while (Box.Get().IsTransitioningToSceneMode());
  		yield return new WaitForSecondsRealtime(1f);
 diff --git a/Assembly-CSharp/UIBScrollable.cs b/Assembly-CSharp/UIBScrollable.cs
-index 80af8701..9d2cd033 100644
+index aa92876b..31c6c308 100644
 --- a/Assembly-CSharp/UIBScrollable.cs
 +++ b/Assembly-CSharp/UIBScrollable.cs
 @@ -233,7 +233,7 @@ public class UIBScrollable : PegUICustomBehavior
@@ -100955,7 +101171,7 @@ index bcdf9450..7827ac97 100644
  {
  	public UIVoiceLinesManager.TriggerType m_TriggerType;
 diff --git a/Assembly-CSharp/UnityEngine/UI/HSInputField.cs b/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
-index 6cc14b0c..fb5066ce 100644
+index b8573f2c..9890b82e 100644
 --- a/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
 +++ b/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
 @@ -1420,11 +1420,11 @@ namespace UnityEngine.UI
@@ -101025,7 +101241,7 @@ index 6cc14b0c..fb5066ce 100644
  	}
  }
 diff --git a/Assembly-CSharp/UniversalInputManager.cs b/Assembly-CSharp/UniversalInputManager.cs
-index 1d476cbe..2167dd0d 100644
+index 1a720496..00001959 100644
 --- a/Assembly-CSharp/UniversalInputManager.cs
 +++ b/Assembly-CSharp/UniversalInputManager.cs
 @@ -6,6 +6,7 @@ using Blizzard.T5.Jobs;
@@ -101036,7 +101252,7 @@ index 1d476cbe..2167dd0d 100644
  
  public class UniversalInputManager : IHasUpdate, IService
  {
-@@ -978,6 +979,13 @@ public class UniversalInputManager : IHasUpdate, IService
+@@ -999,6 +1000,13 @@ public class UniversalInputManager : IHasUpdate, IService
  		{
  			return;
  		}
@@ -101050,7 +101266,7 @@ index 1d476cbe..2167dd0d 100644
  		InputManager inputManager = InputManager.Get();
  		if ((inputManager != null && inputManager.HandleKeyboardInput()) || HearthstoneCheckoutBlocksInput())
  		{
-@@ -1125,6 +1133,8 @@ public class UniversalInputManager : IHasUpdate, IService
+@@ -1146,6 +1154,8 @@ public class UniversalInputManager : IHasUpdate, IService
  		m_inputCanceledCallback = null;
  		m_inputUnfocusedCallback = null;
  		_ = Application.isEditor;

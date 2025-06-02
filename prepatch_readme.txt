@@ -172,6 +172,13 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 [05] Changelog
 ----------
 
+### 2025-06-02
+
+- Updated to Hearthstone 32.4.0.221908 (contributed by Endefx)
+- When converting runestones to arcane orbs in the Chinese shop, it is now possible to press the home and end keys to quickly select the minimum or maximum available quantity (contributed by Endefx)
+- Per Hearthstone UI changes, Tavern Brawl has moved to the modes menu
+- Due to a major revamp of the Arena mode, accessibility support for it has been temporarily removed.
+
 ### 2025-04-29
 
 - Updated to Hearthstone version 32.2.0.219846 (contributed by Endefx)

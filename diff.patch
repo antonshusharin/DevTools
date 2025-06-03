@@ -16896,10 +16896,10 @@ index 00000000..77efef08
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleTraditionalCard.cs b/Assembly-CSharp/Accessibility/AccessibleTraditionalCard.cs
 new file mode 100644
-index 00000000..f5a02bf3
+index 00000000..1ac46b2e
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleTraditionalCard.cs
-@@ -0,0 +1,423 @@
+@@ -0,0 +1,430 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Text;
@@ -17157,6 +17157,13 @@ index 00000000..f5a02bf3
 +            }
 +
 +            AccessibleCardUtils.AddLineIfExists(GetDescription(), lines);
++
++            var darkGiftEntity = m_card.GetEntity().GetTag(GAME_TAG.HAS_DARK_GIFT);
++            if (darkGiftEntity > 1 && extraEntity == null)
++            {
++                extraEntity = GameState.Get().GetEntity(darkGiftEntity);
++            }
++
 +            if (extraEntity != null)
 +            {
 +                var textInHand = extraEntity.GetCardTextBuilder().BuildCardTextInHand(extraEntity);

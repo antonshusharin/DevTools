@@ -172,6 +172,10 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 [05] Changelog
 ----------
 
+### 2025-06-03
+
+- Fixed a bug where dark gifts would not be read while discovering (contributed by Endefx)
+
 ### 2025-06-02
 
 - Updated to Hearthstone 32.4.0.221908 (contributed by Endefx)

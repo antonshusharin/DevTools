@@ -8,7 +8,7 @@ Please stick to the approved process and ***do not publish and/or share decompil
 ## Setup
 1. Clone the project:
 ```
-git clone --recurse-submodules https://github.com/HearthstoneAccess/DevTools.git
+git clone --recurse-submodules https://github.com/antonshusharin/DevTools.git
 cd DevTools
 ```
 

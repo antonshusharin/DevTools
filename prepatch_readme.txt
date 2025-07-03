@@ -172,6 +172,13 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 [05] Changelog
 ----------
 
+### 2025-07-01
+
+- Updated to Hearthstone version 33.0.0.223542 (contributed by Endefx)
+- Support for the Battlegrounds Duos mode has been merged into the main HearthstoneAccess patch. There is no longer a separate build for Duos. (Code contributed by Endefx, sound design by Superblindman and CritterPup)
+
+Note: the warlock quest from the upcoming expansion might not work correctly with the mod. The fix, if one is required, is expected before the expansion launches on July 8th.
+
 ### 2025-06-03
 
 - Fixed a bug where dark gifts would not be read while discovering (contributed by Endefx)

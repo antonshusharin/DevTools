@@ -1,3 +1,7 @@
+### 2025-08-05
+
+- Updated to Hearthstone version 33.2.0.225406 (contributed by Endefx)
+
 ### 2025-07-01
 
 - Updated to Hearthstone version 33.0.0.223542 (contributed by Endefx)

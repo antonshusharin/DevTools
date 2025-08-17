@@ -1,3 +1,7 @@
+### 2025-08-17
+
+- Fixed a bug that made multi-target cards such as "Mountain Avalanche" unplayable in Battlegrounds (contributed by Endefx)
+
 ### 2025-08-05
 
 - Updated to Hearthstone version 33.2.0.225406 (contributed by Endefx)

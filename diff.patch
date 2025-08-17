@@ -18344,10 +18344,10 @@ index 00000000..20d90672
 +}
 diff --git a/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs b/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs
 new file mode 100644
-index 00000000..dfe64f3c
+index 00000000..e60ff75d
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs
-@@ -0,0 +1,2372 @@
+@@ -0,0 +1,2373 @@
 +﻿using System;
 +using System.Collections;
 +using System.Collections.Generic;
@@ -18785,7 +18785,8 @@ index 00000000..dfe64f3c
 +                    return;
 +                case AccessibleGameState.CHOICE_MODE:
 +                    HandleCheckStatusKeys();
-+                    HandleChoiceMode();
++                    bool canHandleChoiceMode=HandleChoiceMode();
++                    if(!canHandleChoiceMode) HandleTargetMode();
 +                    return;
 +                                        case AccessibleGameState.CHOICE_MODE_CHOICES_HIDDEN:
 +                    HandleCheckStatusKeys();

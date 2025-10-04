@@ -172,6 +172,16 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 [05] Changelog
 ----------
 
+### 2025-10-04
+- Updated to Hearthstone version 33.6.0.229238
+
+### 2025-09-29
+
+- Updated to Hearthstone version 33.6.0.228587 (contributed by Endefx)
+
+Note that the new rewind mechanic is not currently accessible. In addition, purchasing the preorder bundles for the new expansion is  not currently accessible in the in-game shop.
+These issues will be addressed in subsequent updates.
+
 ### 2025-09-02
 
 - Updated to Hearthstone version 33.4.0.226928 (contributed by Endefx)

@@ -4105,10 +4105,10 @@ index 00000000..4555017d
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleGameplay.cs b/Assembly-CSharp/Accessibility/AccessibleGameplay.cs
 new file mode 100644
-index 00000000..64e15604
+index 00000000..8168882a
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleGameplay.cs
-@@ -0,0 +1,2996 @@
+@@ -0,0 +1,3016 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Linq;
@@ -4139,6 +4139,7 @@ index 00000000..64e15604
 +            CHOICE_MODE,
 +            CHOICE_MODE_CHOICES_HIDDEN,
 +            SUMMONING_MINION,
++            POSITIONING_LOCATION,
 +            PLAYING_CARD,
 +            TRADING_CARD,
 +            CONFIRMING_END_TURN,
@@ -4677,8 +4678,14 @@ index 00000000..64e15604
 +                case AccessibleGameState.SUMMONING_MINION:
 +                    HandleCardReadingInput();
 +                    HandleCheckStatusKeys();
-+                    HandleSummoningMinion();
++                    HandleCardPlacement();
 +                    HandleTradeCardWhenHoldingCardInput();
++                    return;
++                case AccessibleGameState.POSITIONING_LOCATION:
++                    HandleCardReadingInput();
++                    HandleCheckStatusKeys();
++                    HandleCardPlacement();
++                    // HandleTradeCardWhenHoldingCardInput();
 +                    return;
 +                case AccessibleGameState.PLAYING_CARD:
 +                    //HandleCardReadingInput();
@@ -4819,13 +4826,14 @@ index 00000000..64e15604
 +
 +        private int m_summonPos;
 +
-+        protected void HandleSummoningMinion()
++        protected void HandleCardPlacement()
 +        {
 +            var playerMinions = GameState.Get().GetFriendlySidePlayer().GetBattlefieldZone();
 +
 +            if (playerMinions.GetCardCount() == 0)
 +            {
-+                if (m_prevState != AccessibleGameState.SUMMONING_MINION)
++                if (m_prevState != AccessibleGameState.SUMMONING_MINION
++                    && m_prevState != AccessibleGameState.POSITIONING_LOCATION)
 +                {
 +                    AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.GAMEPLAY_QUERY_SUMMON_MINION));
 +                    OnSummoningMinion(m_heldCard);
@@ -4835,7 +4843,8 @@ index 00000000..64e15604
 +            }
 +            else
 +            {
-+                if (m_prevState != AccessibleGameState.SUMMONING_MINION)
++                if (m_prevState != AccessibleGameState.SUMMONING_MINION
++                    && m_prevState != AccessibleGameState.POSITIONING_LOCATION)
 +                {
 +                    m_summonPos = playerMinions.GetLastPos();
 +                    QuerySummonPosition(0);
@@ -5438,6 +5447,10 @@ index 00000000..64e15604
 +                if (m_heldCard.GetEntity().IsMinion())
 +                {
 +                    m_curState = AccessibleGameState.SUMMONING_MINION;
++                }
++                else if (m_heldCard.GetEntity().IsLocation())
++                {
++                    m_curState = AccessibleGameState.POSITIONING_LOCATION;
 +                }
 +                else if (GameState.Get().IsInMainOptionMode())
 +                {
@@ -6608,6 +6621,8 @@ index 00000000..64e15604
 +                    return GetHiddenChoiceHelp();
 +                case AccessibleGameState.SUMMONING_MINION:
 +                    return GetSummoningMinionHelp();
++                case AccessibleGameState.POSITIONING_LOCATION:
++                    return GetPositioningLocationHelp();
 +                case AccessibleGameState.PLAYING_CARD:
 +                    return GetPlayingCardHelp();
 +                case AccessibleGameState.CONFIRMING_END_TURN:
@@ -6659,6 +6674,11 @@ index 00000000..64e15604
 +        private string GetSummoningMinionHelp()
 +        {
 +            return GetOrNarrateHelpSpeech(AccessibleSpeech.GAMEPLAY_SUMMON_MINION_HELP);
++        }
++
++        private string GetPositioningLocationHelp()
++        {
++            return GetOrNarrateHelpSpeech(AccessibleSpeech.GAMEPLAY_POSITION_LOCATION_HELP);
 +        }
 +
 +        private string GetChoiceModeHelp()
@@ -15527,10 +15547,10 @@ index 00000000..08e84acf
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleSpeech.cs b/Assembly-CSharp/Accessibility/AccessibleSpeech.cs
 new file mode 100644
-index 00000000..39f76b96
+index 00000000..e1972072
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleSpeech.cs
-@@ -0,0 +1,308 @@
+@@ -0,0 +1,309 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Runtime.CompilerServices;
@@ -15598,6 +15618,7 @@ index 00000000..39f76b96
 +        public static HSASpeech GAMEPLAY_PLAY_CARD_HELP = CreateSpeech(L10N.Of(LocalizationKey.GAMEPLAY_PLAY_CARD_HELP, AccessibleKey.CONFIRM), $"Press {AccessibleKey.CONFIRM.ToEnglishString()} to play this card");
 +        public static HSASpeech GAMEPLAY_TRADE_CARD_HELP = CreateSpeech(L10N.Of(LocalizationKey.GAMEPLAY_TRADE_CARD_HELP, AccessibleKey.TRADE_CARD), $"Press {AccessibleKey.TRADE_CARD.ToEnglishString()} to trade this card");
 +        public static HSASpeech GAMEPLAY_SUMMON_MINION_HELP = CreateSpeech(L10N.Of(LocalizationKey.GAMEPLAY_SUMMON_MINION_HELP, AccessibleKey.CONFIRM), $"Press {AccessibleKey.CONFIRM.ToEnglishString()} to summon this minion");
++        public static HSASpeech GAMEPLAY_POSITION_LOCATION_HELP = CreateSpeech(L10N.Of(LocalizationKey.GAMEPLAY_POSITION_LOCATION_HELP, AccessibleKey.CONFIRM), $"Press {AccessibleKey.CONFIRM.ToEnglishString()} to place this location");
 +        public static HSASpeech GAMEPLAY_CHOICE_MODE_HELP = CreateSpeech(L10N.Of(LocalizationKey.GAMEPLAY_CHOICE_MODE_HELP, AccessibleKey.CONFIRM, AccessibleKey.READ_NEXT_VALID_ITEM), $"Use the arrow keys to go through your options. Press {AccessibleKey.CONFIRM.ToEnglishString()} to choose one");
 +        public static HSASpeech GAMEPLAY_CHOOSE_TARGET_HELP = CreateSpeech(L10N.Of(LocalizationKey.GAMEPLAY_CHOOSE_TARGET_HELP, AccessibleKey.READ_NEXT_VALID_ITEM, AccessibleKey.CONFIRM, AccessibleKey.BACK), $"Use {AccessibleKey.READ_NEXT_VALID_ITEM.ToEnglishString()} or the Zone keys to go through your targets. Press {AccessibleKey.CONFIRM.ToEnglishString()} to choose a target or {AccessibleKey.BACK.ToEnglishString()} to cancel");
 +        public static HSASpeech GAMEPLAY_ATTACK_WITH_MINION_HELP = CreateSpeech(L10N.Of(LocalizationKey.GAMEPLAY_ATTACK_WITH_MINION_HELP, AccessibleKey.CONFIRM), $"Press {AccessibleKey.CONFIRM.ToEnglishString()} to attack with this minion");
@@ -18344,7 +18365,7 @@ index 00000000..20d90672
 +}
 diff --git a/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs b/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs
 new file mode 100644
-index 00000000..e60ff75d
+index 00000000..1fd3540f
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs
 @@ -0,0 +1,2373 @@
@@ -18805,7 +18826,7 @@ index 00000000..e60ff75d
 +                case AccessibleGameState.SUMMONING_MINION:
 +                    HandleCardReadingInput();
 +                    HandleCheckStatusKeys();
-+                    HandleSummoningMinion();
++                    HandleCardPlacement();
 +                    // TODO: Check base file to see what this is HandleTradeCardWhenHoldingCardInput();
 +                    return;
 +                case AccessibleGameState.BUYING_CARD:
@@ -20332,7 +20353,7 @@ index 00000000..e60ff75d
 +                AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_TOKENS, tokens));
 +            }
 +        }
-+        
++
 +        #endregion
 +
 +        #region Duos Zones
@@ -26869,10 +26890,10 @@ index 00000000..fb167df2
 +}
 diff --git a/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
 new file mode 100644
-index 00000000..6163a6c5
+index 00000000..013d083a
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
-@@ -0,0 +1,1246 @@
+@@ -0,0 +1,1247 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Linq;
@@ -27335,6 +27356,7 @@ index 00000000..6163a6c5
 +    public static LocalizationKey GAMEPLAY_PLAY_CARD_HELP = CreateKey("ACCESSIBILITY_GAMEPLAY_PLAY_CARD_HELP");
 +    public static LocalizationKey GAMEPLAY_TRADE_CARD_HELP = CreateKey("ACCESSIBILITY_GAMEPLAY_TRADE_CARD_HELP");
 +    public static LocalizationKey GAMEPLAY_SUMMON_MINION_HELP = CreateKey("ACCESSIBILITY_GAMEPLAY_SUMMON_MINION_HELP");
++    public static LocalizationKey GAMEPLAY_POSITION_LOCATION_HELP = CreateKey("ACCESSIBILITY_GAMEPLAY_POSITION_LOCATION_HELP");
 +    public static LocalizationKey GAMEPLAY_CHOICE_MODE_HELP = CreateKey("ACCESSIBILITY_GAMEPLAY_CHOICE_MODE_HELP");
 +    public static LocalizationKey GAMEPLAY_HIDDEN_CHOICE_HELP = CreateKey("ACCESSIBILITY_GAMEPLAY_HIDDEN_CHOICE_HELP");
 +    public static LocalizationKey GAMEPLAY_CHOOSE_TARGET_HELP = CreateKey("ACCESSIBILITY_GAMEPLAY_CHOOSE_TARGET_HELP");

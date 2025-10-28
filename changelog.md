@@ -1,3 +1,10 @@
+### 2025-10-28
+
+- Updated to Hearthstone version 34.0.0.229984 (contributed by Endefx)
+- Support for the new arena has been added to the mod. Note that underground arena is not yet supported. (contributed by Charlie).
+- The rewind mechanic for the new expansion is now supported. Press U to rewind, J to keep. (contributed by Endefx)
+- When playing a location, it is now possible to position it on the board (contributed by YellowFish)
+
 ### 2025-10-04
 - Updated to Hearthstone version 33.6.0.229238
 

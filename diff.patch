@@ -7719,10 +7719,10 @@ index 00000000..2d7ffcb6
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleHub.cs b/Assembly-CSharp/Accessibility/AccessibleHub.cs
 new file mode 100644
-index 00000000..55ab631e
+index 00000000..27dd060c
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleHub.cs
-@@ -0,0 +1,284 @@
+@@ -0,0 +1,291 @@
 +﻿using Hearthstone.Progression;
 +using PegasusShared;
 +using System;
@@ -7778,6 +7778,8 @@ index 00000000..55ab631e
 +
 +            if (box.m_GameModesButton.IsEnabled())
 +                m_mainMenu.AddOption(AccessibleKey.HUB_MODES, LocalizedText.HUB_GAME_MODES_OPTION, OnClickModes);
++            if (box.m_ArenaButton.IsEnabled())
++                m_mainMenu.AddOption(LocalizationUtils.Get(LocalizationKey.GLOBAL_ARENA), OnClickArena);
 +            if (box.m_BattleGroundsButton.IsEnabled())
 +                m_mainMenu.AddOption(AccessibleKey.HUB_BATTLEGROUNDS, LocalizedText.HUB_BATTLEGROUNDS_OPTION, OnClickBattlegrounds);
 +            if (box.m_CollectionButton.IsEnabled())
@@ -7827,6 +7829,11 @@ index 00000000..55ab631e
 +        private void OnClickModes()
 +        {
 +            Box.Get().m_GameModesButton.TriggerRelease();
++        }
++
++        private void OnClickArena()
++        {
++            Box.Get().m_ArenaButton.TriggerRelease();
 +        }
 +
 +        private void OnClickBattlegrounds()
@@ -12016,10 +12023,10 @@ index 00000000..e60c8422
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleKey.cs b/Assembly-CSharp/Accessibility/AccessibleKey.cs
 new file mode 100644
-index 00000000..963bdadf
+index 00000000..084c4c93
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleKey.cs
-@@ -0,0 +1,422 @@
+@@ -0,0 +1,427 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using UnityEngine;
@@ -12167,6 +12174,11 @@ index 00000000..963bdadf
 +        public static AccessibleKey BATTLEGROUNDS_DUOS_PING_CROSS = CreateKey(KeyCode.X, true);
 +        public static AccessibleKey BATTLEGROUNDS_DUOS_PING_WARP = CreateKey(KeyCode.Space, true);
 +        public static AccessibleKey BATTLEGROUNDS_DUOS_PING_QUESTION = CreateKey(KeyCode.Slash, true);
++        #endregion
++
++        #region Arena
++        public static AccessibleKey ARENA_TOGGLE_DRAFTING_DECK = CreateKey(KeyCode.D);
++        public static AccessibleKey ARENA_VIEW_DRAFTING_CURVE = CreateKey(KeyCode.C);
 +        #endregion
 +
 +        #region Dev Utils
@@ -26890,10 +26902,10 @@ index 00000000..fb167df2
 +}
 diff --git a/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
 new file mode 100644
-index 00000000..013d083a
+index 00000000..c170edcb
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
-@@ -0,0 +1,1247 @@
+@@ -0,0 +1,1261 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Linq;
@@ -28070,7 +28082,21 @@ index 00000000..013d083a
 +    //arena
 +    public static LocalizationKey ARENA_DRAFT_SWITCH_HELP = CreateKey("ACCESSIBILITY_ARENA_DRAFT_SWITCH_HELP");
 +    public static LocalizationKey ARENA_WINS_LOSSES = CreateKey("ACCESSIBILITY_ARENA_WINS_LOSSES");
++    public static LocalizationKey ARENA_RATING = CreateKey("ACCESSIBILITY_ARENA_RATING");
 +    public static LocalizationKey ARENA_TICKETS_COUNT = CreateKey("ACCESSIBILITY_ARENA_TICKETS_COUNT");
++    public static LocalizationKey ARENA_START_NORMAL_RUN = CreateKey("ACCESSIBILITY_ARENA_BEGIN_NEW_NORMAL_RUN");
++    public static LocalizationKey ARENA_START_UNDERGROUND_RUN = CreateKey("ACCESSIBILITY_ARENA_BEGIN_NEW_UNDERGROUND_RUN");
++    public static LocalizationKey ARENA_RETIRE_BUTTON = CreateKey("ACCESSIBILITY_ARENA_RETIRE_BUTTON");
++    public static LocalizationKey ARENA_DRAFT_HERO_CONFIRM_HELP = CreateKey("ACCESSIBILITY_ARENA_HELP_DRAFTING_HERO");
++    public static LocalizationKey ARENA_DRAFT_HERO_CONFIRM_PROMPT = CreateKey("ACCESSIBILITY_ARENA_HERO_SELECTED_PROMPT");
++    public static LocalizationKey ARENA_MENU_WELCOME = CreateKey("ACCESSIBILITY_ARENA_MENU_TITLE_WELCOME");
++    public static LocalizationKey ARENA_MENU_WELCOME_BACK = CreateKey("ACCESSIBILITY_ARENA_MENU_TITLE_WELCOME_BACK");
++    public static LocalizationKey ARENA_MENU_RUN_COMPLETE = CreateKey("ACCESSIBILITY_ARENA_MENU_TITLE_RUN_COMPLETE");
++    public static LocalizationKey ARENA_CLAIM_REWARDS = CreateKey("ACCESSIBILITY_ARENA_CLAIM_REWARDS");
++    public static LocalizationKey ARENA_SWITCH_TO_NORMAL_MODE = CreateKey("ACCESSIBILITY_ARENA_CHANGE_TO_NORMAL_MODE");
++    public static LocalizationKey ARENA_SWITCH_TO_UNDERGROUND_MODE = CreateKey("ACCESSIBILITY_ARENA_CHANGE_TO_UNDERGROUND_MODE");
++    public static LocalizationKey ARENA_DRAFT_PACKAGE_HELP = CreateKey("ACCESSIBILITY_ARENA_DRAFT_PACKAGE_HELP");
++    public static LocalizationKey ARENA_EMPTY_DECK = CreateKey("ACCESSIBILITY_ARENA_EMPTY_DECK");
 +
 +    //journal
 +    public static LocalizationKey ACHIEVEMENT_CATEGORY_TITLE = CreateKey("ACCESSIBILITY_ACHIEVEMENT_CATEGORY_TITLE");
@@ -30166,6 +30192,85 @@ index 00000000..967d13f0
 +    }
 +}
 \ No newline at end of file
+diff --git a/Assembly-CSharp/Accessibility/arena/AccessibleArenaDeckMgr.cs b/Assembly-CSharp/Accessibility/arena/AccessibleArenaDeckMgr.cs
+new file mode 100644
+index 00000000..d618cf1e
+--- /dev/null
++++ b/Assembly-CSharp/Accessibility/arena/AccessibleArenaDeckMgr.cs
+@@ -0,0 +1,73 @@
++﻿using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++using Accessibility;
++
++namespace Accessibility
++{
++    /* this is split out from DraftDisplay and the ArenaLandingPageManager because its used in both contexts but we want essentially identical behaviour as of this time
++    * Currently, just a helpful wrapper around the processing to avoid duplication. Could be an AccessibleUI,
++    * but  with how many states the UI could be in keeping this consistent where possible is likely for the best*/
++    internal class AccessibleArenaDeckMgr
++{
++        private AccessibleListOfItems<AccessibleEditingDeckCard> m_accessibleDeckCards;
++        private static AccessibleArenaDeckMgr s_instance = new AccessibleArenaDeckMgr();
++        public static AccessibleArenaDeckMgr Get()
++        {
++            return s_instance;
++        }
++
++        // We're explicit about the deck we're passing in because we will likely want to use this when we come to redrafting, and that uses a separate dec internally by all appearances
++        // So no default pass here
++        public bool TryToSwitchToDeckView(AccessibleComponent parent, CollectionDeck deck)
++        {
++            if (deck == null)
++            {
++                NotifyOfEmptyDeck(parent);
++                return false;
++            }
++            m_accessibleDeckCards = new AccessibleListOfItems<AccessibleEditingDeckCard>(parent, deck.GetSlots()
++                .Select(slot => new AccessibleEditingDeckCard(parent, slot, false)) // no need for eligibility check since its drafted
++                .ToList());
++            if (m_accessibleDeckCards.Count == 0)
++            {
++                NotifyOfEmptyDeck(parent);
++                return false;
++            }
++            m_accessibleDeckCards?.StartReading();
++            return true;
++        }
++
++        private void NotifyOfEmptyDeck(AccessibleComponent parent)
++        {
++            AccessibilityMgr.Output(parent, LocalizationUtils.Get(LocalizationKey.ARENA_EMPTY_DECK));
++        }
++
++        public bool ShouldCloseDeckView()
++        {
++            return AccessibleKey.BACK.IsPressed();
++        }
++
++        public void HandleAccessibleInput()
++        {
++            m_accessibleDeckCards?.HandleAccessibleInput();
++        }
++
++        public string GetHelp(bool hasDraftModeToggleKey)
++        {
++            var stringBuilder = new StringBuilder();
++            stringBuilder.Append(m_accessibleDeckCards?.GetHelp(true));
++            if (stringBuilder.Length > 0)
++            {
++                stringBuilder.Append(". ");
++            }
++            if(hasDraftModeToggleKey)
++            {
++                stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_SWITCH_HELP, AccessibleKey.ARENA_TOGGLE_DRAFTING_DECK.ToString()));
++            }
++            return stringBuilder.ToString();
++        }
++        }
++}
 diff --git a/Assembly-CSharp/Accessibility/arena/AccessibleArenaDraftCard.cs b/Assembly-CSharp/Accessibility/arena/AccessibleArenaDraftCard.cs
 new file mode 100644
 index 00000000..bed8b8cd
@@ -35728,6 +35833,345 @@ index 2c74e9e5..fae9c966 100644
  				SDKWorkThread.Start();
  			}
  		}
+diff --git a/Assembly-CSharp/ArenaLandingPage.cs b/Assembly-CSharp/ArenaLandingPage.cs
+index c4a95fea..e17479f7 100644
+--- a/Assembly-CSharp/ArenaLandingPage.cs
++++ b/Assembly-CSharp/ArenaLandingPage.cs
+@@ -183,4 +183,16 @@ public class ArenaLandingPage : MonoBehaviour
+ 	{
+ 		InitManaCurve();
+ 	}
++
++    #region Accessibility
++    public GameObject GetActiveRunPlayButton()
++    {
++        return m_playButtonActiveRun;
++    }
++
++    public GameObject GetNoActiveRunPlayButton()
++    {
++        return m_playButtonNoActiveRun;
++    }
++	#endregion
+ }
+diff --git a/Assembly-CSharp/ArenaLandingPageManager.cs b/Assembly-CSharp/ArenaLandingPageManager.cs
+index 17070190..7e1ac249 100644
+--- a/Assembly-CSharp/ArenaLandingPageManager.cs
++++ b/Assembly-CSharp/ArenaLandingPageManager.cs
+@@ -8,8 +8,9 @@ using Hearthstone.UI;
+ using PegasusShared;
+ using PegasusUtil;
+ using UnityEngine;
++using Accessibility;
+ 
+-public class ArenaLandingPageManager : MonoBehaviour
++public class ArenaLandingPageManager : MonoBehaviour, AccessibleScreen
+ {
+ 	private const string CODE_START_NORMAL_ARENA = "START_NORMAL_ARENA";
+ 
+@@ -414,9 +415,11 @@ public class ArenaLandingPageManager : MonoBehaviour
+ 
+ 	public void UpdateArenaSessionState(ArenaSessionState sessionState, bool isUnderground)
+ 	{
++		ArenaSessionState prevState = ArenaSessionState.INVALID;
+ 		if (m_arenaLandingPageDataModel != null)
+ 		{
+-			if (isUnderground)
++			prevState = (isUnderground) ? m_arenaLandingPageDataModel.undergroundSessionState : m_arenaLandingPageDataModel.normalSessionState;
++            if (isUnderground)
+ 			{
+ 				m_arenaLandingPageDataModel.undergroundSessionState = sessionState;
+ 			}
+@@ -433,6 +436,12 @@ public class ArenaLandingPageManager : MonoBehaviour
+ 				m_arenaNormalLandingPageDataModel.sessionState = sessionState;
+ 			}
+ 		}
++		#region Accessibility
++		if (AccessibilityMgr.IsCurrentlyFocused(this))
++		{
++			AccessibilityProcessStateChange(prevState, sessionState);
++		}
++		#endregion
+ 	}
+ 
+ 	public void UpdateArenaShouldBeDrafting(bool shouldBeDrafting)
+@@ -943,7 +952,7 @@ public class ArenaLandingPageManager : MonoBehaviour
+ 		{
+ 			yield return null;
+ 		}
+-		bool @bool = Options.Get().GetBool(Option.HAS_SEEN_FORGE_REVAMP_UNDERGROUND, defaultVal: false);
++		bool @bool = Options.Get().GetBool(Option.HAS_SEEN_FORGE_REVAMP_UNDERGROUND, defaultVal: false) || AccessibilityMgr.IsAccessibilityEnabled();
+ 		if (m_draftManager.IsUnderground() && !@bool)
+ 		{
+ 			m_undergroundArenaWidget.TriggerEvent("RUN_FTUE_UG");
+@@ -956,12 +965,14 @@ public class ArenaLandingPageManager : MonoBehaviour
+ 			m_FTUECoroutine = null;
+ 			yield break;
+ 		}
+-		if (Options.Get().GetBool(Option.HAS_SEEN_FORGE, defaultVal: false))
++		if (Options.Get().GetBool(Option.HAS_SEEN_FORGE, defaultVal: false) || AccessibilityMgr.IsAccessibilityEnabled())
+ 		{
++			AccessibilityUtils.LogDebug("Running run_returning in landing page manager.");
+ 			m_normalArenaWidget.TriggerEvent("RUN_RETURNING");
+ 		}
+ 		else
+ 		{
++			AccessibilityUtils.LogDebug("Running run_ftue in landing page manager.");
+ 			m_normalArenaWidget.TriggerEvent("RUN_FTUE");
+ 		}
+ 		Options.Get().SetBool(Option.HAS_SEEN_FORGE_REVAMP, val: true);
+@@ -1023,6 +1034,9 @@ public class ArenaLandingPageManager : MonoBehaviour
+ 			yield return null;
+ 		}
+ 		m_loadingComplete = true;
++		#region Accessibility
++		AccessibilityMgr.SetScreen(this);
++		#endregion
+ 	}
+ 
+ 	private void OnBoxFinishedAnim(object unused)
+@@ -1036,4 +1050,241 @@ public class ArenaLandingPageManager : MonoBehaviour
+ 			}
+ 		}
+ 	}
++
++	#region Accessibility
++	private enum AccessibleLandingPageState
++	{
++		INVALID,
++		MAIN_MENU,
++		DECK_VIEW
++	}
++
++	private AccessibleLandingPageState m_accessibleLandingPageState = AccessibleLandingPageState.INVALID;
++	private AccessibleMenu m_accessibleLandingPageMenu;
++	private bool m_accessibilityRewardsPopupClosing = false;
++
++	private void AccessibilityProcessStateChange(ArenaSessionState prevState, ArenaSessionState newState)
++	{
++		if (prevState == newState)
++		{
++			return;
++		}
++		if (ShouldUpdateAccessibleMenuOnEnteringState(newState))
++					{
++			UpdateAccessibleMenu();
++		}
++	}
++
++	private bool ShouldUpdateAccessibleMenuOnEnteringState(ArenaSessionState state)
++	{
++		return (state == ArenaSessionState.NO_RUN || state == ArenaSessionState.MIDRUN || state == ArenaSessionState.REWARDS);
++	}
++
++	private void UpdateAccessibleMenu()
++	{
++        var state = DraftManager.Get().GetArenaState();
++        AccessibilityUtils.LogDebug($"Setting up arena landing page menu in {state} state.");
++		int numberOfRewards = 0;
++		LocalizationKey key = LocalizationKey.ARENA_MENU_WELCOME_BACK;
++		switch (state)
++		{
++			case ArenaSessionState.REWARDS:
++				{
++					numberOfRewards = m_draftManager.GetRewards().Count; // safe, returns default constructed list even if no rewards
++					if (numberOfRewards == 0 || m_accessibilityRewardsPopupClosing)
++					{
++						m_accessibleLandingPageMenu = null; // we clear this so it doesn't reread it after the popup closes, will update when loading finishes
++						AccessibilityMgr.Output(this, LocalizedText.GLOBAL_PLEASE_WAIT);
++						return;
++					}
++					key = LocalizationKey.ARENA_MENU_RUN_COMPLETE;
++					break;
++				}
++			case ArenaSessionState.NO_RUN:
++				{
++					key = LocalizationKey.ARENA_MENU_WELCOME;
++					break;
++				}
++		}
++		m_accessibleLandingPageMenu = new AccessibleMenu(this, LocalizationUtils.Get(key), BackButtonPress);
++
++		if (state == ArenaSessionState.REWARDS)
++		{
++			m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Format(LocalizationKey.ARENA_CLAIM_REWARDS, numberOfRewards), () => AccessibleInputMgr.Click(m_arenaRewardListPopupWidget.transform));
++		}
++		else
++		{
++			CreateMainAccessibleMenu();
++		}
++		m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Get(LocalizationKey.SCREEN_GO_BACK), BackButtonPress);
++		m_accessibleLandingPageMenu?.StartReading();
++    }
++
++    private void CreateMainAccessibleMenu()
++	{
++        ArenaLandingPage landingPage = m_normalLandingPage;
++		bool isUnderground = m_draftManager.IsUnderground();
++        GameObject buttonObject = null;
++		bool addRetireButton = false;
++		if (!m_draftManager.HasActiveRun || m_draftManager.GetArenaState() == ArenaSessionState.NO_RUN)
++		{
++			buttonObject = landingPage.GetNoActiveRunPlayButton();
++			var clickableComponent = buttonObject.GetComponent<Clickable>();
++			if (clickableComponent != null && clickableComponent.IsActive)
++			{
++						var key = (isUnderground) ? LocalizationKey.ARENA_START_UNDERGROUND_RUN : LocalizationKey.ARENA_START_NORMAL_RUN;
++				m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Get(key), () => AccessibleInputMgr.Click(clickableComponent));
++            }
++            var ticketsInformation = GetTavernTicketsAsAccessibleString();
++			m_accessibleLandingPageMenu.AddOption(ticketsInformation, () => AccessibilityMgr.Output(this, ticketsInformation));
++		}
++		else
++		{
++			buttonObject = landingPage.GetActiveRunPlayButton();
++			if (buttonObject != null)
++			{
++				var playButton = buttonObject.GetComponentInChildren<PlayButton>();
++				var clickableComponent = buttonObject.GetComponentInChildren<Clickable>();
++				if (playButton != null && playButton.IsEnabled() && clickableComponent != null && clickableComponent.IsActive)
++				{
++                    m_accessibleLandingPageMenu.AddOption(GameStrings.Get("GLOBAL_PLAY"), () => AccessibilityActivateButton(playButton));
++                    addRetireButton = true;
++				}
++			}
++			m_accessibleLandingPageMenu.AddOption("View deck", AccessibilityViewDeck);
++		}
++		if (m_draftManager != null && m_draftManager.HasActiveRun && m_draftManager.CanShowWinsLosses)
++		{
++			string status = GetWinLossesText();
++			m_accessibleLandingPageMenu.AddOption(status, () => AccessibilityMgr.Output(this, status));
++		}
++		string ratingText = GetArenaRatingText();
++		m_accessibleLandingPageMenu.AddOption(ratingText, () => AccessibilityMgr.Output(this, ratingText));
++
++		if (addRetireButton)
++		{
++			var retireWidget = DraftDisplay.Get().m_retireButtonWidget;
++			if (retireWidget != null)
++			{
++				Clickable clickableRetireComponent = retireWidget.GetComponentInChildren<Clickable>();
++				if (clickableRetireComponent != null && clickableRetireComponent.IsActive && clickableRetireComponent.enabled)
++				{
++					m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Get(LocalizationKey.ARENA_RETIRE_BUTTON), () => AccessibilityClickRetireButton(clickableRetireComponent));
++				}
++			}
++		}
++
++		if (GameModeUtils.HasUnlockedMode(Global.UnlockableGameMode.UNDERGROUND_ARENA))
++		{
++			if (isUnderground)
++			{
++				// underground is not supported yet
++				// but we support this button to try to let them get back to normal mode if they somehow got into underground
++				m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Get(LocalizationKey.ARENA_SWITCH_TO_NORMAL_MODE), AccessibilityClickToggleArenaModeButton);
++			}
++			else
++			{
++				// not yet supported
++			}
++		}
++    }
++
++    private string GetWinLossesText()
++	{
++		return LocalizationUtils.Format(LocalizationKey.ARENA_WINS_LOSSES, m_draftManager.GetWins(), m_draftManager.GetLosses());
++	}
++
++	private string GetArenaRatingText()
++	{
++		string rating = (m_arenaLandingPageDataModel.inUnderground) ?
++			m_arenaLandingPageDataModel.undergroundRating :
++					m_arenaLandingPageDataModel.rating;
++		return LocalizationUtils.Format(LocalizationKey.ARENA_RATING, rating);
++	}
++
++	private void AccessibilityActivateButton(PlayButton button)
++	{
++		AccessibleInputMgr.Click(button);
++	}
++
++	private void AccessibilityClickRetireButton(Clickable clickableComponent)
++	{
++		AccessibilityUtils.LogDebug("Clicking the retire arena button.");
++		AccessibleInputMgr.Click(clickableComponent);
++	}
++
++	private void AccessibilityClickToggleArenaModeButton()
++	{
++		var widget = m_modeToggleButtonWidget;
++		if (widget == null)
++		{
++				return;
++			}
++		var clickableComponent = widget.GetComponentInChildren<Clickable>();
++		if (clickableComponent != null)
++		{
++			AccessibilityUtils.LogDebug("Attempting to click the toggle arena modes button.");
++			AccessibleInputMgr.Click(clickableComponent);
++		}
++	}
++
++	private string GetTavernTicketsAsAccessibleString()
++	{
++		AccessibilityUtils.LogDebug("Clicked read tavern tickets in arena.");
++		var tickets = DraftManager.Get().GetNumTicketsOwned();
++		return LocalizationUtils.Format(LocalizationKey.ARENA_TICKETS_COUNT, tickets);
++	}
++
++	private void AccessibilityViewDeck()
++	{
++		if (AccessibleArenaDeckMgr.Get().TryToSwitchToDeckView(this, DraftManager.Get().GetDraftDeck()))
++			{
++			m_accessibleLandingPageState = AccessibleLandingPageState.DECK_VIEW;
++		}
++	}
++
++    public void SetProcessingRewardsPopupForAccessibility(bool state)
++	{
++		AccessibilityUtils.LogDebug($"Setting rewards popup processing state: {state}.");
++		m_accessibilityRewardsPopupClosing = state;
++	}
++
++	public void HandleInput()
++	{
++		if (m_accessibleLandingPageState == AccessibleLandingPageState.DECK_VIEW)
++		{
++			var deckMgr = AccessibleArenaDeckMgr.Get();
++			if (deckMgr.ShouldCloseDeckView())
++			{
++				m_accessibleLandingPageState = AccessibleLandingPageState.MAIN_MENU;
++				UpdateAccessibleMenu();
++			}
++			else
++			{
++				deckMgr?.HandleAccessibleInput();
++			}
++		}
++		else
++		{
++			m_accessibleLandingPageMenu?.HandleAccessibleInput();
++		}
++	}
++
++	public string GetHelp()
++	{
++		if (m_accessibleLandingPageState == AccessibleLandingPageState.DECK_VIEW)
++		{
++			return AccessibleArenaDeckMgr.Get().GetHelp(false);
++		}
++		else
++		{
++			return m_accessibleLandingPageMenu?.GetHelp();
++		}
++	}
++
++	public void OnGainedFocus()
++	{
++        UpdateAccessibleMenu();
++    }
++    #endregion
+ }
 diff --git a/Assembly-CSharp/ArenaStore.cs b/Assembly-CSharp/ArenaStore.cs
 index 0730aa77..9ed81cc0 100644
 --- a/Assembly-CSharp/ArenaStore.cs
@@ -57893,6 +58337,287 @@ index 3d9182a7..92516508 100644
  	}
  
  	private void OnDismissDialog()
+diff --git a/Assembly-CSharp/DraftDisplay.cs b/Assembly-CSharp/DraftDisplay.cs
+index b73aa840..4bf57182 100644
+--- a/Assembly-CSharp/DraftDisplay.cs
++++ b/Assembly-CSharp/DraftDisplay.cs
+@@ -1,17 +1,19 @@
+-using System;
+-using System.Collections;
+-using System.Collections.Generic;
+-using System.Linq;
++using Accessibility;
+ using Assets;
+ using Blizzard.T5.Configuration;
+ using Hearthstone;
+ using Hearthstone.DataModels;
+ using Hearthstone.UI;
+ using PegasusShared;
++using System;
++using System.Collections;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
+ using UnityEngine;
+ 
+ [CustomEditClass]
+-public class DraftDisplay : MonoBehaviour
++public class DraftDisplay : MonoBehaviour, AccessibleUI
+ {
+ 	public enum PhaseMessageType
+ 	{
+@@ -1124,8 +1126,11 @@ public class DraftDisplay : MonoBehaviour
+ 		case "REWARDCHEST_CLAIMED":
+ 			if (m_rewardBoxesDisplay != null)
+ 			{
+-				m_rewardBoxesDisplay.AnimateRewards();
+-			}
++					m_rewardBoxesDisplay.AnimateRewards();
++					#region Accessibility
++					m_arenaLandingPageManager.SetProcessingRewardsPopupForAccessibility(true);
++					#endregion
++				}
+ 			break;
+ 		case "PHASE_POPUP_CLOSED":
+ 			OnPhaseMessageClosed();
+@@ -1318,8 +1323,11 @@ public class DraftDisplay : MonoBehaviour
+ 		if (m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO)
+ 		{
+ 			actor = m_choices[heroChoice - 1].m_actor;
+-		}
+-		else if (m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO_POWER)
++			#region Accessibility
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_HERO_CONFIRM_PROMPT, AccessibleKey.CONFIRM.ToString(), AccessibleKey.BACK.ToString()));
++        #endregion
++    }
++        else if (m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO_POWER)
+ 		{
+ 			flag = true;
+ 			actor = m_subclassHeroClones[heroChoice - 1];
+@@ -1779,6 +1787,9 @@ public class DraftDisplay : MonoBehaviour
+ 		{
+ 			m_draftManager.SetArenaState(ArenaSessionState.MIDRUN, m_draftManager.IsUnderground());
+ 			GoToArenaMidrun();
++			#region Accessibility
++			AccessibilityMgr.HideUI(this);
++			#endregion
+ 		}
+ 	}
+ 
+@@ -1996,7 +2007,10 @@ public class DraftDisplay : MonoBehaviour
+ 			m_packageCardsPopup.ShowTray();
+ 			m_packageCardsPopup.SetChooseButtonActive(chooseButtonActive);
+ 		}
+-		for (int i = 0; i < draftChoice.m_packageCardIds.Count; i++)
++        #region Accessibility
++        m_packageCardsPopup.SetExpectedPackageSize(draftChoice.m_packageCardIds.Count); // they add individually not batch add, so if we don't wait we get malformed speech where the menu is inaccurate
++        #endregion
++        for (int i = 0; i < draftChoice.m_packageCardIds.Count; i++)
+ 		{
+ 			CardTileDataModel cardTileDataModel = new CardTileDataModel
+ 			{
+@@ -3092,6 +3106,11 @@ public class DraftDisplay : MonoBehaviour
+ 		{
+ 			return;
+ 		}
++		#region Accessibility
++		// we need to wait on reward animations to resolve and such before updating the UI		because data isn't cleared until that point
++		// and we get falty information in the display otherwise
++		m_arenaLandingPageManager.SetProcessingRewardsPopupForAccessibility(false);
++		#endregion
+ 		DraftManager draftManager = DraftManager.Get();
+ 		CollectionDeck draftDeck = draftManager.GetDraftDeck();
+ 		if (draftDeck != null)
+@@ -3296,6 +3315,9 @@ public class DraftDisplay : MonoBehaviour
+ 				yield return null;
+ 			}
+ 			PositionAndShowChoices();
++			#region Accessibility
++			SetupAccessibleChoices();
++			#endregion
+ 			yield return StartCoroutine(RunAutoDraftCheat());
+ 			m_isHandlingChoiceDisplay = false;
+ 		}
+@@ -4270,4 +4292,179 @@ public class DraftDisplay : MonoBehaviour
+ 		}
+ 		InitManaCurve();
+ 	}
++
++	#region Accessibility
++	private enum AccessibleDraftingState
++	{
++		Deck,
++	Drafting,
++		ManaCurve
++		}
++
++	private AccessibleDraftingState m_accessibleDraftingState = AccessibleDraftingState.Drafting;
++	private AccessibleListOfItems<AccessibleArenaDraftCard> m_accessibleDraftCards;
++
++	private void SetupAccessibleChoices()
++	{
++		var cards = m_choices.Where(choice => choice.m_actor != null).Select(choice => new AccessibleArenaDraftCard(this, choice.m_actor.GetEntityDef())).ToList();
++		m_accessibleDraftCards = new AccessibleListOfItems<AccessibleArenaDraftCard>(this, cards);
++        AccessibilityMgr.ShowUI(this);
++        AccessibilityUtils.LogDebug("Dispatch choices to ui.");
++		if (m_accessibleDraftingState == AccessibleDraftingState.Drafting && m_accessibleDraftCards?.Count> 0) // we need this because hearthstone swaps to drafting mode and this loads before populating with choices, so we get an empty list read double up if we don't
++		{
++			m_accessibleDraftCards?.StartReading();
++		}
++    }
++
++	public void HandleAccessibleInput()
++	{
++		if (m_accessibleDraftingState == AccessibleDraftingState.ManaCurve)
++		{
++			HandleAccessibleInputForManaCurve();
++		}
++		else if (m_accessibleDraftingState == AccessibleDraftingState.Deck)
++		{
++			HandleAccessibleInputForDeckView();
++		}
++		else
++		{
++			HandleAccessibleInputForDrafting();
++		}
++	}
++
++	private void HandleAccessibleInputForManaCurve()
++	{
++		// laying out the framework but not implementing this just yet
++
++	}
++
++	private void HandleAccessibleInputForDeckView()
++	{
++		var deckMgr = AccessibleArenaDeckMgr.Get();
++		if (deckMgr == null || deckMgr.ShouldCloseDeckView() || AccessibleKey.ARENA_TOGGLE_DRAFTING_DECK.IsPressed())
++		{
++			m_accessibleDraftingState = AccessibleDraftingState.Drafting;
++			if (m_accessibleDraftCards?.Count > 0)
++			{
++				m_accessibleDraftCards.StartReading();
++			}
++			}
++		else
++		{
++			deckMgr?.HandleAccessibleInput();
++			}
++	}
++
++	private void HandleAccessibleInputForDrafting()
++	{
++		if (AccessibleKey.CONFIRM.IsPressed())
++		{
++			if (IsInHeroSelectMode())
++			{
++				HandleAccessibleHeroClick();
++			}
++			else
++			{
++				HandleAccessibleChoiceSelect();
++			}
++		}
++		else if (IsInHeroSelectMode() && AccessibleKey.BACK.IsPressed())
++		{
++			DoHeroCancelAnimation();
++		}
++		else if (AccessibleKey.ARENA_TOGGLE_DRAFTING_DECK.IsPressed())
++		{
++			TryToSwitchToDeckView();
++		}
++		/*else if (AccessibleKey.ARENA_VIEW_DRAFTING_CURVE.IsPressed())
++		{
++			TryToSwitchToManaCurveView();
++		}*/
++		else
++		{
++			m_accessibleDraftCards?.HandleAccessibleInput();
++		}
++	}
++
++	private void HandleAccessibleHeroClick()
++	{
++        var index = m_accessibleDraftCards.GetItemBeingReadIndex();
++		if (index >= 0 && index == (m_zoomedHeroIndex-1))
++		{
++			ClickConfirmButton();
++		}
++		else
++		{
++			DoHeroCancelAnimation();
++		}
++    }
++
++    private void HandleAccessibleChoiceSelect()
++	{
++		var index = m_accessibleDraftCards.GetItemBeingReadIndex();
++		if (index < 0 || index >= m_choices.Count)
++		{
++			return;
++		}
++		var choice = m_choices[index];
++		var actor = choice.m_actor;
++		if (actor == null)
++		{
++			return;
++		}
++		AccessibleInputMgr.Click(actor);
++	}
++
++	public void AccessiblyClosePackagePopup()
++	{
++		AccessibleInputMgr.Click(m_doneButton);
++	}
++
++    private void TryToSwitchToDeckView()
++    {
++        var deck = DraftManager.Get().GetDraftDeck();
++        if (AccessibleArenaDeckMgr.Get().TryToSwitchToDeckView(this, deck))
++        {
++            m_accessibleDraftingState = AccessibleDraftingState.Deck;
++        }
++    }
++
++	private void TryToSwitchToManaCurveView()
++	{
++		var activeDeck = m_draftManager.GetDraftDeck();
++		if (activeDeck == null || activeDeck.GetCards()?.Count == 0)
++		{
++			AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.ARENA_EMPTY_DECK));
++			return;
++		}
++		m_accessibleDraftingState = AccessibleDraftingState.ManaCurve;
++	}
++
++    public string GetAccessibleHelp()
++	{
++		var stringBuilder = new System.Text.StringBuilder();
++		if (m_accessibleDraftingState == AccessibleDraftingState.ManaCurve)
++		{
++			// not supported yet
++		}
++		else if (m_accessibleDraftingState == AccessibleDraftingState.Deck)
++		{
++			stringBuilder.Append(AccessibleArenaDeckMgr.Get().GetHelp(true));
++		}
++		else
++		{
++			stringBuilder.Append(m_accessibleDraftCards?.GetHelp(false));
++			stringBuilder.Append(". ");
++			if (IsInHeroSelectMode() || m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO)
++			{
++				stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_HERO_CONFIRM_HELP, AccessibleKey.CONFIRM.ToString(), AccessibleKey.BACK.ToString()));
++			}
++			else
++			{
++				stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_SWITCH_HELP, AccessibleKey.ARENA_TOGGLE_DRAFTING_DECK.ToString()));
++			}
++		}
++		return stringBuilder.ToString();
++    }
++    #endregion
+ }
 diff --git a/Assembly-CSharp/DraftManager.cs b/Assembly-CSharp/DraftManager.cs
 index bd2ab68b..e613d238 100644
 --- a/Assembly-CSharp/DraftManager.cs
@@ -78374,6 +79099,126 @@ index 16ed729b..a5d2eaa4 100644
 +    }
 +
 +	#endregion
+ }
+diff --git a/Assembly-CSharp/PackageCardsPopup.cs b/Assembly-CSharp/PackageCardsPopup.cs
+index 89eee0be..54df9f33 100644
+--- a/Assembly-CSharp/PackageCardsPopup.cs
++++ b/Assembly-CSharp/PackageCardsPopup.cs
+@@ -1,7 +1,8 @@
+ using Hearthstone.UI;
+ using UnityEngine;
++using Accessibility;
+ 
+-public class PackageCardsPopup : MonoBehaviour
++public class PackageCardsPopup : MonoBehaviour, AccessibleUI
+ {
+ 	[SerializeField]
+ 	private RelatedCardsTray m_relatedCardsTray;
+@@ -18,6 +19,10 @@ public class PackageCardsPopup : MonoBehaviour
+ 		if (m_relatedCardsTray != null)
+ 		{
+ 			m_relatedCardsTray.ShowTray();
++			#region Accessibility
++			AccessibilityMgr.ShowUI(this);
++			AccessibilityCheckReading();
++			#endregion
+ 		}
+ 	}
+ 
+@@ -26,6 +31,10 @@ public class PackageCardsPopup : MonoBehaviour
+ 		if (m_relatedCardsTray != null)
+ 		{
+ 			m_relatedCardsTray.HideTray();
++			#region Accessibility
++			m_accessiblePackageItems = null;
++			AccessibilityMgr.HideUI(this);
++			#endregion
+ 		}
+ 	}
+ 
+@@ -34,6 +43,9 @@ public class PackageCardsPopup : MonoBehaviour
+ 		if (m_relatedCardsTray != null)
+ 		{
+ 			m_relatedCardsTray.AddCard(cardID, premium, offsetCardNameForRunes, ghostedState);
++			#region Accessibility
++			AddAccessibleCard(cardID);
++			#endregion
+ 		}
+ 	}
+ 
+@@ -49,4 +61,73 @@ public class PackageCardsPopup : MonoBehaviour
+ 	{
+ 		m_chooseButtonVisualController?.SetState(isActive ? "Active" : "Inactive");
+ 	}
++
++	#region
++	private AccessibleHorizontalMenu<AccessibleArenaDraftCard> m_accessiblePackageItems = null;
++	private int m_waitForCardsBeforeReading = 0;
++
++	public void SetExpectedPackageSize(int numCards)
++	{
++		m_waitForCardsBeforeReading = numCards;
++	}
++
++	private void AccessibilityCheckReading()
++	{
++		if (m_accessiblePackageItems == null || m_accessiblePackageItems.GetNumItems() < m_waitForCardsBeforeReading)
++		{
++			return;
++		}
++		m_accessiblePackageItems.StartReading();
++	}
++
++	private void AddAccessibleCard(string cardId)
++	{
++		if (m_accessiblePackageItems == null)
++		{
++			m_accessiblePackageItems = new AccessibleHorizontalMenu<AccessibleArenaDraftCard>(this, "Arena legendary package", OnCancel);
++		}
++		using (DefLoader.DisposableFullDef disposableFullDef = DefLoader.Get().GetFullDef(cardId))
++		{
++			m_accessiblePackageItems.AddOption(new AccessibleArenaDraftCard(this, disposableFullDef.EntityDef), null);
++			AccessibilityCheckReading();
++		}
++	}
++
++	private void OnCancel()
++	{
++		AccessibilityUtils.LogDebug("Attempting to dismiss the arena package popup.");
++		try
++		{
++			DraftDisplay.Get().AccessiblyClosePackagePopup();
++			HideTray();
++		}
++		catch (System.Exception e)
++		{
++			AccessibilityUtils.LogDebug(e.ToString());
++		}
++	}
++
++	public void HandleAccessibleInput()
++	{
++		if (AccessibleKey.CONFIRM.IsPressed())
++		{
++			var clickable = m_chooseButtonVisualController.GetComponentInChildren<Clickable>();
++			if (clickable != null)
++			{
++				AccessibleInputMgr.Click(clickable);
++			}
++		}
++		else
++		{
++			m_accessiblePackageItems?.HandleAccessibleInput();
++		}
++	}
++
++    public string GetAccessibleHelp()
++	{
++		// we don't use the menu default help here because its really important they don't hit confirm not fully understanding what is going on
++		return LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_PACKAGE_HELP, AccessibleKey.CONFIRM, AccessibleKey.BACK);
++	}
++
++    #endregion
  }
 diff --git a/Assembly-CSharp/PegUIElement.cs b/Assembly-CSharp/PegUIElement.cs
 index b321f37f..1efb646f 100644

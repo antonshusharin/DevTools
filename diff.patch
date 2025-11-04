@@ -12059,10 +12059,10 @@ index 00000000..e60c8422
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleKey.cs b/Assembly-CSharp/Accessibility/AccessibleKey.cs
 new file mode 100644
-index 00000000..16f7c548
+index 00000000..4009d52a
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleKey.cs
-@@ -0,0 +1,429 @@
+@@ -0,0 +1,435 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using UnityEngine;
@@ -12216,7 +12216,13 @@ index 00000000..16f7c548
 +
 +        #region Arena
 +        public static AccessibleKey ARENA_TOGGLE_DRAFTING_DECK = CreateKey(KeyCode.D);
-+        public static AccessibleKey ARENA_VIEW_DRAFTING_CURVE = CreateKey(KeyCode.C);
++        public static AccessibleKey ARENA_VIEW_DRAFTING_CURVE = CreateKey(KeyCode.A);
++        public static AccessibleKey ARENA_REDRAFTING_VIEW_DECK = CreateKey(KeyCode.D);
++        public static AccessibleKey ARENA_REDRAFTING_VIEW_SLOTS = CreateKey(KeyCode.C);
++        public static AccessibleKey ARENA_REDRAFT_START_DRAG = CreateKey(KeyCode.Space);
++        public static AccessibleKey ARENA_REDRAFT_STOP_DRAG = CreateKey(KeyCode.Backspace);
++        public static AccessibleKey ARENA_REDRAFT_DECK_COUNT = CreateKey(KeyCode.D, true);
++        public static AccessibleKey ARENA_EXIT_REDRAFT = CreateKey(KeyCode.E);
 +        #endregion
 +
 +        #region Dev Utils
@@ -26940,10 +26946,10 @@ index 00000000..fb167df2
 +}
 diff --git a/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
 new file mode 100644
-index 00000000..b1e87b7f
+index 00000000..eff7470a
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
-@@ -0,0 +1,1263 @@
+@@ -0,0 +1,1276 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Linq;
@@ -28137,6 +28143,19 @@ index 00000000..b1e87b7f
 +    public static LocalizationKey ARENA_SWITCH_TO_UNDERGROUND_MODE = CreateKey("ACCESSIBILITY_ARENA_CHANGE_TO_UNDERGROUND_MODE");
 +    public static LocalizationKey ARENA_DRAFT_PACKAGE_HELP = CreateKey("ACCESSIBILITY_ARENA_DRAFT_PACKAGE_HELP");
 +    public static LocalizationKey ARENA_EMPTY_DECK = CreateKey("ACCESSIBILITY_ARENA_EMPTY_DECK");
++    public static LocalizationKey ARENA_VIEW_DECK = CreateKey("ACCESSIBILITY_ARENA_VIEW_DECK_BUTTON");
++    public static LocalizationKey ARENA_REDRAFT_EMPTY_SLOT = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_EMPTY_SLOT");
++    public static LocalizationKey ARENA_REDRAFT_ALREADY_DRAGGING_FROM_SLOT = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_ALREADY_DRAGGING_FROM_SLOT");
++    public static LocalizationKey ARENA_REDRAFT_ALREADY_DRAGGING_FROM_DECK = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_ALREADY_DRAGGING_FROM_DECK");
++    public static LocalizationKey ARENA_REDRAFT_SLOT_EMPTY_ERROR = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_SLOT_EMPTY_ERROR");
++    public static LocalizationKey ARENA_REDRAFT_PROMPT_SWAP_SLOT = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_PROMPT_SWAP_SLOT");
++    public static LocalizationKey ARENA_REDRAFT_DRAG_CANCELLED = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_DRAG_CANCELLED");
++    public static LocalizationKey ARENA_REDRAFT_PROMPT_SWAP_DECK = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_PROMPT_SWAP_DECK");
++    public static LocalizationKey ARENA_REDRAFT_DECK_HELP = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_DECK_HELP");
++    public static LocalizationKey ARENA_REDRAFT_SLOT_HELP = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_SLOT_HELP");
++    public static LocalizationKey ARENA_REDRAFT_GENERAL_HELP = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_GENERAL_HELP");
++    public static LocalizationKey ARENA_REDRAFT_DECK_COUNT = CreateKey("ACCESSIBILITY_ARENA_REDRAFT_DECK_COUNT");
++    public static LocalizationKey ARENA_EXIT_REDRAFT_CONFIRM = CreateKey("ACCESSIBILITY_ARENA_EXIT_EDIT_DECK_CONFIRM");
 +
 +    //journal
 +    public static LocalizationKey ACHIEVEMENT_CATEGORY_TITLE = CreateKey("ACCESSIBILITY_ACHIEVEMENT_CATEGORY_TITLE");
@@ -30535,6 +30554,50 @@ index 00000000..bed8b8cd
 +        }
 +    }
 +}
+diff --git a/Assembly-CSharp/Accessibility/arena/AccessibleRedraftSlot.cs b/Assembly-CSharp/Accessibility/arena/AccessibleRedraftSlot.cs
+new file mode 100644
+index 00000000..877b64da
+--- /dev/null
++++ b/Assembly-CSharp/Accessibility/arena/AccessibleRedraftSlot.cs
+@@ -0,0 +1,37 @@
++﻿using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++
++namespace Accessibility
++{
++    internal class AccessibleRedraftSlot: AccessibleItem
++{
++        private int m_slotIndex = -1;
++        private readonly AccessibleArenaDraftCard m_card = null;
++
++        public AccessibleRedraftSlot(AccessibleComponent parent, int index, EntityDef entityDef=null) : base(parent)
++        {
++            m_slotIndex = index;
++            if (entityDef != null)
++            {
++                m_card = new AccessibleArenaDraftCard(parent, entityDef);
++            }
++        }
++
++        internal override List<string> GetLines()
++        {
++            if (m_card == null)
++            {
++                return new List<string>{LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_EMPTY_SLOT, m_slotIndex+1)};
++            }
++            return m_card.GetLines();
++        }
++
++        public int GetSlotIndex()
++        {
++            return m_slotIndex;
++        }
++}
++}
+\ No newline at end of file
 diff --git a/Assembly-CSharp/Accessibility/wip.txt b/Assembly-CSharp/Accessibility/wip.txt
 new file mode 100644
 index 00000000..1b46d0d7
@@ -35478,7 +35541,7 @@ index c4a95fea..e17479f7 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/ArenaLandingPageManager.cs b/Assembly-CSharp/ArenaLandingPageManager.cs
-index 17070190..7e1ac249 100644
+index 17070190..6e51bdb1 100644
 --- a/Assembly-CSharp/ArenaLandingPageManager.cs
 +++ b/Assembly-CSharp/ArenaLandingPageManager.cs
 @@ -8,8 +8,9 @@ using Hearthstone.UI;
@@ -35518,7 +35581,17 @@ index 17070190..7e1ac249 100644
  	}
  
  	public void UpdateArenaShouldBeDrafting(bool shouldBeDrafting)
-@@ -943,7 +952,7 @@ public class ArenaLandingPageManager : MonoBehaviour
+@@ -569,6 +578,9 @@ public class ArenaLandingPageManager : MonoBehaviour
+ 				m_arenaLandingPageDataModel.inUnderground = flag;
+ 			}
+ 			UnhideLandingPage(flag);
++			#region Accessibility
++			UpdateAccessibleMenu();
++			#endregion
+ 			if (m_widget != null)
+ 			{
+ 				m_widget.TriggerEvent("ARENA_TOGGLE_CLICKED", new TriggerEventParameters(null, flag));
+@@ -943,7 +955,7 @@ public class ArenaLandingPageManager : MonoBehaviour
  		{
  			yield return null;
  		}
@@ -35527,7 +35600,7 @@ index 17070190..7e1ac249 100644
  		if (m_draftManager.IsUnderground() && !@bool)
  		{
  			m_undergroundArenaWidget.TriggerEvent("RUN_FTUE_UG");
-@@ -956,12 +965,14 @@ public class ArenaLandingPageManager : MonoBehaviour
+@@ -956,12 +968,14 @@ public class ArenaLandingPageManager : MonoBehaviour
  			m_FTUECoroutine = null;
  			yield break;
  		}
@@ -35543,7 +35616,7 @@ index 17070190..7e1ac249 100644
  			m_normalArenaWidget.TriggerEvent("RUN_FTUE");
  		}
  		Options.Get().SetBool(Option.HAS_SEEN_FORGE_REVAMP, val: true);
-@@ -1023,6 +1034,9 @@ public class ArenaLandingPageManager : MonoBehaviour
+@@ -1023,6 +1037,9 @@ public class ArenaLandingPageManager : MonoBehaviour
  			yield return null;
  		}
  		m_loadingComplete = true;
@@ -35553,7 +35626,7 @@ index 17070190..7e1ac249 100644
  	}
  
  	private void OnBoxFinishedAnim(object unused)
-@@ -1036,4 +1050,241 @@ public class ArenaLandingPageManager : MonoBehaviour
+@@ -1036,4 +1053,243 @@ public class ArenaLandingPageManager : MonoBehaviour
  			}
  		}
  	}
@@ -35629,11 +35702,12 @@ index 17070190..7e1ac249 100644
 +
 +    private void CreateMainAccessibleMenu()
 +	{
-+        ArenaLandingPage landingPage = m_normalLandingPage;
 +		bool isUnderground = m_draftManager.IsUnderground();
++		ArenaLandingPage landingPage = (m_draftManager.IsUnderground()) ? m_undergroundLandingPage : m_normalLandingPage;
 +        GameObject buttonObject = null;
 +		bool addRetireButton = false;
-+		if (!m_draftManager.HasActiveRun || m_draftManager.GetArenaState() == ArenaSessionState.NO_RUN)
++		bool hasActiveRun = m_draftManager.GetArenaState() != ArenaSessionState.NO_RUN;
++		if(!hasActiveRun)
 +		{
 +			buttonObject = landingPage.GetNoActiveRunPlayButton();
 +			var clickableComponent = buttonObject.GetComponent<Clickable>();
@@ -35648,17 +35722,19 @@ index 17070190..7e1ac249 100644
 +		else
 +		{
 +			buttonObject = landingPage.GetActiveRunPlayButton();
-+			if (buttonObject != null)
++// unfortunately the arena landing page widget handles interaction, but the play button component on it doesn't actually update in various cases so... unfortunately we have to do this
++			PlayButton displayPlayButton = DraftDisplay.Get().GetPlayButton();
++			if (buttonObject != null && displayPlayButton != null)
 +			{
 +				var playButton = buttonObject.GetComponentInChildren<PlayButton>();
 +				var clickableComponent = buttonObject.GetComponentInChildren<Clickable>();
 +				if (playButton != null && playButton.IsEnabled() && clickableComponent != null && clickableComponent.IsActive)
 +				{
-+                    m_accessibleLandingPageMenu.AddOption(GameStrings.Get("GLOBAL_PLAY"), () => AccessibilityActivateButton(playButton));
++                    m_accessibleLandingPageMenu.AddOption(GameStrings.Get(displayPlayButton.m_newPlayButtonText.Text), () => AccessibilityActivateButton(playButton));
 +                    addRetireButton = true;
 +				}
 +			}
-+			m_accessibleLandingPageMenu.AddOption("View deck", AccessibilityViewDeck);
++			m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Get(LocalizationKey.ARENA_VIEW_DECK), AccessibilityViewDeck);
 +		}
 +		if (m_draftManager != null && m_draftManager.HasActiveRun && m_draftManager.CanShowWinsLosses)
 +		{
@@ -35681,19 +35757,17 @@ index 17070190..7e1ac249 100644
 +			}
 +		}
 +
-+		if (GameModeUtils.HasUnlockedMode(Global.UnlockableGameMode.UNDERGROUND_ARENA))
++		if (!hasActiveRun && GameModeUtils.HasUnlockedMode(Global.UnlockableGameMode.UNDERGROUND_ARENA))
 +		{
 +			if (isUnderground)
 +			{
-+				// underground is not supported yet
-+				// but we support this button to try to let them get back to normal mode if they somehow got into underground
 +				m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Get(LocalizationKey.ARENA_SWITCH_TO_NORMAL_MODE), AccessibilityClickToggleArenaModeButton);
 +			}
 +			else
 +			{
-+				// not yet supported
-+			}
-+		}
++                m_accessibleLandingPageMenu.AddOption(LocalizationUtils.Get(LocalizationKey.ARENA_SWITCH_TO_UNDERGROUND_MODE), AccessibilityClickToggleArenaModeButton);
++            }
++        }
 +    }
 +
 +    private string GetWinLossesText()
@@ -35779,6 +35853,7 @@ index 17070190..7e1ac249 100644
 +
 +	public string GetHelp()
 +	{
++		return $"{m_draftManager.GetArenaState()}: {DraftDisplay.Get().GetDraftMode()}";
 +		if (m_accessibleLandingPageState == AccessibleLandingPageState.DECK_VIEW)
 +		{
 +			return AccessibleArenaDeckMgr.Get().GetHelp(false);
@@ -56950,7 +57025,7 @@ index 3d9182a7..92516508 100644
  
  	private void OnDismissDialog()
 diff --git a/Assembly-CSharp/DraftDisplay.cs b/Assembly-CSharp/DraftDisplay.cs
-index ff139d33..8f4e9820 100644
+index ff139d33..215f1849 100644
 --- a/Assembly-CSharp/DraftDisplay.cs
 +++ b/Assembly-CSharp/DraftDisplay.cs
 @@ -1,17 +1,19 @@
@@ -57006,17 +57081,45 @@ index ff139d33..8f4e9820 100644
  		{
  			flag = true;
  			actor = m_subclassHeroClones[heroChoice - 1];
-@@ -1779,6 +1787,9 @@ public class DraftDisplay : MonoBehaviour
- 		{
+@@ -1780,9 +1788,9 @@ public class DraftDisplay : MonoBehaviour
  			m_draftManager.SetArenaState(ArenaSessionState.MIDRUN, m_draftManager.IsUnderground());
  			GoToArenaMidrun();
-+			#region Accessibility
-+			AccessibilityMgr.HideUI(this);
-+			#endregion
  		}
+-	}
++    }
+ 
+-	public void GoToArenaEditDeck()
++    public void GoToArenaEditDeck()
+ 	{
+ 		BroadcastArenaDraftScreenEvent("CODE_SLIDEIN_REDRAFT");
+ 		if (m_draftManager != null)
+@@ -1830,6 +1838,11 @@ public class DraftDisplay : MonoBehaviour
+ 			}
+ 		}
+ 		InitManaCurve();
++		#region Accessibility
++		AccessibilityUtils.LogDebug("In setup edit deck trey.");
++		AccessibilityMgr.ShowUI(this);
++		PopulateAccessibleRedraftSlots();
++		#endregion
  	}
  
-@@ -2013,7 +2024,10 @@ public class DraftDisplay : MonoBehaviour
+ 	public void GoToArenaCollection()
+@@ -1893,9 +1906,12 @@ public class DraftDisplay : MonoBehaviour
+ 			m_collectionPageB.transform.localPosition = Vector3.right * 500f;
+ 		}
+ 		DeterminePlayButtonText();
++		#region Accessibility
++		AccessibilityMgr.HideUI(this);
++		#endregion
+ 	}
+ 
+-	public void DeterminePlayButtonText()
++    public void DeterminePlayButtonText()
+ 	{
+ 		if (!(m_playButton == null))
+ 		{
+@@ -2013,7 +2029,10 @@ public class DraftDisplay : MonoBehaviour
  			m_packageCardsPopup.ShowTray();
  			m_packageCardsPopup.SetChooseButtonActive(chooseButtonActive);
  		}
@@ -57028,7 +57131,31 @@ index ff139d33..8f4e9820 100644
  		{
  			CardTileDataModel cardTileDataModel = new CardTileDataModel
  			{
-@@ -3109,6 +3123,11 @@ public class DraftDisplay : MonoBehaviour
+@@ -2383,7 +2402,12 @@ public class DraftDisplay : MonoBehaviour
+ 
+ 	private void OnCardTileRelease(DeckTrayDeckTileVisual cardTile)
+ 	{
+-		RemoveCardFromArenaDeck(cardTile.GetCardID(), cardTile.GetPremium());
++		#region Accessibility // default doesn't use the return
++		if (RemoveCardFromArenaDeck(cardTile.GetCardID(), cardTile.GetPremium()))
++		{
++			UpdateAccessibleRedraftDeckListing();
++		}
++		#endregion
+ 	}
+ 
+ 	private void OnCardTileStartDrag(DeckTrayDeckTileVisual cardTile)
+@@ -2489,6 +2513,9 @@ public class DraftDisplay : MonoBehaviour
+ 		m_isDraggingCardFromCollection = false;
+ 		m_draggingOriginCardSlot = null;
+ 		m_hoveredCardSlot = null;
++		#region Accessibility
++		m_accessibleDragState = AccessibleRedraftingDragState.NO_DRAG;
++		#endregion
+ 	}
+ 
+ 	public bool IsDraggingCardFromDeck()
+@@ -3109,6 +3136,11 @@ public class DraftDisplay : MonoBehaviour
  		{
  			return;
  		}
@@ -57040,7 +57167,15 @@ index ff139d33..8f4e9820 100644
  		DraftManager draftManager = DraftManager.Get();
  		CollectionDeck draftDeck = draftManager.GetDraftDeck();
  		if (draftDeck != null)
-@@ -3313,6 +3332,9 @@ public class DraftDisplay : MonoBehaviour
+@@ -3286,6 +3318,7 @@ public class DraftDisplay : MonoBehaviour
+ 		case ArenaClientStateType.Normal_DeckEdit:
+ 		case ArenaClientStateType.Underground_DeckEdit:
+ 			StartCoroutine(ShowPhaseMessageWithDelays(PhaseMessageType.Edit_Deck));
++			AccessibilityUtils.LogDebug($"On client state updated: {newState}");
+ 			break;
+ 		case ArenaClientStateType.Normal_Ready:
+ 		case ArenaClientStateType.Underground_Ready:
+@@ -3313,6 +3346,9 @@ public class DraftDisplay : MonoBehaviour
  				yield return null;
  			}
  			PositionAndShowChoices();
@@ -57050,7 +57185,7 @@ index ff139d33..8f4e9820 100644
  			yield return StartCoroutine(RunAutoDraftCheat());
  			m_isHandlingChoiceDisplay = false;
  		}
-@@ -4287,4 +4309,179 @@ public class DraftDisplay : MonoBehaviour
+@@ -4287,4 +4323,546 @@ public class DraftDisplay : MonoBehaviour
  		}
  		InitManaCurve();
  	}
@@ -57058,13 +57193,36 @@ index ff139d33..8f4e9820 100644
 +	#region Accessibility
 +	private enum AccessibleDraftingState
 +	{
-+		Deck,
-+	Drafting,
-+		ManaCurve
-+		}
++		DECK,
++		DRAFTING,
++		MANA_CURVE
++	}
 +
-+	private AccessibleDraftingState m_accessibleDraftingState = AccessibleDraftingState.Drafting;
++	private enum AccessibleRedraftingState
++	{
++		UNFINALISED_DECK,
++COLLECTION
++	}
++
++	private enum AccessibleRedraftingDragState
++	{
++		NO_DRAG,
++		DRAG_DECK_TO_SLOT,
++		DRAG_SLOT_TO_DECK
++	}
++
++	private AccessibleDraftingState m_accessibleDraftingState = AccessibleDraftingState.DRAFTING;
++	private AccessibleRedraftingState m_accessibleRedraftingState = AccessibleRedraftingState.UNFINALISED_DECK;
++	private AccessibleRedraftingDragState m_accessibleDragState = AccessibleRedraftingDragState.NO_DRAG;
++	private bool m_accessiblyExitingRedraft = false;
 +	private AccessibleListOfItems<AccessibleArenaDraftCard> m_accessibleDraftCards;
++	private AccessibleListOfItems<AccessibleEditingDeckCard> m_accessibleRedraftCards;
++	private AccessibleListOfItems<AccessibleRedraftSlot> m_accessibleRedraftSlots;
++
++	internal PlayButton GetPlayButton()
++	{
++		return m_playButton;
++	}
 +
 +	private void SetupAccessibleChoices()
 +	{
@@ -57072,19 +57230,61 @@ index ff139d33..8f4e9820 100644
 +		m_accessibleDraftCards = new AccessibleListOfItems<AccessibleArenaDraftCard>(this, cards);
 +        AccessibilityMgr.ShowUI(this);
 +        AccessibilityUtils.LogDebug("Dispatch choices to ui.");
-+		if (m_accessibleDraftingState == AccessibleDraftingState.Drafting && m_accessibleDraftCards?.Count> 0) // we need this because hearthstone swaps to drafting mode and this loads before populating with choices, so we get an empty list read double up if we don't
++		if (m_accessibleDraftingState == AccessibleDraftingState.DRAFTING && m_accessibleDraftCards?.Count> 0) // we need this because hearthstone swaps to drafting mode and this loads before populating with choices, so we get an empty list read double up if we don't
 +		{
 +			m_accessibleDraftCards?.StartReading();
 +		}
 +    }
 +
-+	public void HandleAccessibleInput()
++	private void PopulateAccessibleRedraftSlots()
 +	{
-+		if (m_accessibleDraftingState == AccessibleDraftingState.ManaCurve)
++		var cards = GetAccessibleRedraftDeckCards();
++			m_accessibleRedraftCards = new AccessibleListOfItems<AccessibleEditingDeckCard>(this, cards);
++		if (m_accessibleRedraftCards.Count > 0)
++		{
++			m_accessibleRedraftCards.StartReading();
++		}
++			}
++
++	private List<AccessibleEditingDeckCard> GetAccessibleRedraftDeckCards()
++	{
++		var cards = new List<AccessibleEditingDeckCard>();
++		for (int i = 0; i < m_draftDeckTrays.Count(); i++)
++        {
++            var tray = m_draftDeckTrays[i];
++            if (tray == null)
++			{
++				continue;
++			}
++            var content = tray.GetCardsContent();
++            if (content == null)
++            {
++                continue;
++            }
++			var tiles = content.GetCardTiles();
++            if (tiles == null)
++            {
++                continue;
++            }
++            if (tiles.Count > 0)
++            {
++                cards = tiles.Where(tile => tile.IsInUse()).Select(tile => new AccessibleEditingDeckCard(this, tile)).ToList();
++            }
++        }
++		return cards;
++    }
++
++    public void HandleAccessibleInput()
++	{
++		if (GetDraftMode() == DraftMode.ACTIVE_DRAFT_DECK)
++		{
++			HandleAccessibleRedraftingInput();
++		}
++		else if (m_accessibleDraftingState == AccessibleDraftingState.MANA_CURVE)
 +		{
 +			HandleAccessibleInputForManaCurve();
 +		}
-+		else if (m_accessibleDraftingState == AccessibleDraftingState.Deck)
++		else if (m_accessibleDraftingState == AccessibleDraftingState.DECK)
 +		{
 +			HandleAccessibleInputForDeckView();
 +		}
@@ -57094,7 +57294,281 @@ index ff139d33..8f4e9820 100644
 +		}
 +	}
 +
-+	private void HandleAccessibleInputForManaCurve()
++	private void HandleAccessibleRedraftingInput()
++	{
++		if (m_accessibleRedraftCards == null)
++		{
++			return;
++		}
++		if (AccessiblyHandleExitRedrafting())
++		{
++			return;
++		}
++		else if (m_accessibleDragState != AccessibleRedraftingDragState.NO_DRAG && AccessibleKey.BACK.IsPressed())
++		{
++			CancelAccessibleDrag();
++		}
++		else if (AccessibleKey.ARENA_REDRAFT_DECK_COUNT.IsPressed())
++		{
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_DECK_COUNT, m_deckCount));
++		}
++		else if (m_accessibleRedraftingState == AccessibleRedraftingState.UNFINALISED_DECK)
++		{
++			HandleAccessibleEditDeckInput();
++		}
++		else if (m_accessibleRedraftingState == AccessibleRedraftingState.COLLECTION)
++		{
++			HandleAccessibleDraftingSlotsInput();
++		}
++		else
++		{
++			m_accessibleRedraftingState = AccessibleRedraftingState.UNFINALISED_DECK;
++		}
++	}
++
++	private void HandleAccessibleEditDeckInput()
++	{
++		if (AccessibleKey.CONFIRM.IsPressed())
++		{
++			AccessiblyClickDeckTile();
++		}
++		else if (AccessibleKey.SPACE.IsPressed())
++		{
++			BeginAccessibleDragFromDeck();
++		}
++		else if (AccessibleKey.ARENA_REDRAFTING_VIEW_SLOTS.IsPressed())
++		{
++			SwapToAccessibleDraftingSlotsView();
++		}
++		else
++		{
++			m_accessibleRedraftCards.HandleAccessibleInput();
++		}
++	}
++
++	private bool AccessiblyHandleExitRedrafting()
++	{
++		if (m_accessiblyExitingRedraft)
++		{
++			if (AccessibleKey.CONFIRM.IsPressed() || AccessibleKey.ARENA_EXIT_REDRAFT.IsPressed())
++			{
++				OnEditDeckButtonReleased();
++				return true;
++			}
++		}
++		else if (AccessibleKey.ARENA_EXIT_REDRAFT.IsPressed())
++		{
++			m_accessiblyExitingRedraft = true;
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_EXIT_REDRAFT_CONFIRM, AccessibleKey.CONFIRM.ToString(), AccessibleKey.ARENA_EXIT_REDRAFT.ToString()));
++			return true;
++			}
++			if (Input.anyKeyDown)
++		{
++				m_accessiblyExitingRedraft = false;
++		}
++		return false;
++	}
++
++	private void CancelAccessibleDrag()
++	{
++		ResetDragState();
++		AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.ARENA_REDRAFT_DRAG_CANCELLED));
++	}
++
++	private void AccessiblyClickDeckTile()
++	{
++		var item = m_accessibleRedraftCards?.GetItemBeingRead();
++		if (item == null)
++		{
++			return;
++		}
++		var tile = item.GetCardTile();
++		if (tile == null)
++		{
++			return;
++		}
++		if (m_accessibleDragState == AccessibleRedraftingDragState.DRAG_SLOT_TO_DECK && !string.IsNullOrEmpty(m_draggingCardId) && m_draggingOriginCardSlot != null)
++		{
++			FinaliseAccessibleDragToDeck(tile);
++			return;
++		}
++		AccessibilityUtils.LogDebug($"Clicked tile: {tile}");
++		AccessibleInputMgr.MoveMouseTo(tile.gameObject.transform);
++		OnCardTileRelease(tile);
++		m_accessibleRedraftCards.ReadNextItem(0);
++	}
++
++private void BeginAccessibleDragFromDeck()
++	{
++		if (m_accessibleDragState == AccessibleRedraftingDragState.DRAG_SLOT_TO_DECK)
++		{
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_ALREADY_DRAGGING_FROM_SLOT, AccessibleKey.CONFIRM.ToString(), AccessibleKey.BACK.ToString()));
++			return;
++		}
++		var item = m_accessibleRedraftCards?.GetItemBeingRead();
++		if (item == null)
++		{
++			return;
++		}
++		var tile = item.GetCardTile();
++		if (tile == null)
++		{
++			return;
++		}
++		StartDragState(tile.GetCardID(), tile.GetPremium(), isFromCollection: false, null);
++		m_accessibleDragState = AccessibleRedraftingDragState.DRAG_DECK_TO_SLOT;
++		SwapToAccessibleDraftingSlotsView(isDragTransition: true);
++    }
++
++	private void FinaliseAccessibleDragToDeck(DeckTrayDeckTileVisual tile)
++	{
++		if (SwapCardFromDraftAndCollection(tile.GetCardID(), tile.GetPremium(), m_draggingCardId, m_draggingCardPremium, m_draggingOriginCardSlot))
++		{
++			UpdateAccessibleRedraftDeckListing();
++			m_accessibleRedraftCards.ReadNextItem(0);
++		}
++		ResetDragState();
++    }
++
++    private void UpdateAccessibleRedraftDeckListing()
++	{
++		m_accessibleRedraftCards.UpdateItems(GetAccessibleRedraftDeckCards());
++    }
++
++    void SwapToAccessibleDraftingSlotsView(bool isDragTransition = false)
++	{
++		var slots = new List<AccessibleRedraftSlot>();
++		for (int i = 0; i < m_redraftCardSlots.Count; i++)
++		{
++			var slot = m_redraftCardSlots[i];
++			CardDataModel dataModel = slot?.GetWidget()?.GetDataModel<CardDataModel>();
++			EntityDef entityDef = null;
++			if (dataModel != null)
++			{
++				entityDef = DefLoader.Get().GetEntityDef(dataModel.CardId);
++			}
++			slots.Add(new AccessibleRedraftSlot(this, slot.Index, entityDef));
++		}
++		m_accessibleRedraftSlots = new AccessibleListOfItems<AccessibleRedraftSlot>(this, slots);
++		m_accessibleRedraftingState = AccessibleRedraftingState.COLLECTION;
++		if (isDragTransition)
++		{
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_PROMPT_SWAP_SLOT, AccessibleKey.CONFIRM.ToString()));
++		}
++		else
++		{
++			ResetDragState();
++		}
++			m_accessibleRedraftSlots.StartReading();
++    }
++
++    private void HandleAccessibleDraftingSlotsInput()
++	{
++		if (AccessibleKey.CONFIRM.IsPressed())
++		{
++			AccessiblyClickOnRedraftSlot();
++		}
++		else if (AccessibleKey.SPACE.IsPressed())
++		{
++			BeginAccessibleDragFromRedraftSlots();
++    }
++        else if (AccessibleKey.ARENA_REDRAFTING_VIEW_DECK.IsPressed())
++		{
++			SwapToAccessibleRedraftingDeckView();
++		}
++		else
++		{
++			m_accessibleRedraftSlots?.HandleAccessibleInput();
++		}
++	}
++
++	private void AccessiblyClickOnRedraftSlot()
++	{
++		var item = m_accessibleRedraftSlots?.GetItemBeingRead();
++		if (item == null)
++		{
++			return;
++		}
++		var slotIndex = item.GetSlotIndex();
++		if (!SlotIndexValid(slotIndex))
++		{
++			return;
++		}
++		var slot = m_redraftCardSlots[slotIndex];
++		CardDataModel dataModel = slot?.GetWidget()?.GetDataModel<CardDataModel>();
++		if (dataModel == null)
++		{
++			return;
++		}
++		if (m_accessibleDragState == AccessibleRedraftingDragState.DRAG_DECK_TO_SLOT && !string.IsNullOrEmpty(m_draggingCardId))
++        {
++			FinaliseAccessibleDragToSlot(slot);
++			return;
++        }
++		if (AddCardtoArenaDeck(dataModel.CardId, dataModel.Premium, slot.Index))
++		{
++			UpdateAccessibleRedraftDeckListing();
++			// we don't strictly swap, but we can't just remove the item here since we want slots to stay in the list when empty
++			// could possibly just update in place but this is safer for clarity in case there are knock on changes to the UI
++			SwapToAccessibleDraftingSlotsView();
++		}
++	}
++
++	private void BeginAccessibleDragFromRedraftSlots()
++	{
++		if (m_accessibleDragState == AccessibleRedraftingDragState.DRAG_DECK_TO_SLOT)
++		{
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_ALREADY_DRAGGING_FROM_DECK, AccessibleKey.CONFIRM.ToString(), AccessibleKey.BACK.ToString()));
++            return;
++		}
++		var item = m_accessibleRedraftSlots?.GetItemBeingRead();
++		if (item == null)
++		{
++			return;
++		}
++		var slotIndex = item.GetSlotIndex();
++		if (!SlotIndexValid(slotIndex))
++		{
++			return;
++		}
++		var slot = m_redraftCardSlots[slotIndex];
++		CardDataModel dataModel = slot?.GetWidget()?.GetDataModel<CardDataModel>();
++		if (dataModel == null || !(bool)slot?.HasCard)
++		{
++			AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.ARENA_REDRAFT_SLOT_EMPTY_ERROR));
++			return;
++		}
++		StartDragState(dataModel.CardId, dataModel.Premium, isFromCollection: true, slot);
++		m_accessibleDragState = AccessibleRedraftingDragState.DRAG_SLOT_TO_DECK;
++		SwapToAccessibleRedraftingDeckView(isDragTransition: true);
++	}
++
++	private void FinaliseAccessibleDragToSlot(RedraftCardSlot slot)
++	{
++		CardDataModel dataModel = slot.GetWidget().GetDataModel<CardDataModel>();
++		if (SwapCardFromDraftAndCollection(m_draggingCardId, m_draggingCardPremium, dataModel.CardId, dataModel.Premium, slot))
++		{
++			UpdateAccessibleRedraftDeckListing();
++			SwapToAccessibleDraftingSlotsView(); // still in this view, need to update
++													}
++		ResetDragState();
++    }
++
++    private void SwapToAccessibleRedraftingDeckView(bool isDragTransition = false)
++	{
++		m_accessibleRedraftingState = AccessibleRedraftingState.UNFINALISED_DECK;
++		if (isDragTransition)
++		{
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_PROMPT_SWAP_DECK, AccessibleKey.CONFIRM.ToString()));
++		}
++		else
++		{
++			ResetDragState();
++		}
++        m_accessibleRedraftCards?.StartReading();
++    }
++
++    private void HandleAccessibleInputForManaCurve()
 +	{
 +		// laying out the framework but not implementing this just yet
 +
@@ -57105,7 +57579,7 @@ index ff139d33..8f4e9820 100644
 +		var deckMgr = AccessibleArenaDeckMgr.Get();
 +		if (deckMgr == null || deckMgr.ShouldCloseDeckView() || AccessibleKey.ARENA_TOGGLE_DRAFTING_DECK.IsPressed())
 +		{
-+			m_accessibleDraftingState = AccessibleDraftingState.Drafting;
++			m_accessibleDraftingState = AccessibleDraftingState.DRAFTING;
 +			if (m_accessibleDraftCards?.Count > 0)
 +			{
 +				m_accessibleDraftCards.StartReading();
@@ -57187,7 +57661,7 @@ index ff139d33..8f4e9820 100644
 +        var deck = DraftManager.Get().GetDraftDeck();
 +        if (AccessibleArenaDeckMgr.Get().TryToSwitchToDeckView(this, deck))
 +        {
-+            m_accessibleDraftingState = AccessibleDraftingState.Deck;
++            m_accessibleDraftingState = AccessibleDraftingState.DECK;
 +        }
 +    }
 +
@@ -57199,17 +57673,21 @@ index ff139d33..8f4e9820 100644
 +			AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.ARENA_EMPTY_DECK));
 +			return;
 +		}
-+		m_accessibleDraftingState = AccessibleDraftingState.ManaCurve;
++		m_accessibleDraftingState = AccessibleDraftingState.MANA_CURVE;
 +	}
 +
 +    public string GetAccessibleHelp()
 +	{
 +		var stringBuilder = new System.Text.StringBuilder();
-+		if (m_accessibleDraftingState == AccessibleDraftingState.ManaCurve)
++		if (GetDraftMode() == DraftMode.ACTIVE_DRAFT_DECK)
++		{
++			stringBuilder.Append(GetAccessibleRedraftingHelp());
++		}
++		else if (m_accessibleDraftingState == AccessibleDraftingState.MANA_CURVE)
 +		{
 +			// not supported yet
 +		}
-+		else if (m_accessibleDraftingState == AccessibleDraftingState.Deck)
++		else if (m_accessibleDraftingState == AccessibleDraftingState.DECK)
 +		{
 +			stringBuilder.Append(AccessibleArenaDeckMgr.Get().GetHelp(true));
 +		}
@@ -57228,6 +57706,30 @@ index ff139d33..8f4e9820 100644
 +		}
 +		return stringBuilder.ToString();
 +    }
++
++	private string GetAccessibleRedraftingHelp()
++	{
++		var stringBuilder = new StringBuilder();
++		switch(m_accessibleRedraftingState)
++		{
++			case AccessibleRedraftingState.UNFINALISED_DECK:
++				{
++					stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_DECK_HELP, AccessibleKey.CONFIRM.ToString(), AccessibleKey.ARENA_REDRAFT_START_DRAG.ToString(), AccessibleKey.CONFIRM.ToString(), AccessibleKey.ARENA_REDRAFT_STOP_DRAG.ToString()));
++					break;
++				}
++			case AccessibleRedraftingState.COLLECTION:
++				{
++					stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_SLOT_HELP, AccessibleKey.CONFIRM.ToString(), AccessibleKey.ARENA_REDRAFT_START_DRAG.ToString(), AccessibleKey.CONFIRM.ToString(), AccessibleKey.ARENA_REDRAFT_STOP_DRAG.ToString()));
++					break;
++        }
++	}
++		if (stringBuilder.Length > 0)
++		{
++			stringBuilder.Append(" ");
++		}
++		stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_REDRAFT_GENERAL_HELP, AccessibleKey.ARENA_REDRAFT_DECK_COUNT.ToString(), AccessibleKey.ARENA_EXIT_REDRAFT.ToString()));
++		return stringBuilder.ToString();
++	}
 +    #endregion
  }
 diff --git a/Assembly-CSharp/DraftManager.cs b/Assembly-CSharp/DraftManager.cs

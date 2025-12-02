@@ -1,3 +1,14 @@
+### 2025-12-02
+
+- Updated to Hearthstone version 34.2.0.231720 (contributed by Endefx)
+- Added underground arena support (contributed by Charlie)
+
+Important: Due to a major new mechanic, Battlegrounds is tempararily inaccessible.
+
+### 2025-11-04
+
+- Added support for the underground arena (contributed by Charlie)
+
 ### 2025-10-28
 
 - Updated to Hearthstone version 34.0.0.229984 (contributed by Endefx)

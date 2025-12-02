@@ -171,6 +171,12 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 
 [05] Changelog
 ----------
+### 2025-12-02
+
+- Updated to Hearthstone version 34.2.0.231720 (contributed by Endefx)
+- Added underground arena support (contributed by Charlie)
+
+Important: Due to a major new mechanic, Battlegrounds is tempararily inaccessible.
 
 ### 2025-10-28
 

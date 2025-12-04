@@ -2688,10 +2688,10 @@ index 00000000..a1dfe422
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleCardUtils.cs b/Assembly-CSharp/Accessibility/AccessibleCardUtils.cs
 new file mode 100644
-index 00000000..bf954b55
+index 00000000..81d20fee
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleCardUtils.cs
-@@ -0,0 +1,470 @@
+@@ -0,0 +1,475 @@
 +﻿using System;
 +using System.Collections.Generic;
 +
@@ -3095,6 +3095,11 @@ index 00000000..bf954b55
 +            {
 +                // Stealer of souls changes cost to health instead of mana
 +                return LocalizationUtils.Format(LocalizationKey.READ_HERO_CARD_HEALTH, cost);
++            }
++            else if (card.GetEntity().GetAlternateCost() == TAG_CARD_ALTERNATE_COST.ALT_TAVERN_COIN)
++            {
++                // Battlegrounds timewarped tavern chronum.
++                return LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_GAMEPLAY_READ_CARD_CHRONUM_COST, cost);
 +            }
 +            else
 +            {
@@ -4105,10 +4110,10 @@ index 00000000..4555017d
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleGameplay.cs b/Assembly-CSharp/Accessibility/AccessibleGameplay.cs
 new file mode 100644
-index 00000000..b5ebc1ec
+index 00000000..48bddf1e
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleGameplay.cs
-@@ -0,0 +1,3052 @@
+@@ -0,0 +1,3060 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Linq;
@@ -4157,6 +4162,7 @@ index 00000000..b5ebc1ec
 +            VIEWING_TEAMMATES_CHOICES,
 +            TEAMMATES_CHOICES_HIDDEN,
 +            READING_LEADERBOARD,
++            SHOP_CHOICE,
 +        }
 +
 +        private static AccessibleGameplay s_instance;
@@ -6662,6 +6668,8 @@ index 00000000..b5ebc1ec
 +                    return GetBrowsingHistoryHelp();
 +                case AccessibleGameState.TRADING_CARD:
 +                    return GetTradingCardHelp();
++                    case AccessibleGameState.SHOP_CHOICE:
++                    return GetShopChoiceHelp();
 +                default:
 +                    return "";
 +            }
@@ -6700,6 +6708,11 @@ index 00000000..b5ebc1ec
 +        private string GetTradingCardHelp()
 +        {
 +            return GetOrNarrateHelpSpeech(AccessibleSpeech.TUTORIAL_HOGGER_2_5);
++        }
++
++        private string GetShopChoiceHelp()
++        {
++            return LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_TIMEWARPED_TAVERN_HELP, AccessibleKey.SEE_OPPONENT_MINIONS, AccessibleKey.CONFIRM, AccessibleKey.SEE_PLAYER_MANA);
 +        }
 +
 +        private string GetSummoningMinionHelp()
@@ -7756,7 +7769,7 @@ index 00000000..2d7ffcb6
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleHub.cs b/Assembly-CSharp/Accessibility/AccessibleHub.cs
 new file mode 100644
-index 00000000..5ed42d50
+index 00000000..27dd060c
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleHub.cs
 @@ -0,0 +1,291 @@
@@ -7817,8 +7830,8 @@ index 00000000..5ed42d50
 +                m_mainMenu.AddOption(AccessibleKey.HUB_MODES, LocalizedText.HUB_GAME_MODES_OPTION, OnClickModes);
 +            if (box.m_ArenaButton.IsEnabled())
 +                m_mainMenu.AddOption(LocalizationUtils.Get(LocalizationKey.GLOBAL_ARENA), OnClickArena);
-+            // if (box.m_BattleGroundsButton.IsEnabled())
-+                // m_mainMenu.AddOption(AccessibleKey.HUB_BATTLEGROUNDS, LocalizedText.HUB_BATTLEGROUNDS_OPTION, OnClickBattlegrounds);
++            if (box.m_BattleGroundsButton.IsEnabled())
++                m_mainMenu.AddOption(AccessibleKey.HUB_BATTLEGROUNDS, LocalizedText.HUB_BATTLEGROUNDS_OPTION, OnClickBattlegrounds);
 +            if (box.m_CollectionButton.IsEnabled())
 +                m_mainMenu.AddOption(AccessibleKey.HUB_MY_COLLECTION, LocalizedText.HUB_MY_COLLECTION_OPTION, OnClickMyCollection);
 +            if (box.m_OpenPacksButton.IsEnabled())
@@ -18427,10 +18440,10 @@ index 00000000..20d90672
 +}
 diff --git a/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs b/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs
 new file mode 100644
-index 00000000..1361b983
+index 00000000..6d2b0e03
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Battlegrounds/AccessibleBattlegroundsGameplay.cs
-@@ -0,0 +1,2382 @@
+@@ -0,0 +1,2404 @@
 +﻿using System;
 +using System.Collections;
 +using System.Collections.Generic;
@@ -18707,12 +18720,12 @@ index 00000000..1361b983
 +            }
 +
 +            var player = GameState.Get().GetFriendlySidePlayer();
-+            int availableGold = player.GetNumAvailableResources();
-+            int totalGold = player.GetTag(GAME_TAG.RESOURCES);
++            int availableResources = player.GetNumAvailableResources();
++            int totalResources = player.GetTag(GAME_TAG.RESOURCES);
 +
-+            if (availableGold != totalGold)
++            if (availableResources != totalResources && m_curState != AccessibleGameState.SHOP_CHOICE)
 +            {
-+                AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD_CURRENT_AND_TOTAL, availableGold, totalGold));
++                AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD_CURRENT_AND_TOTAL, availableResources, totalResources));
 +            }
 +            else
 +            {
@@ -18722,8 +18735,9 @@ index 00000000..1361b983
 +
 +		private void ReadAvailablePlayerResources()
 +		{
-+            int curGold = GameState.Get().GetFriendlySidePlayer().GetNumAvailableResources();
-+			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD, curGold));
++            int curResources = GameState.Get().GetFriendlySidePlayer().GetNumAvailableResources();
++            LocalizationKey key = m_curState != AccessibleGameState.SHOP_CHOICE ? LocalizationKey.BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD : LocalizationKey.BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_CHRONUM;
++            AccessibilityMgr.Output(this, LocalizationUtils.Format(key, curResources));
 +		}
 +
 +		private void ReadRemainingPlayerResources()
@@ -18924,6 +18938,11 @@ index 00000000..1361b983
 +                    case AccessibleGameState.VIEWING_TEAMMATES_CHOICES:
 +                    HandleCheckStatusKeys();
 +                    HandleViewingTeammatesChoices();
++                    return;
++                case AccessibleGameState.SHOP_CHOICE:
++                    HandleCardReadingInput();
++                    HandleCheckStatusKeys();
++                    HandleShopChoice();
 +                    return;
 +                default:
 +                    return;
@@ -19341,14 +19360,18 @@ index 00000000..1361b983
 +            }
 +            else if (GameState.Get().IsInChoiceMode())
 +            {
-+                if (IsTargetChoice() || ChoiceCardMgr.Get().IsShowingFriendlyCards())
++                if (ChoiceCardMgr.Get().IsFriendlyShopChoice())
++                {
++                    m_curState = AccessibleGameState.SHOP_CHOICE;
++
++                    if (m_prevState != m_curState)
++                    {
++                        AccessibilityMgr.Output(this, LocalizedText.GLOBAL_TIMEWARP);
++                    }
++                    }
++                else if (IsTargetChoice() || ChoiceCardMgr.Get().IsShowingFriendlyCards())
 +                {
 +                    m_curState = AccessibleGameState.CHOICE_MODE;
-+                }
-+                else if (ChoiceCardMgr.Get().IsFriendlyShopChoice())
-+                {
-+                    // Handle as main option for now. FIXME Might need separate states for this.
-+                    m_curState = AccessibleGameState.MAIN_OPTION_MODE;
 +                }
 +                else
 +                {
@@ -19519,6 +19542,18 @@ index 00000000..1361b983
 +			{
 +                ClickCardForMovingOrPassing();
 +			}
++        }
++
++        private void HandleShopChoice()
++        {
++            HandleZoneInput();
++            // HandleValidOptionsSelectionInput();
++            HandleZoneSelection();
++
++            if (AccessibleKey.CONFIRM.IsPressed() && m_cardBeingRead != null)
++            {
++                InputManager.Get().DoNetworkResponse(m_cardBeingRead.GetCard().GetEntity());
++            }
 +        }
 +
 +        private void HandleViewingTeammatesBoard()
@@ -20448,7 +20483,7 @@ index 00000000..1361b983
 +            {
 +                return TeammateBoardViewer.Get().GetViewer<TeammateMinionViewer>().GetOpposingVirtualZone();
 +            }
-+            if (ChoiceCardMgr.Get().IsFriendlyShopChoice())
++            if (m_curState == AccessibleGameState.SHOP_CHOICE)
 +            {
 +                return BatttlegroundsShopChoice.GetShopChoiceZone();
 +            }
@@ -26961,10 +26996,10 @@ index 00000000..fb167df2
 +}
 diff --git a/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
 new file mode 100644
-index 00000000..eff7470a
+index 00000000..828b0b66
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
-@@ -0,0 +1,1276 @@
+@@ -0,0 +1,1280 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Linq;
@@ -27130,6 +27165,7 @@ index 00000000..eff7470a
 +        public static LocalizationKey GLOBAL_HAUNTED = CreateKey("ACCESSIBILITY_GLOBAL_KEYWORD_HAUNTED");
 +        public static LocalizationKey GLOBAL_DARK_GIFT = CreateKey("GLOBAL_KEYWORD_DARKGIFT");
 +        public static LocalizationKey GLOBAL_ELUSIVE = CreateKey("GLOBAL_KEYWORD_ELUSIVE");
++        public static LocalizationKey GLOBAL_TIMEWARP = CreateKey("GLOBAL_KEYWORD_BACON_TIMEWARP");
 +
 +    // Gameplay
 +    public static LocalizationKey GAMEPLAY_YOUR_TURN = CreateKey("GAMEPLAY_YOUR_TURN");
@@ -27472,6 +27508,7 @@ index 00000000..eff7470a
 +     public static LocalizationKey BATTLEGROUNDS_PARTY_PLAYER_DECLINED_INVITE = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_PARTY_PLAYER_DECLINED_INVITE");
 +     public static LocalizationKey BATTLEGROUNDS_PARTY_PLAYER_LEFT = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_PARTY_PLAYER_LEFT");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_CARD_COST = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_CARD_COST");
++    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_CARD_CHRONUM_COST = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_CARD_CHRONUM_COST");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_DARKMOON_TICKET = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_DARKMOON_TICKET");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_CARD_PREMIUM_GOLDEN = CreateKey("GLUE_MASS_DISENCHANT_PREMIUM_TITLE");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_RECRUIT_PHASE = CreateKey("GLUE_BACON_INFO_POPUP_RECRUIT");
@@ -27482,6 +27519,7 @@ index 00000000..eff7470a
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_COMBAT_PHASE_START_DESCRIBE_AGAINST_DEAD_PLAYER = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_COMBAT_PHASE_START_DESCRIBE_AGAINST_DEAD_PLAYER");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD_CURRENT_AND_TOTAL = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD_CURRENT_AND_TOTAL");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_GOLD");
++    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_CHRONUM = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_PLAYER_CHRONUM");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_REMAINING_GOLD = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_REMAINING_GOLD");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_ZONE_MINIONS_FOR_SALE = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_ZONE_MINIONS_FOR_SALE");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_ZONE_PLAYER_TRINKETS = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_ZONE_PLAYER_TRINKETS");
@@ -27539,6 +27577,7 @@ index 00000000..eff7470a
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_MY_STATS_HELP = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_MY_STATS_HELP");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_READ_RACES_IN_GAME_HELP = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_READ_RACES_IN_GAME_HELP");
 +    public static LocalizationKey BATTLEGROUNDS_GAMEPLAY_HERO_REROLL_HELP = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_GAMEPLAY_HERO_REROLL_HELP");
++    public static LocalizationKey BATTLEGROUNDS_TIMEWARPED_TAVERN_HELP = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_TIMEWARPED_TAVERN_HELP");
 +
 +    // Battlegrounds Duos
 +    public static LocalizationKey BATTLEGROUNDS_DUOS_GAMEPLAY_QUERY_PASS_CARD = CreateKey("ACCESSIBILITY_BATTLEGROUNDS_DUOS_GAMEPLAY_QUERY_PASS_CARD");
@@ -28379,10 +28418,10 @@ index 00000000..a7d8e6a6
 +}
 diff --git a/Assembly-CSharp/Accessibility/Localization/LocalizedText.cs b/Assembly-CSharp/Accessibility/Localization/LocalizedText.cs
 new file mode 100644
-index 00000000..7c37510c
+index 00000000..4d1ffb66
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Localization/LocalizedText.cs
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,79 @@
 +﻿using Accessibility;
 +using System;
 +using System.Collections.Generic;
@@ -28442,6 +28481,7 @@ index 00000000..7c37510c
 +    public static string GLOBAL_SILENCE => LocalizationUtils.Get(LocalizationKey.GLOBAL_SILENCE);
 +    public static string GLOBAL_DARK_GIFT => LocalizationUtils.Get(LocalizationKey.GLOBAL_DARK_GIFT);
 +    public static string GLOBAL_ELUSIVE => LocalizationUtils.Get(LocalizationKey.GLOBAL_ELUSIVE);
++    public static string GLOBAL_TIMEWARP => LocalizationUtils.Get(LocalizationKey.GLOBAL_TIMEWARP);
 +
 +    // Gameplay
 +    public static string GAMEPLAY_YOUR_TURN => LocalizationUtils.Get(LocalizationKey.GAMEPLAY_YOUR_TURN);
@@ -60115,7 +60155,7 @@ index 00000000..0cb326f6
 +    #endregion
 +}
 diff --git a/Assembly-CSharp/FriendListFrame.cs b/Assembly-CSharp/FriendListFrame.cs
-index 6fd6b251..6b54c655 100644
+index 6fd6b251..1657674b 100644
 --- a/Assembly-CSharp/FriendListFrame.cs
 +++ b/Assembly-CSharp/FriendListFrame.cs
 @@ -8,8 +8,9 @@ using Hearthstone.UI;
@@ -61131,8 +61171,8 @@ index 6fd6b251..6b54c655 100644
 +				}
 +			}
 +
-+			// if (netObject.Games.BattlegroundsFriendlyChallenge && !flag2 && player.GetHearthstoneGameAccount().GetBattlegroundsTutorialComplete() && GameUtils.IsBattleGroundsTutorialComplete())
-+				// friendMenu.AddOption(LocalizationUtils.Format(LocalizationKey.UI_SOCIAL_INVITE_FRIEND_TO_BG), () => InviteToBgParty(friend));
++			if (netObject.Games.BattlegroundsFriendlyChallenge && !flag2 && player.GetHearthstoneGameAccount().GetBattlegroundsTutorialComplete() && GameUtils.IsBattleGroundsTutorialComplete())
++				friendMenu.AddOption(LocalizationUtils.Format(LocalizationKey.UI_SOCIAL_INVITE_FRIEND_TO_BG), () => InviteToBgParty(friend));
 +		}
 +		friendMenu.AddOption(LocalizationUtils.Get(LocalizationKey.UI_SOCIAL_CHAT_SEND_MESSAGE), () => friend.OpenChatWithFriend());
 +	}

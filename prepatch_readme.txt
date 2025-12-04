@@ -171,6 +171,11 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 
 [05] Changelog
 ----------
+
+### 2025-12-05
+
+- Added support for the timewarped tavern in Battlegrounds. The mode has been returned to the main menu. (contributed by Endefx)
+
 ### 2025-12-02
 
 - Updated to Hearthstone version 34.2.0.231720 (contributed by Endefx)

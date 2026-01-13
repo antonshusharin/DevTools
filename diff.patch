@@ -394,7 +394,7 @@ index 00000000..17c1c11d
 +*.sln.iml
 +.vscode
 diff --git a/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs b/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
-index 677f070d..8b4f4df6 100644
+index 7baa04fa..5b246d19 100644
 --- a/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
 +++ b/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
 @@ -7,6 +7,7 @@ using Hearthstone.DataModels;
@@ -33480,7 +33480,7 @@ index ebabc8bf..380f8aa4 100644
  		m_rewards = new List<RewardData>(rewardDataList);
  		FixUpRewardOrigins(m_rewards);
 diff --git a/Assembly-CSharp/Actor.cs b/Assembly-CSharp/Actor.cs
-index 4f6be99f..333fb625 100644
+index a9353d93..4913c9d9 100644
 --- a/Assembly-CSharp/Actor.cs
 +++ b/Assembly-CSharp/Actor.cs
 @@ -2,6 +2,7 @@ using System;
@@ -33491,7 +33491,7 @@ index 4f6be99f..333fb625 100644
  using Assets;
  using Blizzard.BlizzardErrorMobile;
  using Blizzard.T5.AssetManager;
-@@ -4097,22 +4098,11 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent, IScriptEventHandler
+@@ -4104,22 +4105,11 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent, IScriptEventHandler
  		{
  			return;
  		}
@@ -33518,7 +33518,7 @@ index 4f6be99f..333fb625 100644
  		}
  	}
  
-@@ -5174,6 +5164,8 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent, IScriptEventHandler
+@@ -5181,6 +5171,8 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent, IScriptEventHandler
  		{
  			TeammatePingWheelManager.Get().AddActorHasPing(this);
  		}
@@ -33527,7 +33527,7 @@ index 4f6be99f..333fb625 100644
  	}
  
  	public void PingSelected(TEAMMATE_PING_TYPE pingType)
-@@ -7876,4 +7868,28 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent, IScriptEventHandler
+@@ -7920,4 +7912,28 @@ public class Actor : MonoBehaviour, IVisibleWidgetComponent, IScriptEventHandler
  	{
  		return m_signatureTextIsOn;
  	}
@@ -34025,7 +34025,7 @@ index 0936cc72..82f74cfe 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/AdventureChooserTray.cs b/Assembly-CSharp/AdventureChooserTray.cs
-index 86eb8a06..9dddf2b0 100644
+index 5e122270..dc75e3f4 100644
 --- a/Assembly-CSharp/AdventureChooserTray.cs
 +++ b/Assembly-CSharp/AdventureChooserTray.cs
 @@ -56,6 +56,7 @@ public class AdventureChooserTray : AccordionMenuTray
@@ -35514,7 +35514,7 @@ index 2ca05b44..3fbf18b2 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/AntiCheatSDK/AntiCheatManager.cs b/Assembly-CSharp/AntiCheatSDK/AntiCheatManager.cs
-index b95de349..d0fe3ad7 100644
+index 2c74e9e5..fae9c966 100644
 --- a/Assembly-CSharp/AntiCheatSDK/AntiCheatManager.cs
 +++ b/Assembly-CSharp/AntiCheatSDK/AntiCheatManager.cs
 @@ -72,7 +72,7 @@ namespace AntiCheatSDK
@@ -35947,7 +35947,7 @@ index 0730aa77..9ed81cc0 100644
  	}
  
 diff --git a/Assembly-CSharp/Assembly-CSharp.csproj b/Assembly-CSharp/Assembly-CSharp.csproj
-index 196d7934..ee2288d6 100644
+index 196d7934..eb644d72 100644
 --- a/Assembly-CSharp/Assembly-CSharp.csproj
 +++ b/Assembly-CSharp/Assembly-CSharp.csproj
 @@ -1,119 +1,124 @@
@@ -36257,7 +36257,7 @@ index 196d7934..ee2288d6 100644
 +<PackageReference Include="System.Runtime" Version="4.3.1" />
 +	</ItemGroup>
 +	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-+		<Exec Command="xcopy /y &quot;bin\Release\net472\Assembly-CSharp.dll&quot; &quot;..\..\Hearthstone\Hearthstone_Data\Managed\&quot; &amp;&amp; ^&#xD;&#xA;xcopy /y &quot;bin\Release\net472\TolkDotNet.dll&quot; &quot;..\..\Hearthstone\Hearthstone_Data\Managed\&quot; &amp;&amp; ^&#xD;&#xA;xcopy /y &quot;..\..\ManagedOverrides\Tolk.dll&quot; &quot;..\..\Hearthstone\Hearthstone_Data\Managed\&quot; &amp;&amp; ^&#xD;&#xA;xcopy /y &quot;..\..\ManagedOverrides\Accessibility\*&quot; &quot;..\..\Hearthstone\Hearthstone_Data\Managed\Accessibility\*&quot; &amp;&amp; ^&#xD;&#xA;xcopy /y &quot;..\..\Localization\enUS\ACCESSIBILITY.txt&quot; &quot;..\..\Hearthstone\Strings\enUS\&quot; &amp;&amp; ^&#xD;&#xA;xcopy /y &quot;..\..\ManagedOverrides\*&quot; &quot;..\..\Hearthstone\Hearthstone_Data\Managed\*&quot; &amp;&amp; ^&#xD;&#xA;if exist &quot;..\..\Hearthstone\Accessibility\Speeches&quot; (del /s /q &quot;..\..\Hearthstone\Accessibility\Speeches\*&quot;) else (echo &quot;initializing accessibility&quot;) &amp;&amp; ^&#xD;&#xA;xcopy /y /i &quot;..\..\Speeches\*&quot; &quot;..\..\Hearthstone\Accessibility\Speeches\*&quot;" />
++		<Exec Command="powershell.exe -ExecutionPolicy RemoteSigned -File &quot;$(ProjectDir)post-build.ps1&quot; -Configuration $(Configuration)" />
 +	</Target>
 +</Project>
 diff --git a/Assembly-CSharp/Assembly-CSharp.sln b/Assembly-CSharp/Assembly-CSharp.sln
@@ -36413,7 +36413,7 @@ index 3728674f..b574aacc 100644
  
  		public enum Adventurebooklocation
 diff --git a/Assembly-CSharp/Assets/Global.cs b/Assembly-CSharp/Assets/Global.cs
-index 7dc3adf8..7fcd5566 100644
+index 52f9e3d6..32ca5444 100644
 --- a/Assembly-CSharp/Assets/Global.cs
 +++ b/Assembly-CSharp/Assets/Global.cs
 @@ -390,7 +390,8 @@ namespace Assets
@@ -36580,7 +36580,7 @@ index e61a7e8d..55d2f971 100644
  			if (actorSpell != null)
  			{
 diff --git a/Assembly-CSharp/BaconCollectionDisplay.cs b/Assembly-CSharp/BaconCollectionDisplay.cs
-index b0834c99..c0c6d466 100644
+index 3a5ff8da..ca552b50 100644
 --- a/Assembly-CSharp/BaconCollectionDisplay.cs
 +++ b/Assembly-CSharp/BaconCollectionDisplay.cs
 @@ -8,6 +8,7 @@ using Hearthstone.Progression;
@@ -36827,19 +36827,19 @@ index 2cfb77ca..7f2d61f6 100644
  		{
  			PartyManager.Get().UpdateBattlegroundsStrikeMemberAttribute();
 diff --git a/Assembly-CSharp/BaconCosmeticPreviewRunnerConfig.cs b/Assembly-CSharp/BaconCosmeticPreviewRunnerConfig.cs
-index 4e6814d6..011b7ea3 100644
+index dc2e1269..011b7ea3 100644
 --- a/Assembly-CSharp/BaconCosmeticPreviewRunnerConfig.cs
 +++ b/Assembly-CSharp/BaconCosmeticPreviewRunnerConfig.cs
-@@ -1,7 +1,6 @@
- using System.Collections.Generic;
+@@ -2,7 +2,6 @@ using System.Collections.Generic;
  using UnityEngine;
  
--[CreateAssetMenu(menuName = "ScriptableObjects/Bacon Cosmetic Preview Config")]
  [CustomEditClass]
+-[CreateAssetMenu(menuName = "ScriptableObjects/Bacon Cosmetic Preview Config")]
  public class BaconCosmeticPreviewRunnerConfig : ScriptableObject
  {
+ 	public int boardId;
 diff --git a/Assembly-CSharp/BaconDisplay.cs b/Assembly-CSharp/BaconDisplay.cs
-index 9333b61c..b6e60650 100644
+index 50a8fa93..d8453a1b 100644
 --- a/Assembly-CSharp/BaconDisplay.cs
 +++ b/Assembly-CSharp/BaconDisplay.cs
 @@ -72,7 +72,7 @@ public class BaconDisplay : AbsSceneDisplay
@@ -37253,17 +37253,17 @@ index a9bcdc54..40b57f7e 100644
  
  	protected override bool CanToggleFavorite()
 diff --git a/Assembly-CSharp/BaconLHSConfig.cs b/Assembly-CSharp/BaconLHSConfig.cs
-index ef6b748c..e55ec428 100644
+index cb298764..e55ec428 100644
 --- a/Assembly-CSharp/BaconLHSConfig.cs
 +++ b/Assembly-CSharp/BaconLHSConfig.cs
-@@ -3,7 +3,6 @@ using System.Collections.Generic;
+@@ -2,7 +2,6 @@ using System;
+ using System.Collections.Generic;
  using UnityEngine;
  
- [CustomEditClass]
 -[CreateAssetMenu(fileName = "BaconLHSConfig", menuName = "ScriptableObjects/BaconLHSConfig", order = 2)]
+ [CustomEditClass]
  public class BaconLHSConfig : ScriptableObject
  {
- 	[Serializable]
 diff --git a/Assembly-CSharp/BaconParty.cs b/Assembly-CSharp/BaconParty.cs
 index 4bbf7b9d..56b4eba2 100644
 --- a/Assembly-CSharp/BaconParty.cs
@@ -38388,7 +38388,7 @@ index 222659a3..a435f8b1 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/BatttlegroundsShopChoice.cs b/Assembly-CSharp/BatttlegroundsShopChoice.cs
-index 37bfcc53..9866b87c 100644
+index 60427c67..da887c53 100644
 --- a/Assembly-CSharp/BatttlegroundsShopChoice.cs
 +++ b/Assembly-CSharp/BatttlegroundsShopChoice.cs
 @@ -59,7 +59,7 @@ public class BatttlegroundsShopChoice
@@ -38400,7 +38400,7 @@ index 37bfcc53..9866b87c 100644
  		if (teammateShopChoice)
  		{
  			vector = TeammateBoardViewer.Get().GetTeammateBoardPosition();
-@@ -538,4 +538,11 @@ public class BatttlegroundsShopChoice
+@@ -543,4 +543,11 @@ public class BatttlegroundsShopChoice
  				m_zoneShop.UpdateLayout();
  			}
  		}
@@ -40014,7 +40014,7 @@ index dc7efd1c..8629e336 100644
  
  	protected override void OnProductSet()
 diff --git a/Assembly-CSharp/Box.cs b/Assembly-CSharp/Box.cs
-index 67ba9ede..9d43e624 100644
+index 58398882..13bba180 100644
 --- a/Assembly-CSharp/Box.cs
 +++ b/Assembly-CSharp/Box.cs
 @@ -18,6 +18,7 @@ using Hearthstone.Streaming;
@@ -40202,7 +40202,7 @@ index 67ba9ede..9d43e624 100644
  				boxDressingDataModel.Type = specialEventDataModel.SpecialEventType.ToString();
 @@ -2591,47 +2593,47 @@ public class Box : MonoBehaviour
  		BoxMenuButton boxMenuButton = (BoxMenuButton)element;
- 		if (!OnPressDisabledButtons.Contains(boxMenuButton) && (IsInStateWithButtons() || (!(element == m_PlayButton) && !(element == m_BattleGroundsButton) && !(element == m_ArenaButton) && !(element == m_GameModesButton))))
+ 		if (!OnPressDisabledButtons.Contains(boxMenuButton) && (IsInStateWithButtons() || (!(element == m_PlayButton) && !(element == m_BattleGroundsButton) && !(element == m_ArenaButton) && !(element == m_GameModesButton))) && !PopupDisplayManager.Get().IsShowing)
  		{
 -			NetCache.NetCacheFeatures netObject = NetCache.Get().GetNetObject<NetCache.NetCacheFeatures>();
 -			bool flag = false;
@@ -40372,7 +40372,7 @@ index 67ba9ede..9d43e624 100644
  		Log.Box.Print("Set Rotation Button Pressed!");
  		if (!ServiceManager.IsAvailable<SceneMgr>())
  		{
-@@ -2893,11 +2897,11 @@ public class Box : MonoBehaviour
+@@ -2899,11 +2903,11 @@ public class Box : MonoBehaviour
  		{
  			SceneMgr.Get().SetNextMode(SceneMgr.Mode.TAVERN_BRAWL);
  			if (TavernBrawlManager.Get().IsFirstTimeSeeingThisFeature)
@@ -40388,7 +40388,7 @@ index 67ba9ede..9d43e624 100644
  				PlayTavernBrawlCrowdSFX();
  			}
  		}
-@@ -2911,8 +2915,8 @@ public class Box : MonoBehaviour
+@@ -2917,8 +2921,8 @@ public class Box : MonoBehaviour
  		}
  		else if (SceneMgr.Get() != null && !DialogManager.Get().ShowingDialog())
  		{
@@ -40399,7 +40399,7 @@ index 67ba9ede..9d43e624 100644
  	}
  
  	public void OnArenaButtonPressed(UIEvent e)
-@@ -2992,7 +2996,7 @@ public class Box : MonoBehaviour
+@@ -2998,7 +3002,7 @@ public class Box : MonoBehaviour
  		DownloadConfirmationPopup.DownloadConfirmationPopupData confirmationPopupData = new DownloadConfirmationPopup.DownloadConfirmationPopupData(moduleTag, OnDownloadPopupYesClicked, OnDownloadPopupNoClicked);
  		if (downloadPromptTextOverride == "")
  		{
@@ -40408,7 +40408,7 @@ index 67ba9ede..9d43e624 100644
  		}
  		else
  		{
-@@ -3083,6 +3087,7 @@ public class Box : MonoBehaviour
+@@ -3089,6 +3093,7 @@ public class Box : MonoBehaviour
  		if (!IsShopButtonReadyToOpen(out var unableToOpenReason, out var reasonLogLevel))
  		{
  			Log.Store.Print(reasonLogLevel, verbose: false, unableToOpenReason);
@@ -40416,7 +40416,7 @@ index 67ba9ede..9d43e624 100644
  			return;
  		}
  		FireButtonPressEvent(ButtonType.STORE);
-@@ -3504,25 +3509,25 @@ public class Box : MonoBehaviour
+@@ -3510,25 +3515,25 @@ public class Box : MonoBehaviour
  		bool flag4 = m_railroadManager.ShouldHideButtonType(ButtonType.JOURNAL);
  		bool flag5 = m_railroadManager.ShouldDisableButtonType(ButtonType.JOURNAL);
  		if (num2 || flag3 || flag4)
@@ -40454,7 +40454,7 @@ index 67ba9ede..9d43e624 100644
  		string reason;
  		bool flag6 = !TavernBrawlManager.Get().CanEnterStandardTavernBrawl(out reason);
  		bool flag7 = m_railroadManager.ShouldHideButtonType(ButtonType.TAVERN_BRAWL);
-@@ -3564,17 +3569,17 @@ public class Box : MonoBehaviour
+@@ -3570,17 +3575,17 @@ public class Box : MonoBehaviour
  	}
  
  	private void DisableAllBoxButtons(bool updateText)
@@ -45238,7 +45238,7 @@ index 51238c6b..aa809693 100644
  	}
  
 diff --git a/Assembly-CSharp/Cheats.cs b/Assembly-CSharp/Cheats.cs
-index fa6c20e5..a87259d0 100644
+index 9aea6df6..5aa8f6b0 100644
 --- a/Assembly-CSharp/Cheats.cs
 +++ b/Assembly-CSharp/Cheats.cs
 @@ -261,9 +261,9 @@ public class Cheats : IService
@@ -47081,7 +47081,7 @@ index 97817725..00bee3ed 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/ClientOption.cs b/Assembly-CSharp/ClientOption.cs
-index 09798d67..1284607e 100644
+index 8aec3497..23f16e42 100644
 --- a/Assembly-CSharp/ClientOption.cs
 +++ b/Assembly-CSharp/ClientOption.cs
 @@ -131,6 +131,13 @@ public enum ClientOption
@@ -47340,7 +47340,7 @@ index 95949542..15a0bddb 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/CollectionDeckTray.cs b/Assembly-CSharp/CollectionDeckTray.cs
-index 67ba6ec3..4615efdd 100644
+index be1ae89d..309253cf 100644
 --- a/Assembly-CSharp/CollectionDeckTray.cs
 +++ b/Assembly-CSharp/CollectionDeckTray.cs
 @@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
@@ -47438,7 +47438,7 @@ index 67ba6ec3..4615efdd 100644
  		}
  		if (flag)
  		{
-@@ -1132,16 +1138,20 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -1134,16 +1140,20 @@ public class CollectionDeckTray : EditableDeckTray
  		m_runeIndicatorVisual.EnableRuneButtons();
  		m_cardsContent.UpdateCardList();
  		CheckNumCardsNeededToBuildDeck(deck);
@@ -47459,7 +47459,7 @@ index 67ba6ec3..4615efdd 100644
  		CollectionManager.Get().SetEditedDeck(deck);
  		CollectionManagerDisplay obj = CollectionManager.Get().GetCollectibleDisplay() as CollectionManagerDisplay;
  		obj.ShowDuelsDeckHeader();
-@@ -1330,31 +1340,31 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -1332,31 +1342,31 @@ public class CollectionDeckTray : EditableDeckTray
  
  	private void ResetDeathKnightTrayChanges()
  	{
@@ -47509,7 +47509,7 @@ index 67ba6ec3..4615efdd 100644
  		CollectionDeck editedDeck = CollectionManager.Get().GetEditedDeck();
  		if (editedDeck == null)
  		{
-@@ -1415,7 +1425,7 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -1417,7 +1427,7 @@ public class CollectionDeckTray : EditableDeckTray
  		{
  			flag = deckRuleset.IsDeckValid(editedDeck);
  		}
@@ -47518,7 +47518,7 @@ index 67ba6ec3..4615efdd 100644
  		{
  			Options.Get().SetBool(Option.NEEDS_TO_MAKE_STANDARD_DECK, val: false);
  			Options.Get().SetLong(Option.LAST_CUSTOM_DECK_CHOSEN, editedDeck.ID);
-@@ -1424,7 +1434,7 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -1426,7 +1436,7 @@ public class CollectionDeckTray : EditableDeckTray
  			Notification notification = NotificationManager.Get().CreatePopupText(UserAttentionBlocker.SET_ROTATION_CM_TUTORIALS, relativePosition, NotificationManager.NOTIFICATITON_WORLD_SCALE, GameStrings.Get("GLUE_COLLECTION_TUTORIAL16"), convertLegacyPosition: false);
  			notification.ShowPopUpArrow(Notification.PopUpArrowDirection.RightDown);
  			notification.PulseReminderEveryXSeconds(3f);
@@ -47527,7 +47527,7 @@ index 67ba6ec3..4615efdd 100644
  			m_doneButton.GetComponentInChildren<HighlightState>().ChangeState(ActorStateType.HIGHLIGHT_PRIMARY_ACTIVE);
  		}
  		SaveCurrentDeckAndEnterDeckListMode();
-@@ -1521,7 +1531,7 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -1523,7 +1533,7 @@ public class CollectionDeckTray : EditableDeckTray
  		}
  	}
  
@@ -47536,7 +47536,7 @@ index 67ba6ec3..4615efdd 100644
  	{
  		if (this == null || base.gameObject == null)
  		{
-@@ -1553,7 +1563,7 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -1555,7 +1565,7 @@ public class CollectionDeckTray : EditableDeckTray
  	}
  
  	public static void SaveDeck(CollectionDeck deck, CollectionDeck.ChangeSource changeSource)
@@ -47545,7 +47545,7 @@ index 67ba6ec3..4615efdd 100644
  		if (deck != null)
  		{
  			deck.RemoveOrphanedSideboards();
-@@ -1755,6 +1765,7 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -1757,6 +1767,7 @@ public class CollectionDeckTray : EditableDeckTray
  		AllowInput(allowed: true);
  		m_isAutoAddingCardsWithTiming = false;
  		completedCallback?.Invoke(addedCards, removedCards);
@@ -47553,7 +47553,7 @@ index 67ba6ec3..4615efdd 100644
  	}
  
  	public void PopulateTeam(IEnumerable<LettuceCollectionDisplay.TeamCopyingModule.TeamFill> fillCards, PopuplateDeckCompleteCallback completedCallback)
-@@ -1999,11 +2010,11 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -2001,11 +2012,11 @@ public class CollectionDeckTray : EditableDeckTray
  			bool num = collectionInputMgr != null && collectionInputMgr.HasHeldCard();
  			bool flag = arenaInputManager != null && arenaInputManager.HasHeldCard();
  			if (!num && !flag)
@@ -47568,7 +47568,7 @@ index 67ba6ec3..4615efdd 100644
  
  	private void OnCardTileHeld(DeckTrayDeckTileVisual cardTile)
  	{
-@@ -2015,8 +2026,8 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -2017,8 +2028,8 @@ public class CollectionDeckTray : EditableDeckTray
  
  	protected override void OnCardTileRelease(DeckTrayDeckTileVisual cardTile)
  	{
@@ -47579,7 +47579,7 @@ index 67ba6ec3..4615efdd 100644
  
  	public void RemoveCardTile(DeckTrayDeckTileVisual cardTile)
  	{
-@@ -2034,11 +2045,13 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -2036,11 +2047,13 @@ public class CollectionDeckTray : EditableDeckTray
  			HideDeckBigCard(cardTile);
  			return;
  		}
@@ -47593,7 +47593,7 @@ index 67ba6ec3..4615efdd 100644
  		else if (!(CollectionInputMgr.Get() == null) && !TavernBrawlDisplay.IsTavernBrawlViewing())
  		{
  			CollectionDeckTileActor actor = cardTile.GetActor();
-@@ -2117,17 +2130,17 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -2119,17 +2132,17 @@ public class CollectionDeckTray : EditableDeckTray
  			deck = currentCardListContext.GetEditingDeck();
  		}
  		GhostCard.Type ghostTypeFromSlot = GhostCard.GetGhostTypeFromSlot(deck, cardTile.GetSlot());
@@ -47621,7 +47621,7 @@ index 67ba6ec3..4615efdd 100644
  
  	protected override void HideDeckBigCard(DeckTrayDeckTileVisual cardTile, bool force = false)
  	{
-@@ -2301,8 +2314,8 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -2303,8 +2316,8 @@ public class CollectionDeckTray : EditableDeckTray
  	{
  		if (!(m_doneButton == null))
  		{
@@ -47632,7 +47632,7 @@ index 67ba6ec3..4615efdd 100644
  	}
  
  	public Vector3 GetFirstRuneIndicatorButtonPosition()
-@@ -2342,4 +2355,11 @@ public class CollectionDeckTray : EditableDeckTray
+@@ -2344,4 +2357,11 @@ public class CollectionDeckTray : EditableDeckTray
  			_ => null, 
  		};
  	}
@@ -48313,7 +48313,7 @@ index ed88ad52..224de7cc 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/CollectionManagerDisplay.cs b/Assembly-CSharp/CollectionManagerDisplay.cs
-index 00ee4b68..07ea4bc1 100644
+index ebe186e8..8cbaefb1 100644
 --- a/Assembly-CSharp/CollectionManagerDisplay.cs
 +++ b/Assembly-CSharp/CollectionManagerDisplay.cs
 @@ -14,6 +14,7 @@ using Hearthstone.Util;
@@ -52976,17 +52976,17 @@ index b543bb85..8ac66377 100644
  		public static bool ContentstackEnabled => NetCache.Get().GetNetObject<NetCache.NetCacheFeatures>()?.ContentstackEnabled ?? true;
  
 diff --git a/Assembly-CSharp/CornerReplacementConfig.cs b/Assembly-CSharp/CornerReplacementConfig.cs
-index 9a7f0fd1..bd2a0b7b 100644
+index 1512a667..bd2a0b7b 100644
 --- a/Assembly-CSharp/CornerReplacementConfig.cs
 +++ b/Assembly-CSharp/CornerReplacementConfig.cs
-@@ -3,7 +3,6 @@ using Blizzard.T5.AssetManager;
- using Blizzard.T5.Core;
+@@ -4,7 +4,6 @@ using Blizzard.T5.Core;
  using UnityEngine;
  
--[CreateAssetMenu(fileName = "CornerReplacementConfigData", menuName = "ScriptableObjects/CornerReplacementConfig")]
  [CustomEditClass]
+-[CreateAssetMenu(fileName = "CornerReplacementConfigData", menuName = "ScriptableObjects/CornerReplacementConfig")]
  public class CornerReplacementConfig : ScriptableObject
  {
+ 	public const string CornerReplacementConfigReference = "Player_CornerReplacement.asset:a61dcd0d9c8367e45b20ac2f69f6cefd";
 diff --git a/Assembly-CSharp/CorpseCounter.cs b/Assembly-CSharp/CorpseCounter.cs
 index 072136ff..bc811f36 100644
 --- a/Assembly-CSharp/CorpseCounter.cs
@@ -54000,7 +54000,7 @@ index 6b9297b1..6e7456f7 100644
  				NotificationManager.Get().CreateInnkeeperQuote(UserAttentionBlocker.NONE, GameStrings.Get("VO_ANNOUNCER_CM_HELP_DECK_50"), "VO_ANNOUNCER_CM_HELP_DECK_50.prefab:450881875d33d094e9a27f6260fb06d9");
  				Options.Get().SetBool(Option.HAS_SEEN_DECK_HELPER, val: true);
 diff --git a/Assembly-CSharp/DeckOptionsMenu.cs b/Assembly-CSharp/DeckOptionsMenu.cs
-index 4e3fa728..40b0e32e 100644
+index 65932196..a426c0e9 100644
 --- a/Assembly-CSharp/DeckOptionsMenu.cs
 +++ b/Assembly-CSharp/DeckOptionsMenu.cs
 @@ -4,6 +4,7 @@ using Blizzard.T5.Core;
@@ -54142,7 +54142,7 @@ index 4e3fa728..40b0e32e 100644
 +		#endregion
  }
 diff --git a/Assembly-CSharp/DeckPickerTrayDisplay.cs b/Assembly-CSharp/DeckPickerTrayDisplay.cs
-index 20b9e2be..08dd0526 100644
+index 8ce97d24..2aa93a09 100644
 --- a/Assembly-CSharp/DeckPickerTrayDisplay.cs
 +++ b/Assembly-CSharp/DeckPickerTrayDisplay.cs
 @@ -4,6 +4,7 @@ using System.Collections.Generic;
@@ -56457,7 +56457,7 @@ index f5f83b1c..93772b13 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/DeckTrayDeckListContent.cs b/Assembly-CSharp/DeckTrayDeckListContent.cs
-index 34b56a4c..30c9cb47 100644
+index d0220a2e..a692339a 100644
 --- a/Assembly-CSharp/DeckTrayDeckListContent.cs
 +++ b/Assembly-CSharp/DeckTrayDeckListContent.cs
 @@ -8,6 +8,7 @@ using Hearthstone.Core;
@@ -56530,7 +56530,7 @@ index 34b56a4c..30c9cb47 100644
  		return result;
  	}
 diff --git a/Assembly-CSharp/DeckTrayDeckTileVisual.cs b/Assembly-CSharp/DeckTrayDeckTileVisual.cs
-index 5b30cb49..4e980009 100644
+index 0ace2b5c..52bd2c0c 100644
 --- a/Assembly-CSharp/DeckTrayDeckTileVisual.cs
 +++ b/Assembly-CSharp/DeckTrayDeckTileVisual.cs
 @@ -203,7 +203,7 @@ public class DeckTrayDeckTileVisual : PegUIElement
@@ -56542,7 +56542,7 @@ index 5b30cb49..4e980009 100644
  	{
  		CollectionDeckTileActor.GhostedState result = CollectionDeckTileActor.GhostedState.NONE;
  		if (m_deck != null)
-@@ -342,9 +342,11 @@ public class DeckTrayDeckTileVisual : PegUIElement
+@@ -344,9 +344,11 @@ public class DeckTrayDeckTileVisual : PegUIElement
  		m_actor.UpdateDeckCardProperties(flag, isMultiCard: false, m_slot.Count, m_useSliderAnimations);
  		if (m_defHandleOverride == null)
  		{
@@ -56556,7 +56556,7 @@ index 5b30cb49..4e980009 100644
  				{
  					if (!(m_actor == null) && cardID.Equals(m_actor.GetEntityDef().GetCardId()))
  					{
-@@ -354,7 +356,8 @@ public class DeckTrayDeckTileVisual : PegUIElement
+@@ -356,7 +358,8 @@ public class DeckTrayDeckTileVisual : PegUIElement
  						m_actor.UpdateTrialIconState();
  					}
  				}
@@ -56566,7 +56566,7 @@ index 5b30cb49..4e980009 100644
  			return;
  		}
  		DefLoader.DisposableCardDef disposableCardDef = m_defHandleOverride.Share();
-@@ -399,4 +402,11 @@ public class DeckTrayDeckTileVisual : PegUIElement
+@@ -401,4 +404,11 @@ public class DeckTrayDeckTileVisual : PegUIElement
  		}
  		return m_actor.GetEntityDef()?.HasRuneCost ?? false;
  	}
@@ -56633,7 +56633,7 @@ index 790def1b..8facf1a2 100644
 +    public abstract string GetAccessibleHelp();
  }
 diff --git a/Assembly-CSharp/DialogManager.cs b/Assembly-CSharp/DialogManager.cs
-index 366b4e99..d734353e 100644
+index 9516c9e1..8131e109 100644
 --- a/Assembly-CSharp/DialogManager.cs
 +++ b/Assembly-CSharp/DialogManager.cs
 @@ -13,6 +13,7 @@ using Hearthstone.UI;
@@ -56728,7 +56728,7 @@ index 366b4e99..d734353e 100644
  		{
  			return;
  		}
-@@ -860,7 +867,7 @@ public class DialogManager : MonoBehaviour
+@@ -863,7 +870,7 @@ public class DialogManager : MonoBehaviour
  	{
  		DialogRequest dialogRequest = ((m_dialogRequests.Count == 0) ? null : m_dialogRequests.Peek());
  		UserAttentionBlocker attentionCategory = dialogRequest?.m_attentionCategory ?? UserAttentionBlocker.NONE;
@@ -56737,7 +56737,7 @@ index 366b4e99..d734353e 100644
  		{
  			m_loadingDialog = false;
  			UnityEngine.Object.DestroyImmediate(go);
-@@ -1227,4 +1234,17 @@ public class DialogManager : MonoBehaviour
+@@ -1230,4 +1237,17 @@ public class DialogManager : MonoBehaviour
  		};
  		AddToQueue(request);
  	}
@@ -58318,7 +58318,7 @@ index ec641343..507281e1 100644
  
  	private void HideEnemyEmote(EnemyEmote emote)
 diff --git a/Assembly-CSharp/Entity.cs b/Assembly-CSharp/Entity.cs
-index ae1d88f3..af0747f4 100644
+index 4e37804c..e5f3182e 100644
 --- a/Assembly-CSharp/Entity.cs
 +++ b/Assembly-CSharp/Entity.cs
 @@ -212,7 +212,7 @@ public class Entity : EntityBase
@@ -58502,7 +58502,7 @@ index ae1d88f3..af0747f4 100644
  
  	private void ResolveEnchantmentPortraitCardID(int creatorDBID)
  	{
-@@ -1504,7 +1510,7 @@ public class Entity : EntityBase
+@@ -1507,7 +1513,7 @@ public class Entity : EntityBase
  
  	public override void GetClasses(IList<TAG_CLASS> classes)
  	{
@@ -58511,7 +58511,7 @@ index ae1d88f3..af0747f4 100644
  		if (classes.Count == 0)
  		{
  			GetEntityDef().GetClasses(classes);
-@@ -1590,8 +1596,8 @@ public class Entity : EntityBase
+@@ -1593,8 +1599,8 @@ public class Entity : EntityBase
  		if (!(enchantmentBannerText == null) && GetCardId() == "ETC_335")
  		{
  			enchantmentBannerText.transform.localScale *= 0.8f;
@@ -58522,7 +58522,7 @@ index ae1d88f3..af0747f4 100644
  				enchantmentBannerText.transform.localPosition += new Vector3(0.14f, 0.084f, 0f);
  			}
  			else if (IsControlledByFriendlySidePlayer())
-@@ -1820,13 +1826,13 @@ public class Entity : EntityBase
+@@ -1823,13 +1829,13 @@ public class Entity : EntityBase
  		{
  			int tag = GetTag(GAME_TAG.BACON_SKIN_PARENT_ID);
  			using DefLoader.DisposableFullDef disposableFullDef = DefLoader.Get().GetFullDef(tag);
@@ -58542,7 +58542,7 @@ index ae1d88f3..af0747f4 100644
  		return GetTag(GAME_TAG.BACON_COMPANION_ID);
  	}
  
-@@ -1950,35 +1956,35 @@ public class Entity : EntityBase
+@@ -1953,35 +1959,35 @@ public class Entity : EntityBase
  	public string GetCardTextInHand()
  	{
  		using DefLoader.DisposableCardDef disposableCardDef = ShareDisposableCardDef();
@@ -58596,7 +58596,7 @@ index ae1d88f3..af0747f4 100644
  
  	public void AddAttachment(Entity entity)
  	{
-@@ -2268,6 +2274,22 @@ public class Entity : EntityBase
+@@ -2271,6 +2277,22 @@ public class Entity : EntityBase
  		return entity;
  	}
  
@@ -58619,7 +58619,7 @@ index ae1d88f3..af0747f4 100644
  	public bool IsHistoryDupe()
  	{
  		return m_duplicateForHistory;
-@@ -2307,9 +2329,9 @@ public class Entity : EntityBase
+@@ -2310,9 +2332,9 @@ public class Entity : EntityBase
  				return lettuceAbilityOwner.GetController();
  			}
  		}
@@ -58631,7 +58631,7 @@ index ae1d88f3..af0747f4 100644
  			Entity parentEntity2 = GetParentEntity();
  			if (parentEntity2 != null)
  			{
-@@ -2947,7 +2969,7 @@ public class Entity : EntityBase
+@@ -2950,7 +2972,7 @@ public class Entity : EntityBase
  			}
  			else
  			{
@@ -58640,7 +58640,7 @@ index ae1d88f3..af0747f4 100644
  			}
  			return;
  		}
-@@ -2959,8 +2981,8 @@ public class Entity : EntityBase
+@@ -2962,8 +2984,8 @@ public class Entity : EntityBase
  		}
  		else
  		{
@@ -58651,7 +58651,7 @@ index ae1d88f3..af0747f4 100644
  	}
  
  	private void OnCardDefLoaded(string cardId, DefLoader.DisposableCardDef cardDef, object callbackData)
-@@ -3033,9 +3055,9 @@ public class Entity : EntityBase
+@@ -3036,9 +3058,9 @@ public class Entity : EntityBase
  				return SpellType.TRIGGER_UPBEAT;
  			}
  			if (gameState.IsUsingFastActorTriggers() && !IsHeroPower())
@@ -58664,7 +58664,7 @@ index ae1d88f3..af0747f4 100644
  		}
  		return SpellType.TRIGGER;
  	}
-@@ -3335,4 +3357,18 @@ public class Entity : EntityBase
+@@ -3338,4 +3360,18 @@ public class Entity : EntityBase
  		}
  		return false;
  	}
@@ -58958,7 +58958,7 @@ index dcc4e28e..fc57fee6 100644
  	public class Info
  	{
 diff --git a/Assembly-CSharp/FriendChallengeMgr.cs b/Assembly-CSharp/FriendChallengeMgr.cs
-index 6ff18e1c..486f2963 100644
+index 47d7d3cb..a82e150a 100644
 --- a/Assembly-CSharp/FriendChallengeMgr.cs
 +++ b/Assembly-CSharp/FriendChallengeMgr.cs
 @@ -1,5 +1,6 @@
@@ -61639,10 +61639,10 @@ index cae4e3d6..53d1dd45 100644
  	public static FriendlyChallengeHelper Get()
  	{
 diff --git a/Assembly-CSharp/GAME_TAG.cs b/Assembly-CSharp/GAME_TAG.cs
-index a81fa8e0..c67bccd9 100644
+index ab5eca3f..8ef80db8 100644
 --- a/Assembly-CSharp/GAME_TAG.cs
 +++ b/Assembly-CSharp/GAME_TAG.cs
-@@ -1075,10 +1075,12 @@ public enum GAME_TAG
+@@ -1078,10 +1078,12 @@ public enum GAME_TAG
  	PET_TREATS_GENERATED = 4281,
  	PET_LEVELOVERRIDE = 4452,
  	BACON_RALLY = 4204,
@@ -61670,10 +61670,10 @@ index c20db678..f4c443cc 100644
  		public int Count => m_cards.Count;
  
 diff --git a/Assembly-CSharp/GameEntity.cs b/Assembly-CSharp/GameEntity.cs
-index 14cef490..e4bce481 100644
+index 35889e1d..eca7beeb 100644
 --- a/Assembly-CSharp/GameEntity.cs
 +++ b/Assembly-CSharp/GameEntity.cs
-@@ -1328,8 +1328,8 @@ public class GameEntity : Entity
+@@ -1334,8 +1334,8 @@ public class GameEntity : Entity
  	{
  		if (source == null || (source.GetTag<TAG_ZONE>(GAME_TAG.ZONE) != TAG_ZONE.PLAY && source.GetTag<TAG_ZONE>(GAME_TAG.ZONE) != TAG_ZONE.SECRET))
  		{
@@ -61684,7 +61684,7 @@ index 14cef490..e4bce481 100644
  		int tag = source.GetTag(GAME_TAG.DISPLAY_ENTITY_IN_PLAY_ID);
  		Entity result = null;
  		GameState gameState = GameState.Get();
-@@ -1373,14 +1373,14 @@ public class GameEntity : Entity
+@@ -1379,14 +1379,14 @@ public class GameEntity : Entity
  			CornerReplacementSpellType tag = (CornerReplacementSpellType)heroCard.GetEntity().GetTag(GAME_TAG.CORNER_REPLACEMENT_TYPE);
  			if (tag != 0)
  			{
@@ -61705,7 +61705,7 @@ index 14cef490..e4bce481 100644
  		Board board = Board.Get();
  		if (board != null)
  		{
-@@ -1554,11 +1554,11 @@ public class GameEntity : Entity
+@@ -1560,11 +1560,11 @@ public class GameEntity : Entity
  		if (spell != null)
  		{
  			spell.SetSource(card.gameObject);
@@ -61722,7 +61722,7 @@ index 14cef490..e4bce481 100644
  		Card obj = ((card == heroCard) ? heroCard2 : heroCard);
  		SpellType spellType2 = ((card == heroCard) ? SpellType.ENDGAME_VICTORY_STRIKE_FRIENDLY : SpellType.ENDGAME_VICTORY_STRIKE_ENEMY);
  		Spell actorSpell = obj.GetActorSpell(spellType2);
-@@ -1911,4 +1911,22 @@ public class GameEntity : Entity
+@@ -1938,4 +1938,22 @@ public class GameEntity : Entity
  	public virtual void UpdateNameDisplay()
  	{
  	}
@@ -61746,7 +61746,7 @@ index 14cef490..e4bce481 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/GameMenu.cs b/Assembly-CSharp/GameMenu.cs
-index c00e965b..7842cff2 100644
+index f9725534..2ed9ec7d 100644
 --- a/Assembly-CSharp/GameMenu.cs
 +++ b/Assembly-CSharp/GameMenu.cs
 @@ -4,9 +4,11 @@ using Hearthstone;
@@ -61812,10 +61812,10 @@ index c00e965b..7842cff2 100644
 -				list.Add(null);
 +			list.Add(null);
  			}
- 			list.Add(m_loginButton);
- 		}
-@@ -348,8 +362,8 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
- 			list.Add(m_skipNprButton);
+ 			if (m_loginButton != null)
+ 			{
+@@ -354,8 +368,8 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+ 			}
  			if (!flag5)
  			{
 -				list.Add(null);
@@ -61825,7 +61825,7 @@ index c00e965b..7842cff2 100644
  		}
  		if (Network.IsLoggedIn() && BnetBar.Get().ShowShowSkipTutorialButton && IsInGameMenu())
  		{
-@@ -358,11 +372,11 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -367,11 +381,11 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  		}
  		bool num = DemoMgr.Get().IsExpoDemo();
  		if (!num && !flag3 && !flag && CanLogInOrCreateAccount() && (PlatformSettings.IsMobile() || PlatformSettings.IsSteam))
@@ -61841,18 +61841,7 @@ index c00e965b..7842cff2 100644
  			list.Add(m_optionsButton);
  		}
  		if (m_downloadManagerButton != null && !flag && PlatformSettings.IsMobile() && DownloadManager != null && DownloadManager.IsReadyToPlay && !(flag3 && flag4))
-@@ -375,8 +389,8 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
- 			{
- 				list.Add(null);
- 			}
--			list.Add(m_quitButton);
--		}
-+					list.Add(m_quitButton);
-+				}
- 		return list;
- 	}
- 
-@@ -457,7 +471,7 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -469,7 +483,7 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  			if (friendlySidePlayer.HasTag(GAME_TAG.DUOS_QUEUED_NOT_ON_TEAM) && !flag && tB_BaconShopDuos.HasTag(GAME_TAG.BACON_DUOS_PUNISH_LEAVERS))
  			{
  				warning |= CONCEDE_WARNING.LEAVE_TEAMMATE_PENALTY;
@@ -61861,7 +61850,7 @@ index c00e965b..7842cff2 100644
  		}
  		if (friendlySidePlayer != null && friendlySidePlayer.IsEarlyConcedePopupAvailable() && (friendlySidePlayer.GetHero()?.GetCurrentHealth() ?? 0) > m_minHPForProgressAfterConcede && turn < num)
  		{
-@@ -465,8 +479,8 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -477,8 +491,8 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  		}
  		if (warning == CONCEDE_WARNING.NONE)
  		{
@@ -61872,7 +61861,7 @@ index c00e965b..7842cff2 100644
  		return false;
  	}
  
-@@ -477,16 +491,16 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -489,16 +503,16 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  		{
  		case CONCEDE_WARNING.NO_QUEST_PROGRESS:
  			info = new AlertPopup.PopupInfo
@@ -61899,7 +61888,7 @@ index c00e965b..7842cff2 100644
  			break;
  		case CONCEDE_WARNING.LEAVE_TEAMMATE_PENALTY:
  		{
-@@ -524,16 +538,16 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -536,16 +550,16 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  	{
  		switch (response)
  		{
@@ -61926,7 +61915,7 @@ index c00e965b..7842cff2 100644
  		}
  		Hide();
  	}
-@@ -593,7 +607,7 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -605,7 +619,7 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  		{
  			return;
  		}
@@ -61935,7 +61924,7 @@ index c00e965b..7842cff2 100644
  		{
  			if (!(go == null))
  			{
-@@ -630,26 +644,27 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -642,26 +656,27 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  		{
  			switch (gameEntity.GetTag(GAME_TAG.CONCEDE_BUTTON_ALTERNATIVE_TEXT))
  			{
@@ -61979,7 +61968,7 @@ index c00e965b..7842cff2 100644
  	private void OnSkipNprButtonReleased(UIEvent e)
  	{
  		Hide();
-@@ -676,4 +691,41 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
+@@ -688,4 +703,41 @@ public class GameMenu : ButtonListMenu, GameMenuInterface
  	{
  		RankMgr.Get().RequestSkipApprentice();
  	}
@@ -62403,7 +62392,7 @@ index fa2f3bcf..0b05cae9 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/GameState.cs b/Assembly-CSharp/GameState.cs
-index 6531cdde..97dd4d41 100644
+index 4e5aad83..dcbcb59b 100644
 --- a/Assembly-CSharp/GameState.cs
 +++ b/Assembly-CSharp/GameState.cs
 @@ -11,6 +11,7 @@ using Blizzard.T5.Core;
@@ -62925,7 +62914,7 @@ index 02d3bee2..a2313b39 100644
 +    #endregion
  }
 diff --git a/Assembly-CSharp/GameUtils.cs b/Assembly-CSharp/GameUtils.cs
-index 8dbd4518..e14ffee4 100644
+index 3306cf73..b47e2187 100644
 --- a/Assembly-CSharp/GameUtils.cs
 +++ b/Assembly-CSharp/GameUtils.cs
 @@ -13,6 +13,7 @@ using PegasusLettuce;
@@ -63542,10 +63531,10 @@ index 8dbd4518..e14ffee4 100644
  	{
  		if (tagsToCheck == null)
 diff --git a/Assembly-CSharp/Gameplay.cs b/Assembly-CSharp/Gameplay.cs
-index bf2630a3..58f90adb 100644
+index 7c999920..0ca230b5 100644
 --- a/Assembly-CSharp/Gameplay.cs
 +++ b/Assembly-CSharp/Gameplay.cs
-@@ -228,6 +228,7 @@ public class Gameplay : PegasusScene
+@@ -230,6 +230,7 @@ public class Gameplay : PegasusScene
  
  	private void Start()
  	{
@@ -63553,7 +63542,7 @@ index bf2630a3..58f90adb 100644
  		Log.LoadingScreen.Print("Gameplay.Start()");
  		CheckBattleNetConnection();
  		Network network = Network.Get();
-@@ -832,23 +833,23 @@ public class Gameplay : PegasusScene
+@@ -834,23 +835,23 @@ public class Gameplay : PegasusScene
  			int count = race2.Count;
  			if (race == 0 || race == 26 || !Enum.IsDefined(typeof(TAG_RACE), race))
  			{
@@ -63588,7 +63577,7 @@ index bf2630a3..58f90adb 100644
  		availableRacesInBattlegroundsExcludingAmalgam.Sort((TAG_RACE a, TAG_RACE b) => string.Compare(GameStrings.GetRaceNameBattlegrounds(a), GameStrings.GetRaceNameBattlegrounds(b), StringComparison.Ordinal));
  		missingRacesInBattlegrounds.Sort((TAG_RACE a, TAG_RACE b) => string.Compare(GameStrings.GetRaceNameBattlegrounds(a), GameStrings.GetRaceNameBattlegrounds(b), StringComparison.Ordinal));
  		if (MulliganManager.Get() != null && MulliganManager.Get().IsMulliganActive())
-@@ -970,19 +971,19 @@ public class Gameplay : PegasusScene
+@@ -972,19 +973,19 @@ public class Gameplay : PegasusScene
  
  	private void ShowTeammateConcedePopup()
  	{
@@ -63621,7 +63610,7 @@ index bf2630a3..58f90adb 100644
  
  	private void OnReplaceBattlegroundMulliganHero()
  	{
-@@ -1262,8 +1263,8 @@ public class Gameplay : PegasusScene
+@@ -1264,8 +1265,8 @@ public class Gameplay : PegasusScene
  			return;
  		}
  		DoTraditionalTutorialPreload();
@@ -63632,7 +63621,7 @@ index bf2630a3..58f90adb 100644
  
  	private void OnEndTurnButtonLoaded(AssetReference assetRef, GameObject go, object callbackData)
  	{
-@@ -1520,8 +1521,8 @@ public class Gameplay : PegasusScene
+@@ -1522,8 +1523,8 @@ public class Gameplay : PegasusScene
  		{
  			if (!GameMgr.Get().IsBattlegrounds())
  			{
@@ -63914,10 +63903,10 @@ index 3c0c94cb..bfc0fa70 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/Hearthstone/APIGateway/OptInApi.cs b/Assembly-CSharp/Hearthstone/APIGateway/OptInApi.cs
-index bf44394b..3ba421ee 100644
+index f157af95..afb8c48d 100644
 --- a/Assembly-CSharp/Hearthstone/APIGateway/OptInApi.cs
 +++ b/Assembly-CSharp/Hearthstone/APIGateway/OptInApi.cs
-@@ -129,7 +129,7 @@ namespace Hearthstone.APIGateway
+@@ -131,7 +131,7 @@ namespace Hearthstone.APIGateway
  		{
  			UpdateAccountOptInByAccountId((OptInType)type, value).ContinueWith(delegate(Task<bool> task)
  			{
@@ -63926,7 +63915,7 @@ index bf44394b..3ba421ee 100644
  			});
  		}
  
-@@ -271,14 +271,14 @@ namespace Hearthstone.APIGateway
+@@ -273,14 +273,14 @@ namespace Hearthstone.APIGateway
  			{
  				InitializeScopesIfNeeded(APIGatewayService);
  				string content = ConstructGetAccountOptInsByAccountIdRequest();
@@ -63948,7 +63937,7 @@ index bf44394b..3ba421ee 100644
  			catch (Exception ex)
  			{
  				Logger?.Log(Blizzard.T5.Core.LogLevel.Error, "Exception retrieving messages from gateway: " + ex.Message);
-@@ -293,14 +293,14 @@ namespace Hearthstone.APIGateway
+@@ -295,14 +295,14 @@ namespace Hearthstone.APIGateway
  			{
  				InitializeScopesIfNeeded(APIGatewayService);
  				string content = ConstructUpdateAccountOptInRequest(optInType, value);
@@ -64188,7 +64177,7 @@ index a168aca6..f865d23f 100644
  	}
  }
 diff --git a/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs b/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs
-index 58f96386..663222fc 100644
+index 4c239cbc..b76e39c4 100644
 --- a/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs
 +++ b/Assembly-CSharp/Hearthstone/Core/Streaming/RuntimeAssetDownloader.cs
 @@ -178,9 +178,9 @@ namespace Hearthstone.Core.Streaming
@@ -64362,7 +64351,7 @@ index 3e2bf702..995285fa 100644
  		}
  
 diff --git a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
-index f0b00423..353b4f91 100644
+index cc8714ca..fc78403a 100644
 --- a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 +++ b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 @@ -1,5 +1,6 @@
@@ -64419,7 +64408,7 @@ index f0b00423..353b4f91 100644
  			catch (Exception ex)
  			{
 diff --git a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
-index f1bea376..5130284a 100644
+index dd120ccd..78ad99e8 100644
 --- a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 +++ b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 @@ -5,6 +5,7 @@ using System.IO;
@@ -64479,7 +64468,7 @@ index f1bea376..5130284a 100644
 +			// ExceptionReporterControl.Get().ExceptionReportInitialize(); // Remove so we don't send Blizzard exceptions that may be caused by us
 +			ExceptionReporterControl.Get().ExceptionReportInitializeDebug();
  			TelemetryManager.Client().SendSystemDetail(TelemetryUtil.GetUnitySystemInfo());
- 			HearthstonePerformance.Initialize(TestType, 4412353.ToString(), 231720);
+ 			HearthstonePerformance.Initialize(TestType, 4438218.ToString(), 233275);
  			HearthstonePerformance.Get()?.CaptureAppStartTime();
 @@ -280,7 +285,7 @@ namespace Hearthstone
  			{
@@ -64497,7 +64486,7 @@ index f1bea376..5130284a 100644
 +			AccessibleHearthstoneApplication.OnClosing();
 +			AccessibilityMgr.Shutdown();
  			IsHearthstoneClosing = true;
- 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 231720, Log.UberText);
+ 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 233275, Log.UberText);
  			if (this.OnShutdown != null)
 @@ -560,7 +567,7 @@ namespace Hearthstone
  
@@ -64506,7 +64495,7 @@ index f1bea376..5130284a 100644
 -			ServiceLocator runtimeServices = new ServiceLocator("Hearthstone Services", Processor.JobQueue, Log.Services, delegate(Exception exception)
 +			ServiceLocator runtimeServices = new ServiceLocator("Hearthstone Services", Processor.JobQueue, (Blizzard.T5.Core.ILogger)Log.Services, delegate(Exception exception)
  			{
- 				ExceptionReporter.Get()?.ReportCaughtException(exception, Environment.StackTrace);
+ 				ExceptionReporter.Get()?.ReportCaughtException(exception);
  			});
 @@ -629,7 +636,7 @@ namespace Hearthstone
  			runtimeServices.RegisterService<HearthstoneCheckout>();
@@ -64536,7 +64525,7 @@ index f1bea376..5130284a 100644
 +			jobDefinition.AddJobFinishedEventListener(OnGameStringsLoaded);
 +			Processor.QueueJob("HearthstoneApplication.InitializeMode", Job_InitializeMode(), Array.Empty<IJobDependency>());
  			Processor.QueueJob(jobDefinition);
- 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 231720, Log.UberText));
+ 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 233275, Log.UberText));
  			Processor.QueueJob(HearthstoneJobs.CreateJobFromAction("HearthstoneApplication.SetWindowText", SetWindowText, jobDefinition.CreateDependency()));
 @@ -752,7 +760,12 @@ namespace Hearthstone
  			}
@@ -64579,7 +64568,7 @@ index f1bea376..5130284a 100644
  			}
  			else
 diff --git a/Assembly-CSharp/Hearthstone/InGameMessage/UI/MessagePopupDisplay.cs b/Assembly-CSharp/Hearthstone/InGameMessage/UI/MessagePopupDisplay.cs
-index b06606db..4231d88b 100644
+index c6c532a3..39ccd912 100644
 --- a/Assembly-CSharp/Hearthstone/InGameMessage/UI/MessagePopupDisplay.cs
 +++ b/Assembly-CSharp/Hearthstone/InGameMessage/UI/MessagePopupDisplay.cs
 @@ -8,10 +8,11 @@ using Hearthstone.Core;
@@ -65372,7 +65361,7 @@ index c0c785a9..043edebe 100644
  				if (m_journalMetaDatamodel == null)
  				{
 diff --git a/Assembly-CSharp/Hearthstone/Progression/JournalTrayDisplay.cs b/Assembly-CSharp/Hearthstone/Progression/JournalTrayDisplay.cs
-index 15c82221..9b1c90cd 100644
+index 8fd7bddb..1095ea29 100644
 --- a/Assembly-CSharp/Hearthstone/Progression/JournalTrayDisplay.cs
 +++ b/Assembly-CSharp/Hearthstone/Progression/JournalTrayDisplay.cs
 @@ -4,6 +4,7 @@ using Assets;
@@ -67548,7 +67537,7 @@ index c070437b..f918d5cb 100644
  					num3 = 0.0;
  				}
 diff --git a/Assembly-CSharp/Hearthstone/UI/Clickable.cs b/Assembly-CSharp/Hearthstone/UI/Clickable.cs
-index 77a9253f..feef8416 100644
+index fdda3340..14f6a3d5 100644
 --- a/Assembly-CSharp/Hearthstone/UI/Clickable.cs
 +++ b/Assembly-CSharp/Hearthstone/UI/Clickable.cs
 @@ -580,5 +580,14 @@ namespace Hearthstone.UI
@@ -67818,7 +67807,7 @@ index c2af9505..b6434015 100644
  
  		public static List<ScriptToken> Tokenize(string str)
 diff --git a/Assembly-CSharp/Hearthstone/UI/Spawnable.cs b/Assembly-CSharp/Hearthstone/UI/Spawnable.cs
-index 3f8502f5..955b34e5 100644
+index 9843f03f..1a2ee9d8 100644
 --- a/Assembly-CSharp/Hearthstone/UI/Spawnable.cs
 +++ b/Assembly-CSharp/Hearthstone/UI/Spawnable.cs
 @@ -360,13 +360,13 @@ namespace Hearthstone.UI
@@ -67955,7 +67944,7 @@ index 3f8502f5..955b34e5 100644
  			managedSprite.SpriteRenderer.flipX = spriteItemParameters.FlipX;
  			managedSprite.SpriteRenderer.flipY = spriteItemParameters.FlipY;
 diff --git a/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs b/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs
-index c86ec526..5a885e60 100644
+index 821c0e11..1abd515d 100644
 --- a/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs
 +++ b/Assembly-CSharp/Hearthstone/UI/WidgetInstance.cs
 @@ -35,7 +35,7 @@ namespace Hearthstone.UI
@@ -67977,7 +67966,7 @@ index c86ec526..5a885e60 100644
  		private WidgetTemplate m_parentWidgetTemplate;
  
 diff --git a/Assembly-CSharp/HearthstoneCheckout.cs b/Assembly-CSharp/HearthstoneCheckout.cs
-index be262208..0232d8f9 100644
+index 92350f22..a0b5ac76 100644
 --- a/Assembly-CSharp/HearthstoneCheckout.cs
 +++ b/Assembly-CSharp/HearthstoneCheckout.cs
 @@ -199,9 +199,6 @@ public class HearthstoneCheckout : blz_commerce_log_hook, ISceneEventObserver, I
@@ -68720,24 +68709,10 @@ index 6e49664e..b88cf3ed 100644
  	}
  
 diff --git a/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs b/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
-index 512701e5..5bf25e5e 100644
+index 8e083b41..41b5f738 100644
 --- a/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
 +++ b/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
-@@ -75,18 +75,19 @@ namespace HutongGames.PlayMaker.Actions
- 			}
- 			if (ownerDefaultTarget.GetComponent<Animation>() == null)
- 			{
--				Debug.LogError($"AnimationPlayAction.OnUpdate() - animation component is missing. GameObject: {ownerDefaultTarget}, full path: {ownerDefaultTarget.GetFullPath()}");
-+				UnityEngine.Debug.LogError($"AnimationPlayAction.OnUpdate() - animation component is missing. GameObject: {ownerDefaultTarget}, full path: {ownerDefaultTarget.GetFullPath()}");
- 				ExceptionReporter.Get().ReportCaughtException(new Exception($"AnimationPlayAction.OnUpdate() - animation component is missing. GameObject: {ownerDefaultTarget}, full path: {ownerDefaultTarget.GetFullPath()}"), Environment.StackTrace);
- 				Finish();
- 				return;
- 			}
- 			if (m_animState == null)
- 			{
--				Debug.LogError($"m_animState is null. GameObject: {ownerDefaultTarget}, full path: {ownerDefaultTarget.GetFullPath()}");
-+				UnityEngine.Debug.LogError($"m_animState is null. GameObject: {ownerDefaultTarget}, full path: {ownerDefaultTarget.GetFullPath()}");
- 				ExceptionReporter.Get().ReportCaughtException(new Exception($"m_animState is null. GameObject: {ownerDefaultTarget}, full path: {ownerDefaultTarget.GetFullPath()}"), Environment.StackTrace);
+@@ -87,6 +87,7 @@ namespace HutongGames.PlayMaker.Actions
  				Finish();
  				return;
  			}
@@ -69381,7 +69356,7 @@ index 755b8a02..33d18045 100644
  	}
  
 diff --git a/Assembly-CSharp/InputManager.cs b/Assembly-CSharp/InputManager.cs
-index 4af9491f..ba7dd375 100644
+index a68e22b0..5643b0e8 100644
 --- a/Assembly-CSharp/InputManager.cs
 +++ b/Assembly-CSharp/InputManager.cs
 @@ -7,6 +7,7 @@ using Blizzard.T5.Game.Spells;
@@ -69448,7 +69423,7 @@ index 4af9491f..ba7dd375 100644
  		mousedOverCard.HideTooltip();
  		mousedOverCard.NotifyMousedOut();
  		ShowBullseyeIfNeeded();
-@@ -5158,4 +5167,12 @@ public class InputManager : MonoBehaviour
+@@ -5160,4 +5169,12 @@ public class InputManager : MonoBehaviour
  		}
  		return NetCache.Get().GetNetObject<NetCache.NetCacheFeatures>()?.EnablePlayingFromMiniHand ?? false;
  	}
@@ -69622,7 +69597,7 @@ index 1b028853..c9b99c83 100644
  			{
  				OnDocButtonPressed(url);
 diff --git a/Assembly-CSharp/LegendaryHeroMagicEffectMaterial.cs b/Assembly-CSharp/LegendaryHeroMagicEffectMaterial.cs
-index b75e8ac3..ca903724 100644
+index fd32c84c..45647654 100644
 --- a/Assembly-CSharp/LegendaryHeroMagicEffectMaterial.cs
 +++ b/Assembly-CSharp/LegendaryHeroMagicEffectMaterial.cs
 @@ -1,7 +1,6 @@
@@ -70295,7 +70270,7 @@ index 4afbbafa..4e3e2baa 100644
  		{
  			LogSystem.Get().CreateFullLogger(s_legacyHearthstoneLogger);
 diff --git a/Assembly-CSharp/Login.cs b/Assembly-CSharp/Login.cs
-index 777c3694..5695a642 100644
+index f4ff4432..28dacd18 100644
 --- a/Assembly-CSharp/Login.cs
 +++ b/Assembly-CSharp/Login.cs
 @@ -1,4 +1,5 @@
@@ -70545,7 +70520,7 @@ index 42ede673..9b25fb12 100644
  public class LuckyDrawAssetReferenceLibrary : ScriptableObject
  {
 diff --git a/Assembly-CSharp/LuckyDrawEventDialog.cs b/Assembly-CSharp/LuckyDrawEventDialog.cs
-index 8bcf3f7e..31adcd9a 100644
+index 97dbc99c..faf767aa 100644
 --- a/Assembly-CSharp/LuckyDrawEventDialog.cs
 +++ b/Assembly-CSharp/LuckyDrawEventDialog.cs
 @@ -1,8 +1,9 @@
@@ -70572,7 +70547,7 @@ index 4301f50e..ab44c8be 100644
  {
  	public AnimationCurve LookAtWeightCurve;
 diff --git a/Assembly-CSharp/LuckyDrawManager.cs b/Assembly-CSharp/LuckyDrawManager.cs
-index c85db8d6..33bc5371 100644
+index 008ecf27..03f1f811 100644
 --- a/Assembly-CSharp/LuckyDrawManager.cs
 +++ b/Assembly-CSharp/LuckyDrawManager.cs
 @@ -4,6 +4,7 @@ using System.Collections.Generic;
@@ -70583,7 +70558,7 @@ index c85db8d6..33bc5371 100644
  using Assets;
  using Blizzard.T5.Core;
  using Blizzard.T5.Jobs;
-@@ -1485,6 +1486,11 @@ public class LuckyDrawManager : IHasUpdate, IService
+@@ -1499,6 +1500,11 @@ public class LuckyDrawManager : IHasUpdate, IService
  
  	public bool ShowEventPopup(int luckyDrawBoxID, Action popupClosedCallback)
  	{
@@ -70836,7 +70811,7 @@ index a747c9cc..7f7138ce 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/MassPackOpeningHighlights.cs b/Assembly-CSharp/MassPackOpeningHighlights.cs
-index 2d20becd..984cb323 100644
+index 7db3838a..b4b973ae 100644
 --- a/Assembly-CSharp/MassPackOpeningHighlights.cs
 +++ b/Assembly-CSharp/MassPackOpeningHighlights.cs
 @@ -53,7 +53,7 @@ public class MassPackOpeningHighlights : MonoBehaviour
@@ -71452,7 +71427,7 @@ index 67bd1884..b8bfedde 100644
  
  	public MountType Mount { get; set; }
 diff --git a/Assembly-CSharp/MulliganManager.cs b/Assembly-CSharp/MulliganManager.cs
-index f65658ad..7e4060c5 100644
+index 2cc55077..0ac2f686 100644
 --- a/Assembly-CSharp/MulliganManager.cs
 +++ b/Assembly-CSharp/MulliganManager.cs
 @@ -1,6 +1,7 @@
@@ -71726,7 +71701,7 @@ index f65658ad..7e4060c5 100644
  			}
  			bool flag2 = false;
  			bool[] handCardsMarkedForReplace = m_handCardsMarkedForReplace;
-@@ -2809,11 +2849,11 @@ public class MulliganManager : MonoBehaviour
+@@ -2818,11 +2858,11 @@ public class MulliganManager : MonoBehaviour
  				{
  					m_handCardsMarkedForTentativeConfirm[i] = false;
  				}
@@ -71742,7 +71717,7 @@ index f65658ad..7e4060c5 100644
  			else if (!isConfirmation)
  			{
  				tentativeFallbackChooseOneEntityId = 0;
-@@ -2878,25 +2918,25 @@ public class MulliganManager : MonoBehaviour
+@@ -2887,25 +2927,25 @@ public class MulliganManager : MonoBehaviour
  	{
  		if (!(GameState.Get().GetGameEntity() is TB_BaconShop tB_BaconShop) || !tB_BaconShop.IsAllHeroesTheSameThisGame())
  		{
@@ -71784,7 +71759,7 @@ index f65658ad..7e4060c5 100644
  
  	private void OnBGSeasonPassFTUEPopupResponse(AlertPopup.Response response, object userData)
  	{
-@@ -2990,11 +3030,11 @@ public class MulliganManager : MonoBehaviour
+@@ -2999,11 +3039,11 @@ public class MulliganManager : MonoBehaviour
  		{
  			return;
  		}
@@ -71800,7 +71775,7 @@ index f65658ad..7e4060c5 100644
  
  	public void ServerHasDealtReplacementCards(bool isFriendlySide)
  	{
-@@ -3035,7 +3075,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3044,7 +3084,7 @@ public class MulliganManager : MonoBehaviour
  			ShowMulliganCardRefreshButton(show: false);
  			if (destroyTimer)
  			{
@@ -71809,7 +71784,7 @@ index f65658ad..7e4060c5 100644
  			}
  			BeginDealNewCards();
  		}
-@@ -3071,6 +3111,8 @@ public class MulliganManager : MonoBehaviour
+@@ -3080,6 +3120,8 @@ public class MulliganManager : MonoBehaviour
  			}
  			HideRerollPopups();
  			Network.Get().RequestReplaceBattlegroundsMulliganHero(entity.GetEntityId());
@@ -71818,7 +71793,7 @@ index f65658ad..7e4060c5 100644
  		}
  	}
  
-@@ -3130,7 +3172,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3139,7 +3181,7 @@ public class MulliganManager : MonoBehaviour
  		}
  	}
  
@@ -71827,7 +71802,7 @@ index f65658ad..7e4060c5 100644
  	{
  		if (!InputManager.Get().PermitDecisionMakingInput())
  		{
-@@ -3145,17 +3187,17 @@ public class MulliganManager : MonoBehaviour
+@@ -3154,17 +3196,17 @@ public class MulliganManager : MonoBehaviour
  				return;
  			}
  		}
@@ -71855,7 +71830,7 @@ index f65658ad..7e4060c5 100644
  
  	private void OnMulliganCancelConfirmationButtonReleased(UIEvent e)
  	{
-@@ -3445,12 +3487,12 @@ public class MulliganManager : MonoBehaviour
+@@ -3454,12 +3496,12 @@ public class MulliganManager : MonoBehaviour
  					yield return new WaitForSeconds(0.5f);
  					if (topCard != null)
  					{
@@ -71873,7 +71848,7 @@ index f65658ad..7e4060c5 100644
  				}
  				xOffset += spaceForEachCard;
  			}
-@@ -3520,10 +3562,12 @@ public class MulliganManager : MonoBehaviour
+@@ -3529,10 +3571,12 @@ public class MulliganManager : MonoBehaviour
  
  	private IEnumerator WaitForOpponentToFinishMulligan()
  	{
@@ -71888,7 +71863,7 @@ index f65658ad..7e4060c5 100644
  		}
  		else
  		{
-@@ -3553,9 +3597,9 @@ public class MulliganManager : MonoBehaviour
+@@ -3562,9 +3606,9 @@ public class MulliganManager : MonoBehaviour
  		}
  		if (!GameMgr.Get().IsBattlegrounds())
  		{
@@ -71901,7 +71876,7 @@ index f65658ad..7e4060c5 100644
  		}
  		CreateTagConditionalVFXs(position2);
  		Actor yourHeroActor = null;
-@@ -3913,7 +3957,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3922,7 +3966,7 @@ public class MulliganManager : MonoBehaviour
  				if (GameMgr.Get().IsBattlegrounds() && GetBaconAnomaly() != 0)
  				{
  					component.SetBaconAnomalyBannerText(title, subtitle, GetBaconAnomaly(), GameState.Get().GetGameEntity().GetMulliganDetailTextPositionOverride());
@@ -71910,7 +71885,7 @@ index f65658ad..7e4060c5 100644
  				else
  				{
  					component.SetBaconBannerText(title, subtitle);
-@@ -3921,14 +3965,14 @@ public class MulliganManager : MonoBehaviour
+@@ -3930,14 +3974,14 @@ public class MulliganManager : MonoBehaviour
  			}
  		}
  		else if (subtitle != null)
@@ -71932,7 +71907,7 @@ index f65658ad..7e4060c5 100644
  
  	private void SetMulliganDetailLabelText(string title)
  	{
-@@ -3973,7 +4017,7 @@ public class MulliganManager : MonoBehaviour
+@@ -3982,7 +4026,7 @@ public class MulliganManager : MonoBehaviour
  		return GetAnomalies().Count > 0;
  	}
  
@@ -71941,7 +71916,7 @@ index f65658ad..7e4060c5 100644
  	{
  		List<int> list = new List<int>();
  		GameEntity gameEntity = GameState.Get().GetGameEntity();
-@@ -4025,7 +4069,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4034,7 +4078,7 @@ public class MulliganManager : MonoBehaviour
  				if (IsBaconAnomalyActive())
  				{
  					component.SetBaconAnomalyBannerText(gameEntity.GetMulliganBannerText(), gameEntity.GetMulliganDetailText(), GetBaconAnomaly(), gameEntity.GetMulliganDetailTextPositionOverride());
@@ -71950,7 +71925,7 @@ index f65658ad..7e4060c5 100644
  				else
  				{
  					component.SetBaconBannerText(gameEntity.GetMulliganBannerText(), gameEntity.GetMulliganDetailText());
-@@ -4034,8 +4078,8 @@ public class MulliganManager : MonoBehaviour
+@@ -4043,8 +4087,8 @@ public class MulliganManager : MonoBehaviour
  			return;
  		}
  		string mulliganDetailText = GameState.Get().GetGameEntity().GetMulliganDetailText();
@@ -71961,7 +71936,7 @@ index f65658ad..7e4060c5 100644
  			if (mulliganDetailLabel == null)
  			{
  				mulliganDetailLabel = UnityEngine.Object.Instantiate(mulliganDetailLabelPrefab);
-@@ -4301,8 +4345,8 @@ public class MulliganManager : MonoBehaviour
+@@ -4310,8 +4354,8 @@ public class MulliganManager : MonoBehaviour
  					GameState.Get().GetGameEntity().ToggleAlternateMulliganActorHighlight(card, highlighted: false);
  					GameState.Get().GetGameEntity().ToggleAlternateMulliganActorConfirmHighlight(card, highlighted: false);
  					if (actor is PlayerLeaderboardMainCardActor)
@@ -71972,7 +71947,7 @@ index f65658ad..7e4060c5 100644
  					}
  				}
  			}
-@@ -4381,6 +4425,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4393,6 +4437,7 @@ public class MulliganManager : MonoBehaviour
  
  	public void EndMulligan()
  	{
@@ -71980,7 +71955,7 @@ index f65658ad..7e4060c5 100644
  		m_waitingForUserInput = false;
  		if (m_replaceLabels != null)
  		{
-@@ -4531,7 +4576,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4543,7 +4588,7 @@ public class MulliganManager : MonoBehaviour
  				coinObject.GetComponentInChildren<PlayMakerFSM>().SendEvent("Birth");
  				yield return new WaitForSeconds(0.1f);
  			}
@@ -71989,7 +71964,7 @@ index f65658ad..7e4060c5 100644
  			{
  				NotificationManager.Get().CreateInnkeeperQuote(UserAttentionBlocker.NONE, new Vector3(155.3f, NotificationManager.DEPTH, 34.5f), GameStrings.Get("VO_INNKEEPER_COIN_INTRO"), "VO_INNKEEPER_COIN_INTRO.prefab:6fb1b3b124d474c4c84e392646caada4");
  				Options.Get().SetBool(Option.HAS_SEEN_THE_COIN, val: true);
-@@ -4598,6 +4643,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4613,6 +4658,7 @@ public class MulliganManager : MonoBehaviour
  
  	private void CoinCardSummonFinishedCallback(Spell spell, object userData)
  	{
@@ -71997,7 +71972,7 @@ index f65658ad..7e4060c5 100644
  		Card card = GameObjectUtils.FindComponentInParents<Card>(spell);
  		card.RefreshActor();
  		card.UpdateActorComponents();
-@@ -4692,7 +4738,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4707,7 +4753,7 @@ public class MulliganManager : MonoBehaviour
  		opposingSideHandZone.SetDoNotUpdateLayout(enable: false);
  		if (dragPlane != null)
  		{
@@ -72006,7 +71981,7 @@ index f65658ad..7e4060c5 100644
  		}
  		friendlySideHandZone.AddInputBlocker();
  		opposingSideHandZone.AddInputBlocker();
-@@ -4716,10 +4762,10 @@ public class MulliganManager : MonoBehaviour
+@@ -4731,10 +4777,10 @@ public class MulliganManager : MonoBehaviour
  		SceneMgr.Get().NotifySceneLoaded();
  		if (LoadingScreen.Get() != null)
  		{
@@ -72021,7 +71996,7 @@ index f65658ad..7e4060c5 100644
  		}
  		if (ducker != null)
  		{
-@@ -4755,7 +4801,7 @@ public class MulliganManager : MonoBehaviour
+@@ -4770,7 +4816,7 @@ public class MulliganManager : MonoBehaviour
  		InputManager.Get().OnMulliganEnded();
  		if (EndTurnButton.Get() != null)
  		{
@@ -72922,7 +72897,7 @@ index 91cc05e5..28073d96 100644
  	}
  
 diff --git a/Assembly-CSharp/Network.cs b/Assembly-CSharp/Network.cs
-index d5c6a0ea..5785874a 100644
+index 7b15e283..b8e8c0f2 100644
 --- a/Assembly-CSharp/Network.cs
 +++ b/Assembly-CSharp/Network.cs
 @@ -37,6 +37,7 @@ using PegasusUtil;
@@ -73835,10 +73810,10 @@ index 43913d5e..ebb138cb 100644
  			return false;
  		}
 diff --git a/Assembly-CSharp/Option.cs b/Assembly-CSharp/Option.cs
-index d48672b2..bbd6c078 100644
+index 0bb427a1..0554e51b 100644
 --- a/Assembly-CSharp/Option.cs
 +++ b/Assembly-CSharp/Option.cs
-@@ -673,6 +673,7 @@ public enum Option
+@@ -675,6 +675,7 @@ public enum Option
  	EARLY_CONCEDE_CONFIRMATION_DISABLED,
  	[Description("hasSeenMythicUnlock")]
  	HAS_SEEN_MYTHIC_UNLOCK,
@@ -73846,7 +73821,7 @@ index d48672b2..bbd6c078 100644
  	[Description("optoutDataSharing")]
  	OPTOUT_DATA_SHARING,
  	[Description("optoutDataSharingCached")]
-@@ -732,5 +733,17 @@ public enum Option
+@@ -734,5 +735,17 @@ public enum Option
  	[Description("hasSeenBGGuidePopup")]
  	HAS_SEEN_BG_GUIDE_POPUP,
  	[Description("hasSeenTimewarpedTavernPopup")]
@@ -73866,7 +73841,7 @@ index d48672b2..bbd6c078 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/OptionDataTables.cs b/Assembly-CSharp/OptionDataTables.cs
-index ac1b0bd5..5a6b706b 100644
+index 6dc81bff..e84b0a39 100644
 --- a/Assembly-CSharp/OptionDataTables.cs
 +++ b/Assembly-CSharp/OptionDataTables.cs
 @@ -837,6 +837,28 @@ public class OptionDataTables
@@ -73898,7 +73873,7 @@ index ac1b0bd5..5a6b706b 100644
  		{
  			Option.AADC_LOCAL_SAVE_TIME_STAMP,
  			typeof(ulong)
-@@ -891,7 +913,7 @@ public class OptionDataTables
+@@ -895,7 +917,7 @@ public class OptionDataTables
  		},
  		{
  			Option.SOUND_VOLUME,
@@ -73907,7 +73882,7 @@ index ac1b0bd5..5a6b706b 100644
  		},
  		{
  			Option.MUSIC_VOLUME,
-@@ -1397,6 +1419,28 @@ public class OptionDataTables
+@@ -1401,6 +1423,28 @@ public class OptionDataTables
  			Option.HAS_SEEN_CLASSIC_MODE_VO,
  			false
  		},
@@ -73937,7 +73912,7 @@ index ac1b0bd5..5a6b706b 100644
  			Option.DEBUG_SHOW_BATTLEGROUND_SKIN_IDS,
  			false
 diff --git a/Assembly-CSharp/OptionsMenu.cs b/Assembly-CSharp/OptionsMenu.cs
-index 904d3288..82d45f5f 100644
+index 871c6455..1caa8b73 100644
 --- a/Assembly-CSharp/OptionsMenu.cs
 +++ b/Assembly-CSharp/OptionsMenu.cs
 @@ -6,9 +6,11 @@ using Blizzard.T5.Services;
@@ -74191,7 +74166,7 @@ index 6744698e..9d6a981b 100644
 +
  }
 diff --git a/Assembly-CSharp/PackOpening.cs b/Assembly-CSharp/PackOpening.cs
-index 77bd2974..48a4e3d7 100644
+index 9ce4bac0..5bb92dc7 100644
 --- a/Assembly-CSharp/PackOpening.cs
 +++ b/Assembly-CSharp/PackOpening.cs
 @@ -11,8 +11,9 @@ using Hearthstone.Progression;
@@ -74720,7 +74695,7 @@ index b9b0c5f1..748eac9a 100644
  		{
  			if (packs <= 0)
 diff --git a/Assembly-CSharp/PackOpeningCard.cs b/Assembly-CSharp/PackOpeningCard.cs
-index 51742390..176e690d 100644
+index 19a50935..2cbbe262 100644
 --- a/Assembly-CSharp/PackOpeningCard.cs
 +++ b/Assembly-CSharp/PackOpeningCard.cs
 @@ -39,13 +39,13 @@ public class PackOpeningCard : MonoBehaviour
@@ -74798,7 +74773,7 @@ index 51742390..176e690d 100644
  		if (!(m_rarityInfo.m_RarityObject == null) && !(m_rarityInfo.m_HiddenCardObject == null))
  		{
  			m_rarityInfo.m_RarityObject.SetActive(value: true);
-@@ -895,7 +895,7 @@ public class PackOpeningCard : MonoBehaviour
+@@ -898,7 +898,7 @@ public class PackOpeningCard : MonoBehaviour
  
  	private void ShowClassName()
  	{
@@ -74807,7 +74782,7 @@ index 51742390..176e690d 100644
  		UberText[] componentsInChildren = m_ClassNameSpell.GetComponentsInChildren<UberText>(includeInactive: true);
  		foreach (UberText uberText in componentsInChildren)
  		{
-@@ -916,12 +916,12 @@ public class PackOpeningCard : MonoBehaviour
+@@ -919,12 +919,12 @@ public class PackOpeningCard : MonoBehaviour
  		}
  	}
  
@@ -74824,7 +74799,7 @@ index 51742390..176e690d 100644
  		}
  		if (@class == TAG_CLASS.NEUTRAL)
  		{
-@@ -930,10 +930,10 @@ public class PackOpeningCard : MonoBehaviour
+@@ -933,10 +933,10 @@ public class PackOpeningCard : MonoBehaviour
  		return GameStrings.GetClassName(@class);
  	}
  
@@ -75375,29 +75350,29 @@ index 798cc5c7..1a823b4e 100644
  		{
  			PrintLog("RELEASE", PegUILogLevel.ALL_EVENTS);
 diff --git a/Assembly-CSharp/PetAnimationSpellsConfig.cs b/Assembly-CSharp/PetAnimationSpellsConfig.cs
-index 009b4b64..5fa30861 100644
+index 599a0242..5fa30861 100644
 --- a/Assembly-CSharp/PetAnimationSpellsConfig.cs
 +++ b/Assembly-CSharp/PetAnimationSpellsConfig.cs
-@@ -1,7 +1,6 @@
- using System.Collections.Generic;
+@@ -2,7 +2,6 @@ using System.Collections.Generic;
  using UnityEngine;
  
--[CreateAssetMenu(fileName = "PetAnimSpellsConfig", menuName = "ScriptableObjects/Pet/PetAnimationSpellsConfig")]
  [CustomEditClass]
+-[CreateAssetMenu(fileName = "PetAnimSpellsConfig", menuName = "ScriptableObjects/Pet/PetAnimationSpellsConfig")]
  public class PetAnimationSpellsConfig : ScriptableObject
  {
+ 	[CustomEditField(Sections = "Spell", ListSortable = true)]
 diff --git a/Assembly-CSharp/PetData.cs b/Assembly-CSharp/PetData.cs
-index 1977623a..969b30bb 100644
+index 6739329c..969b30bb 100644
 --- a/Assembly-CSharp/PetData.cs
 +++ b/Assembly-CSharp/PetData.cs
-@@ -2,7 +2,6 @@ using System;
+@@ -1,7 +1,6 @@
+ using System;
  using UnityEngine;
  
- [CustomEditClass]
 -[CreateAssetMenu(fileName = "PetData", menuName = "ScriptableObjects/Pet/PetData", order = 1)]
+ [CustomEditClass]
  public class PetData : ScriptableObject
  {
- 	[Serializable]
 diff --git a/Assembly-CSharp/PetEventConfig.cs b/Assembly-CSharp/PetEventConfig.cs
 index 7bf21570..825e32c2 100644
 --- a/Assembly-CSharp/PetEventConfig.cs
@@ -75411,7 +75386,7 @@ index 7bf21570..825e32c2 100644
  {
  	[FormerlySerializedAs("EditorPetStates")]
 diff --git a/Assembly-CSharp/PetInteractionConfig.cs b/Assembly-CSharp/PetInteractionConfig.cs
-index b60dd7df..b1e43d5f 100644
+index 3feabedb..5b95cb95 100644
 --- a/Assembly-CSharp/PetInteractionConfig.cs
 +++ b/Assembly-CSharp/PetInteractionConfig.cs
 @@ -1,6 +1,5 @@
@@ -75771,7 +75746,7 @@ index 4b49c14c..f0da1514 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs b/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs
-index dbf1c82f..f68d9f69 100644
+index 6a2a9e9c..e45faf99 100644
 --- a/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs
 +++ b/Assembly-CSharp/PlayerLeaderboardPlayerOverlay.cs
 @@ -87,9 +87,9 @@ public class PlayerLeaderboardPlayerOverlay : MonoBehaviour
@@ -76508,10 +76483,10 @@ index 1849b64a..80c19cd7 100644
 +	EOE = 7
  }
 diff --git a/Assembly-CSharp/PrivacyFeaturesPopup.cs b/Assembly-CSharp/PrivacyFeaturesPopup.cs
-index 8092b7af..b21d501e 100644
+index c2121660..659b300a 100644
 --- a/Assembly-CSharp/PrivacyFeaturesPopup.cs
 +++ b/Assembly-CSharp/PrivacyFeaturesPopup.cs
-@@ -1,229 +1,275 @@
+@@ -1,123 +1,124 @@
  using System;
  using System.Collections.Generic;
  using UnityEngine;
@@ -76714,26 +76689,11 @@ index 8092b7af..b21d501e 100644
 +        m_choiceTwoButton.RemoveEventListener(UIEventType.RELEASE, OnChoiceTwoButton);
 +    }
  
--	private void CreateInputBlocker()
--	{
--		GameObject gameObject = CameraUtils.CreateInputBlocker(CameraUtils.FindFirstByLayer(base.gameObject.layer), "PrivacyFeaturesInputBlocker");
--		gameObject.transform.parent = base.gameObject.transform;
--		m_inputBlocker = gameObject.AddComponent<PegUIElement>();
--		m_inputBlocker.AddEventListener(UIEventType.RELEASE, delegate
--		{
--		});
--		TransformUtil.SetPosY(m_inputBlocker, base.gameObject.transform.position.y - 0.1f);
--	}
-+    private void CreateInputBlocker()
-+    {
-+        GameObject gameObject = CameraUtils.CreateInputBlocker(CameraUtils.FindFirstByLayer(base.gameObject.layer), "PrivacyFeaturesInputBlocker");
-+        gameObject.transform.parent = base.gameObject.transform;
-+        m_inputBlocker = gameObject.AddComponent<PegUIElement>();
-+        m_inputBlocker.AddEventListener(UIEventType.RELEASE, delegate
-+        {
-+        });
-+        TransformUtil.SetPosY(m_inputBlocker, base.gameObject.transform.position.y - 0.1f);
-+    }
+ 	private void CreateInputBlocker()
+ 	{
+@@ -131,100 +132,145 @@ public class PrivacyFeaturesPopup : DialogBase
+ 		TransformUtil.SetPosY(m_inputBlocker, base.gameObject.transform.position.y - 0.1f);
+ 	}
  
 -	private void OnChoiceOneButton(UIEvent e)
 -	{
@@ -76742,6 +76702,12 @@ index 8092b7af..b21d501e 100644
 -			m_onCancelCallback?.Invoke();
 -		}
 -	}
+-
+-	private void OnChoiceTwoButton(UIEvent e)
+-	{
+-		if (!m_buttonBlocked && m_activeState == DialogState.START)
+-		{
+-			m_onAcceptCallback?.Invoke();
 +    private void OnChoiceOneButton(UIEvent e)
 +    {
 +        if (!m_buttonBlocked && m_activeState == DialogState.START)
@@ -76749,12 +76715,7 @@ index 8092b7af..b21d501e 100644
 +            m_onCancelCallback?.Invoke();
 +        }
 +    }
- 
--	private void OnChoiceTwoButton(UIEvent e)
--	{
--		if (!m_buttonBlocked && m_activeState == DialogState.START)
--		{
--			m_onAcceptCallback?.Invoke();
++
 +    private void OnChoiceTwoButton(UIEvent e)
 +    {
 +        if (!m_buttonBlocked && m_activeState == DialogState.START)
@@ -76971,7 +76932,7 @@ index 8092b7af..b21d501e 100644
 +    #endregion
  }
 diff --git a/Assembly-CSharp/PrivacyGate.cs b/Assembly-CSharp/PrivacyGate.cs
-index 76d28424..2624640b 100644
+index 30572f7b..4a91ce87 100644
 --- a/Assembly-CSharp/PrivacyGate.cs
 +++ b/Assembly-CSharp/PrivacyGate.cs
 @@ -43,6 +43,12 @@ public class PrivacyGate : IService
@@ -77923,7 +77884,7 @@ index 8a714843..a56c52aa 100644
  		UIContext.GetRoot().ShowPopup(base.gameObject, UIContext.BlurType.None);
  		FadeEffectsIn();
 diff --git a/Assembly-CSharp/QuestlineController.cs b/Assembly-CSharp/QuestlineController.cs
-index b7e56954..a1b3ba8e 100644
+index dd568505..644d0ed4 100644
 --- a/Assembly-CSharp/QuestlineController.cs
 +++ b/Assembly-CSharp/QuestlineController.cs
 @@ -27,7 +27,7 @@ public class QuestlineController : MonoBehaviour
@@ -81124,7 +81085,7 @@ index 5de5dfe5..4d1e2e53 100644
  	private static bool DoesCardRecordHaveTag(CardDbfRecord cardRecord, GAME_TAG gameTag)
  	{
 diff --git a/Assembly-CSharp/RewindUIManager.cs b/Assembly-CSharp/RewindUIManager.cs
-index 0330e7c9..54ab92bf 100644
+index f93de6ad..e541748c 100644
 --- a/Assembly-CSharp/RewindUIManager.cs
 +++ b/Assembly-CSharp/RewindUIManager.cs
 @@ -6,10 +6,10 @@ public class RewindUIManager : MonoBehaviour
@@ -81138,8 +81099,8 @@ index 0330e7c9..54ab92bf 100644
 -	private UIBButton m_keepButton;
 +	internal UIBButton m_keepButton;
  
- 	[SerializeField]
  	[Header("HUD Animation References")]
+ 	[SerializeField]
 diff --git a/Assembly-CSharp/RitualSpellConfig.cs b/Assembly-CSharp/RitualSpellConfig.cs
 index cce42fb0..cf2757de 100644
 --- a/Assembly-CSharp/RitualSpellConfig.cs
@@ -81165,7 +81126,7 @@ index 3ec035e9..bbd3acd7 100644
 +	EOE
  }
 diff --git a/Assembly-CSharp/SceneMgr.cs b/Assembly-CSharp/SceneMgr.cs
-index 053260a6..a9f94a88 100644
+index a0d61027..56839748 100644
 --- a/Assembly-CSharp/SceneMgr.cs
 +++ b/Assembly-CSharp/SceneMgr.cs
 @@ -708,13 +708,13 @@ public class SceneMgr : IService, IHasUpdate
@@ -82634,7 +82595,7 @@ index cf2264c3..f7e4bc96 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/ShopBrowser.cs b/Assembly-CSharp/ShopBrowser.cs
-index c868262d..6b21aa53 100644
+index a92a1287..2e020295 100644
 --- a/Assembly-CSharp/ShopBrowser.cs
 +++ b/Assembly-CSharp/ShopBrowser.cs
 @@ -9,6 +9,7 @@ using Hearthstone.UI;
@@ -82753,7 +82714,7 @@ index 0fadf784..bd7d5298 100644
  {
  	[Serializable]
 diff --git a/Assembly-CSharp/ShopSlot.cs b/Assembly-CSharp/ShopSlot.cs
-index f736de9e..af0dc2b9 100644
+index 0f0e07b2..c507317f 100644
 --- a/Assembly-CSharp/ShopSlot.cs
 +++ b/Assembly-CSharp/ShopSlot.cs
 @@ -516,4 +516,12 @@ public class ShopSlot : ShopBrowserElement
@@ -83007,7 +82968,7 @@ index 7fbffbab..85726337 100644
  	}
  
 diff --git a/Assembly-CSharp/SoundOptionsMenu.cs b/Assembly-CSharp/SoundOptionsMenu.cs
-index 200e57ea..68e53957 100644
+index b82e2729..9b9f9742 100644
 --- a/Assembly-CSharp/SoundOptionsMenu.cs
 +++ b/Assembly-CSharp/SoundOptionsMenu.cs
 @@ -1,6 +1,7 @@
@@ -83017,8 +82978,8 @@ index 200e57ea..68e53957 100644
 -public class SoundOptionsMenu : MonoBehaviour
 +public class SoundOptionsMenu : MonoBehaviour, AccessibleUI
  {
- 	[Header("Sound")]
  	[SerializeField]
+ 	[Header("Sound")]
 @@ -113,10 +114,12 @@ public class SoundOptionsMenu : MonoBehaviour
  	{
  		ShowOrHide(showOrHide: true);
@@ -83218,7 +83179,7 @@ index 841ac18c..7b3f561c 100644
  
  	private bool IsPlayerInGame(BnetGameAccountId gameAccountId)
 diff --git a/Assembly-CSharp/SplashScreen.cs b/Assembly-CSharp/SplashScreen.cs
-index 71fbc12f..0bf99259 100644
+index cfd17cdd..2cc3d1c3 100644
 --- a/Assembly-CSharp/SplashScreen.cs
 +++ b/Assembly-CSharp/SplashScreen.cs
 @@ -14,6 +14,7 @@ using Hearthstone.Login;
@@ -83242,7 +83203,7 @@ index 71fbc12f..0bf99259 100644
  		string str = Vars.Key("Debug.ForceRatingScreen").GetStr(string.Empty);
  		if (!string.IsNullOrEmpty(str))
 diff --git a/Assembly-CSharp/StarshipHUDManager.cs b/Assembly-CSharp/StarshipHUDManager.cs
-index 7547f793..455cb776 100644
+index 2d6cf975..98b0cc8c 100644
 --- a/Assembly-CSharp/StarshipHUDManager.cs
 +++ b/Assembly-CSharp/StarshipHUDManager.cs
 @@ -1,7 +1,9 @@
@@ -86353,17 +86314,17 @@ index 07818e36..a385756e 100644
  		SceneMgr.Get().SetNextMode(SceneMgr.Mode.HUB);
  		m_screenEffectsHandle.StopEffect(0.5f, iTween.EaseType.easeInOutQuad);
 diff --git a/Assembly-CSharp/Tutorial_Config.cs b/Assembly-CSharp/Tutorial_Config.cs
-index 2077bcf9..e241d647 100644
+index 847dcfc0..e241d647 100644
 --- a/Assembly-CSharp/Tutorial_Config.cs
 +++ b/Assembly-CSharp/Tutorial_Config.cs
-@@ -1,7 +1,6 @@
- using System.Collections.Generic;
+@@ -2,7 +2,6 @@ using System.Collections.Generic;
  using UnityEngine;
  
--[CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/TutorialConfig", order = 1)]
  [CustomEditClass]
+-[CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/TutorialConfig", order = 1)]
  public class Tutorial_Config : ScriptableObject
  {
+ 	[CustomEditField(Sections = "Tutorial_Fight1")]
 diff --git a/Assembly-CSharp/Tutorial_Dungeon.cs b/Assembly-CSharp/Tutorial_Dungeon.cs
 index 60bb0e01..96b7a73e 100644
 --- a/Assembly-CSharp/Tutorial_Dungeon.cs
@@ -87499,7 +87460,7 @@ index 3276afbd..ba3bc377 100644
  		while (Box.Get().IsTransitioningToSceneMode());
  		yield return new WaitForSecondsRealtime(1f);
 diff --git a/Assembly-CSharp/UIBScrollable.cs b/Assembly-CSharp/UIBScrollable.cs
-index af298aa0..a5d56daf 100644
+index 2c79f5b8..987a9896 100644
 --- a/Assembly-CSharp/UIBScrollable.cs
 +++ b/Assembly-CSharp/UIBScrollable.cs
 @@ -233,7 +233,7 @@ public class UIBScrollable : PegUICustomBehavior
@@ -87552,7 +87513,7 @@ index ae846904..7e5c7339 100644
  
  	public enum BoundsMode
 diff --git a/Assembly-CSharp/UIStatus.cs b/Assembly-CSharp/UIStatus.cs
-index 0c42f97f..a7f5ba35 100644
+index f9169312..1ef7bdbf 100644
 --- a/Assembly-CSharp/UIStatus.cs
 +++ b/Assembly-CSharp/UIStatus.cs
 @@ -1,6 +1,7 @@
@@ -87563,7 +87524,7 @@ index 0c42f97f..a7f5ba35 100644
  
  public class UIStatus : MonoBehaviour
  {
-@@ -102,9 +103,9 @@ public class UIStatus : MonoBehaviour
+@@ -109,9 +110,9 @@ public class UIStatus : MonoBehaviour
  	public void StopText()
  	{
  		Log.UIStatus.PrintDebug("Stop message");
@@ -87576,7 +87537,7 @@ index 0c42f97f..a7f5ba35 100644
  
  	private IEnumerator Initialize()
  	{
-@@ -147,6 +148,8 @@ public class UIStatus : MonoBehaviour
+@@ -154,6 +155,8 @@ public class UIStatus : MonoBehaviour
  			{
  				delay = m_FadeDelaySec;
  			}
@@ -87609,7 +87570,7 @@ index bcdf9450..1912ea5e 100644
  {
  	public UIVoiceLinesManager.TriggerType m_TriggerType;
 diff --git a/Assembly-CSharp/UnityEngine/UI/HSInputField.cs b/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
-index b5620027..24e4f8ea 100644
+index c1e5240f..0e394ce4 100644
 --- a/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
 +++ b/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
 @@ -1420,11 +1420,11 @@ namespace UnityEngine.UI
@@ -87713,6 +87674,19 @@ index c494f35f..eebe7788 100644
  	}
  
  	private bool IgnoreGUIInput()
+diff --git a/Assembly-CSharp/UpdateUtils.cs b/Assembly-CSharp/UpdateUtils.cs
+index b472aa54..311423b2 100644
+--- a/Assembly-CSharp/UpdateUtils.cs
++++ b/Assembly-CSharp/UpdateUtils.cs
+@@ -126,7 +126,7 @@ public class UpdateUtils
+ 		try
+ 		{
+ 			List<string> list = new List<string>();
+-			string[] array = versionStr.Split('_', 2);
++			string[] array = versionStr.Split(new[] { '_' }, 2);
+ 			int num = 4;
+ 			if (array.Length == 1)
+ 			{
 diff --git a/Assembly-CSharp/UserAttentionManager.cs b/Assembly-CSharp/UserAttentionManager.cs
 index 30ee7ee4..32414763 100644
 --- a/Assembly-CSharp/UserAttentionManager.cs
@@ -87812,7 +87786,7 @@ index 30ee7ee4..32414763 100644
  		if (SpectatorManager.Get().IsInSpectatorMode())
  		{
 diff --git a/Assembly-CSharp/VertexSquishHelper.cs b/Assembly-CSharp/VertexSquishHelper.cs
-index 4f6e069f..93080461 100644
+index 50305855..52f3ba6b 100644
 --- a/Assembly-CSharp/VertexSquishHelper.cs
 +++ b/Assembly-CSharp/VertexSquishHelper.cs
 @@ -1,3 +1,4 @@
@@ -88160,3 +88134,123 @@ index 68dece88..29a19327 100644
  {
  	public delegate void UpdateLayoutCompleteCallback(Zone zone, object userData);
  
+diff --git a/Assembly-CSharp/post-build.ps1 b/Assembly-CSharp/post-build.ps1
+new file mode 100644
+index 00000000..2b5fac19
+--- /dev/null
++++ b/Assembly-CSharp/post-build.ps1
+@@ -0,0 +1,114 @@
++# Post-build script for Assembly-CSharp
++# Copies build outputs and dependencies to the Hearthstone installation
++
++param(
++    [string]$Configuration = "Release"
++)
++
++$ErrorActionPreference = "Stop"
++
++# Resolve paths relative to script location
++# Script is in: DevTools\Decompiled\Assembly-CSharp
++# Target directories are in: DevTools (two levels up)
++$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
++$DevToolsRoot = Split-Path -Parent (Split-Path -Parent $ScriptDir)
++$HearthstoneManaged = Join-Path $DevToolsRoot "Hearthstone\Hearthstone_Data\Managed"
++$HearthstoneStrings = Join-Path $DevToolsRoot "Hearthstone\Strings\enUS"
++$HearthstoneAccessibility = Join-Path $DevToolsRoot "Hearthstone\Accessibility\Sounds"
++$ManagedOverrides = Join-Path $DevToolsRoot "ManagedOverrides"
++$Localization = Join-Path $DevToolsRoot "Localization\enUS"
++$Sounds = Join-Path $DevToolsRoot "Sounds"
++$BuildOutput = Join-Path $ScriptDir "bin\$Configuration\net472"
++
++# Helper function to copy a file with existence check
++function Copy-FileChecked {
++    param(
++        [string]$Source,
++        [string]$Destination,
++        [string]$Description
++    )
++
++    if (-not (Test-Path $Source)) {
++        Write-Error "ERROR: $Description not found at: $Source"
++        exit 1
++    }
++
++    $DestDir = Split-Path -Parent $Destination
++    if (-not (Test-Path $DestDir)) {
++        Write-Error "ERROR: Destination directory not found: $DestDir`nThis may indicate a misconfigured development environment."
++        exit 1
++    }
++
++    Write-Host "Copying $Description -> $Destination"
++    Copy-Item -Path $Source -Destination $Destination -Force
++}
++
++# Helper function to copy directory contents with existence check
++function Copy-DirectoryChecked {
++    param(
++        [string]$Source,
++        [string]$Destination,
++        [string]$Description,
++        [switch]$CreateDestination
++    )
++
++    if (-not (Test-Path $Source)) {
++        Write-Error "ERROR: $Description directory not found at: $Source"
++        exit 1
++    }
++
++    if (-not (Test-Path $Destination)) {
++        if ($CreateDestination) {
++            Write-Host "Creating directory: $Destination"
++            New-Item -ItemType Directory -Path $Destination -Force | Out-Null
++        } else {
++            Write-Error "ERROR: Destination directory not found: $Destination`nThis may indicate a misconfigured development environment."
++            exit 1
++        }
++    }
++
++    Write-Host "Copying $Description -> $Destination"
++    Copy-Item -Path "$Source\*" -Destination $Destination -Recurse -Force
++}
++
++Write-Host "=========================================="
++Write-Host "Assembly-CSharp Post-Build Script"
++Write-Host "Configuration: $Configuration"
++Write-Host "=========================================="
++
++# 1. Copy compiled Assembly-CSharp.dll
++Copy-FileChecked `
++    -Source (Join-Path $BuildOutput "Assembly-CSharp.dll") `
++    -Destination (Join-Path $HearthstoneManaged "Assembly-CSharp.dll") `
++    -Description "Assembly-CSharp.dll"
++
++# 2. Copy localization file
++Copy-FileChecked `
++    -Source (Join-Path $Localization "ACCESSIBILITY.txt") `
++    -Destination (Join-Path $HearthstoneStrings "ACCESSIBILITY.txt") `
++    -Description "ACCESSIBILITY.txt localization"
++
++# 3. Copy all ManagedOverrides
++Copy-DirectoryChecked `
++    -Source $ManagedOverrides `
++    -Destination $HearthstoneManaged `
++    -Description "ManagedOverrides"
++
++# 4. Clear and copy Sounds
++if (Test-Path $HearthstoneAccessibility) {
++    Write-Host "Clearing existing sounds directory..."
++    Remove-Item -Path "$HearthstoneAccessibility\*" -Recurse -Force
++} else {
++    Write-Host "Initializing accessibility sounds directory..."
++    New-Item -ItemType Directory -Path $HearthstoneAccessibility -Force | Out-Null
++}
++
++Copy-DirectoryChecked `
++    -Source $Sounds `
++    -Destination $HearthstoneAccessibility `
++    -Description "Sounds" `
++    -CreateDestination
++
++Write-Host "=========================================="
++Write-Host "Post-build completed successfully!"
++Write-Host "=========================================="

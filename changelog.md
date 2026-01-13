@@ -1,3 +1,7 @@
+### 2026-01-13
+
+- Updated to Hearthstone version 34.4.0.233275 (contributed by Endefx)
+
 ### 2025-12-05
 
 - Added support for the timewarped tavern in Battlegrounds. The mode has been returned to the main menu. (contributed by Endefx)

@@ -1,3 +1,7 @@
+### 2026-02-09
+
+- Updated to Hearthstone version 34.6.0.235290 (contributed by Endefx)
+
 ### 2026-01-13
 
 - Updated to Hearthstone version 34.4.0.233275 (contributed by Endefx)

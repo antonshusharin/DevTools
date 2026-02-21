@@ -1299,6 +1299,12 @@ namespace Accessibility
             return card.GetEntity().IsTradeable() || card.GetEntity().IsForgeable();
         }
 
+        private bool CanTradeAnyCardInHand()
+        {
+            var handCards = GameState.Get().GetFriendlySidePlayer().GetHandZone().GetCards();
+            return handCards.Any(card => CanTradeCard(card));
+        }
+
         private bool CanPassCard(Card card)
         {
             if (!GameMgr.Get().IsBattlegroundDuoGame() || card == null)
@@ -1307,6 +1313,12 @@ namespace Accessibility
             }
 
             return card.GetAccessibleZone() == GameState.Get().GetFriendlySidePlayer().GetHandZone();
+        }
+
+        private bool CanPassAnyCardInHand()
+        {
+            var handCards = GameState.Get().GetFriendlySidePlayer().GetHandZone().GetCards();
+            return handCards.Any(card => CanPassCard(card));
         }
 
         private void QueryRefreshTavern()
@@ -2472,6 +2484,14 @@ namespace Accessibility
             lines.Add(LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_TUTORIAL_MINION_MOVE_TUTORIAL_OVERRIDE, AccessibleKey.SEE_PLAYER_MINIONS, AccessibleKey.SPACE));
             lines.Add(LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_TUTORIAL_DRAGBUY_TUTORIAL_OVERRIDE, AccessibleKey.SEE_OPPONENT_MINIONS, AccessibleKey.CONFIRM));
             lines.Add(LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_TUTORIAL_DRAGSELL_TUTORIAL_OVERRIDE, AccessibleKey.SEE_PLAYER_MINIONS, AccessibleKey.CONFIRM));
+            if (CanTradeAnyCardInHand())
+            {
+                lines.Add(LocalizationUtils.Format(LocalizationKey.GAMEPLAY_TRADE_CARD_HELP, AccessibleKey.TRADE_CARD));
+            }
+            if (CanPassAnyCardInHand())
+            {
+                lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_PASS_CARD} to pass a card in your hand to your teammate");
+            }
 
             return AccessibleSpeechUtils.CombineLines(lines);
         }

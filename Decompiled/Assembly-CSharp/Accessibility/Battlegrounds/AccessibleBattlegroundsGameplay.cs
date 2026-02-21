@@ -459,6 +459,7 @@ namespace Accessibility
                     HandleCheckStatusKeys();
                     HandleSummoningMinion();
                     HandleTradeCardWhenHoldingCardInput();
+                    HandlePassCardWhenHoldingCardInput();
                     return;
                 case AccessibleGameState.BUYING_CARD:
                     HandleCheckStatusKeys();
@@ -477,6 +478,7 @@ namespace Accessibility
                     HandleCheckStatusKeys();
                     HandlePlayingCard();
                     HandleTradeCardWhenHoldingCardInput();
+                    HandlePassCardWhenHoldingCardInput();
                     return;
                 case AccessibleGameState.TRADING_CARD:
                     HandleCheckStatusKeys();
@@ -807,14 +809,16 @@ namespace Accessibility
             {
                 m_movingMinion = false;
                 m_tradingCard = false;
+                m_passingCard = false;
             }
             else if (m_movingMinionWaitingForHold)
 			{
                 m_movingMinionWaitingForHold = false;
                 m_movingMinion = true;
 			}
-            else if (m_passingCardWaitingForHold)
+            else if (m_passingCardWaitingForHold && CanPassCard(m_heldCard))
             {
+                // Additional check via CanPassCard to prevent race conditions around turn transitions.
                 m_passingCardWaitingForHold = false;
                 m_passingCard = true;
             }
@@ -1222,7 +1226,6 @@ namespace Accessibility
             var card = m_cardBeingRead.GetCard();
 
             var playerBattlefield = GameState.Get().GetFriendlySidePlayer().GetBattlefieldZone();
-            var playerHand = GameState.Get().GetFriendlySidePlayer().GetHandZone();
 
             if (card.GetAccessibleZone() == playerBattlefield && playerBattlefield.GetCardCount() > 1)
             {
@@ -1232,7 +1235,7 @@ namespace Accessibility
 
                 AccessibleInputMgr.ClickLeftMouseButton();
             }
-            else if (card.GetAccessibleZone() == playerHand && GameMgr.Get().IsBattlegroundDuoGame())
+            else if (CanPassCard(card))
             {
                 ResetState();
 
@@ -1271,6 +1274,14 @@ namespace Accessibility
             }
         }
 
+        private void HandlePassCardWhenHoldingCardInput()
+        {
+            if (AccessibleKey.BATTLEGROUNDS_DUOS_PASS_CARD.IsPressed() && CanPassCard(m_heldCard))
+            {
+                m_passingCard = true;
+            }
+        }
+
         private void QueryTradeOrForgeCard(Card card)
         {
             m_tradingCard = true;
@@ -1286,6 +1297,16 @@ namespace Accessibility
             }
 
             return card.GetEntity().IsTradeable() || card.GetEntity().IsForgeable();
+        }
+
+        private bool CanPassCard(Card card)
+        {
+            if (!GameMgr.Get().IsBattlegroundDuoGame() || card == null)
+            {
+                return false;
+            }
+
+            return card.GetAccessibleZone() == GameState.Get().GetFriendlySidePlayer().GetHandZone();
         }
 
         private void QueryRefreshTavern()

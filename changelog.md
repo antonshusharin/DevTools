@@ -13,6 +13,7 @@
 - Expanded accessible adventure selection to include all available adventure modes automatically (instead of a fixed subset).
 - Improved Rastakhan's Rumble hero picker narration with additional hero class and flavor text context.
 - Added spoken dormant-banner timer text for shrine-style cards (including Rastakhan's Rumble shrine respawn counters).
+- Added a quick shrine status readout on the anomalies key: reads both friendly and opponent shrine state, including dormant respawn timer text.
 
 ### 2026-02-09
 

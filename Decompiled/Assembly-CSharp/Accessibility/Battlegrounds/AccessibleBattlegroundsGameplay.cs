@@ -2359,7 +2359,7 @@ namespace Accessibility
         {
             var actor = TeammatePingWheelManager.Get()?.GetLastPingedCard()?.GetActor();
 
-            if (actor == null)
+            if (actor == null || actor.GetActivePingType() == TEAMMATE_PING_TYPE.INVALID)
             {
                 AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.BATTLEGROUNDS_DUOS_GAMEPLAY_NO_PING));
             }
@@ -2381,6 +2381,11 @@ namespace Accessibility
 
             var cardActor = card.GetActor();
             if (cardActor == null)
+            {
+                AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.BATTLEGROUNDS_DUOS_GAMEPLAY_NO_PING));
+                yield break;
+            }
+            if (cardActor.GetActivePingType() == TEAMMATE_PING_TYPE.INVALID)
             {
                 AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.BATTLEGROUNDS_DUOS_GAMEPLAY_NO_PING));
                 yield break;

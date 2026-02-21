@@ -2312,8 +2312,15 @@ namespace Accessibility
 
         private IEnumerator FastApplyPingToActor(Actor actor, TEAMMATE_PING_TYPE pingType)
         {
+            if (actor == null)
+            {
+                AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.GLOBAL_CANNOT_DO_THAT));
+                yield break;
+            }
+
             if (actor.ArePingsBlocked())
             {
+                AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.GLOBAL_CANNOT_DO_THAT));
                 yield break;
             }
 

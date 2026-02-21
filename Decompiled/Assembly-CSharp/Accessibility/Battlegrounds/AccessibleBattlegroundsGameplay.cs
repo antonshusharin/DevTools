@@ -1328,7 +1328,8 @@ namespace Accessibility
                 return false;
             }
 
-            return card.GetAccessibleZone() == GameState.Get().GetFriendlySidePlayer().GetHandZone();
+            return card.GetAccessibleZone() == GameState.Get().GetFriendlySidePlayer().GetHandZone()
+                && card.GetEntity()?.IsPassable() == true;
         }
 
         private bool CanPassAnyCardInHand()

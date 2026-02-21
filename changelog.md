@@ -9,6 +9,8 @@
 - Added a timeout safeguard when switching to teammate board during jump-to-last-ping to prevent infinite waiting.
 - Added support for the Rastakhan's Rumble solo adventure in the accessible adventure menu.
 - Added dedicated spoken status lines on the hero picker for Rastakhan's Rumble (locked/unowned state and unlock information).
+- Extended hero picker accessibility status speech to non-adventure hero-pick contexts (friendly and Tavern Brawl).
+- Expanded accessible adventure selection to include all available adventure modes automatically (instead of a fixed subset).
 
 ### 2026-02-09
 

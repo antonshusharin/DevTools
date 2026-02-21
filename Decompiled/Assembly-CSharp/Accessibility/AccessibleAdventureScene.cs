@@ -92,7 +92,7 @@ namespace Accessibility
             m_curState = State.CHOOSING_ADVENTURE;
             m_curMenu = new AccessibleMenu(this, LocalizationUtils.Get(LocalizationKey.SCREEN_CHOOSE_ADVENTURE_SCREEN_MENU_TITLE), OnGoBackToHub);
 
-            AdventureModeDbId[] modes = { AdventureModeDbId.DUNGEON_CRAWL, AdventureModeDbId.LINEAR, AdventureModeDbId.DUNGEON_CRAWL_HEROIC, AdventureModeDbId.EXPERT, AdventureModeDbId.INVALID, AdventureModeDbId.LINEAR_HEROIC, AdventureModeDbId.BONUS_CHALLENGE };
+            AdventureModeDbId[] modes = GetSupportedAdventureModes();
             AdventureDbId[] supportedAdventures = { AdventureDbId.BOH, AdventureDbId.BOM, AdventureDbId.PRACTICE, AdventureDbId.ROTLK, AdventureDbId.BTP, AdventureDbId.ICC, AdventureDbId.LOOT, AdventureDbId.GIL, AdventureDbId.TRL };
             foreach (AdventureDef def in adventures)
             {
@@ -109,6 +109,22 @@ namespace Accessibility
             }
             m_curMenu.AddOption(LocalizedText.SCREEN_GO_BACK, OnGoBackToHub);
             m_curMenu.StartReading();
+        }
+
+        private static AdventureModeDbId[] GetSupportedAdventureModes()
+        {
+            AdventureModeDbId[] modes = (AdventureModeDbId[])Enum.GetValues(typeof(AdventureModeDbId));
+            var supportedModes = new List<AdventureModeDbId>();
+
+            foreach (AdventureModeDbId mode in modes)
+            {
+                if (mode != AdventureModeDbId.INVALID)
+                {
+                    supportedModes.Add(mode);
+                }
+            }
+
+            return supportedModes.ToArray();
         }
 
 

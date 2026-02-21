@@ -48,9 +48,9 @@ namespace Accessibility
 
             AddLineIfNotEmpty(ret, heroName);
 
-            if (IsRastakhansRumbleSelected())
+            if (ShouldReadAvailabilityStatus())
             {
-                AddRastakhansRumbleStatus(ret);
+                AddHeroAvailabilityStatus(ret);
             }
 
             if (m_button.m_crown != null && m_button.m_crown.activeInHierarchy)
@@ -61,19 +61,19 @@ namespace Accessibility
             return ret;
         }
 
-        private static bool IsRastakhansRumbleSelected()
+        private static bool ShouldReadAvailabilityStatus()
         {
-            if (SceneMgr.Get()?.GetMode() != SceneMgr.Mode.ADVENTURE)
+            var mode = SceneMgr.Get()?.GetMode() ?? SceneMgr.Mode.INVALID;
+
+            if (mode == SceneMgr.Mode.ADVENTURE || mode == SceneMgr.Mode.FRIENDLY || mode == SceneMgr.Mode.TAVERN_BRAWL)
             {
-                return false;
+                return true;
             }
 
-            AdventureConfig adventureConfig = AdventureConfig.Get();
-
-            return adventureConfig != null && adventureConfig.GetSelectedAdventure() == AdventureDbId.TRL;
+            return false;
         }
 
-        private void AddRastakhansRumbleStatus(List<string> lines)
+        private void AddHeroAvailabilityStatus(List<string> lines)
         {
             var dataModel = m_button.GetDataModel();
             var isTimeLocked = dataModel?.IsTimelocked ?? false;

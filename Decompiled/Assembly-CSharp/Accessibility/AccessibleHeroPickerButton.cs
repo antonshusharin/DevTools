@@ -45,12 +45,19 @@ namespace Accessibility
             var ret = new List<string>();
 
             var heroName = m_button.GetEntityDef()?.GetName();
+            var heroClass = GetHeroClassName();
 
             AddLineIfNotEmpty(ret, heroName);
+            AddLineIfNotEmpty(ret, heroClass);
 
             if (ShouldReadAvailabilityStatus())
             {
                 AddHeroAvailabilityStatus(ret);
+            }
+
+            if (IsRastakhansRumbleSelected())
+            {
+                AddRastakhansRumbleFlavorText(ret);
             }
 
             if (m_button.m_crown != null && m_button.m_crown.activeInHierarchy)
@@ -71,6 +78,33 @@ namespace Accessibility
             }
 
             return false;
+        }
+
+        private static bool IsRastakhansRumbleSelected()
+        {
+            if (SceneMgr.Get()?.GetMode() != SceneMgr.Mode.ADVENTURE)
+            {
+                return false;
+            }
+
+            var adventureConfig = AdventureConfig.Get();
+            return adventureConfig != null && adventureConfig.GetSelectedAdventure() == AdventureDbId.TRL;
+        }
+
+        private string GetHeroClassName()
+        {
+            var entityDef = m_button.GetEntityDef();
+            if (entityDef == null)
+            {
+                return "";
+            }
+
+            return GameStrings.GetClassName(entityDef.GetClass());
+        }
+
+        private void AddRastakhansRumbleFlavorText(List<string> lines)
+        {
+            AddLineIfNotEmpty(lines, m_button.GetGuestHero()?.FlavorText);
         }
 
         private void AddHeroAvailabilityStatus(List<string> lines)

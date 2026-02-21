@@ -11,6 +11,7 @@
 - Added dedicated spoken status lines on the hero picker for Rastakhan's Rumble (locked/unowned state and unlock information).
 - Extended hero picker accessibility status speech to non-adventure hero-pick contexts (friendly and Tavern Brawl).
 - Expanded accessible adventure selection to include all available adventure modes automatically (instead of a fixed subset).
+- Improved Rastakhan's Rumble hero picker narration with additional hero class and flavor text context.
 
 ### 2026-02-09
 

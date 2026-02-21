@@ -514,9 +514,25 @@ namespace Accessibility
             }
         }
 
-        private static void ClickDuosPortal()
+        private void ClickDuosPortal()
         {
-            TeammateBoardViewer.Get().GetDuosPortal()?.PortalPushed();
+            var teammateBoardViewer = TeammateBoardViewer.Get();
+            var duosPortal = teammateBoardViewer?.GetDuosPortal();
+            if (duosPortal == null)
+            {
+                return;
+            }
+
+            var wasViewingTeammate = teammateBoardViewer.IsViewingTeammate();
+            duosPortal.PortalPushed();
+
+            // Use current state when available; otherwise fall back to expected toggled state.
+            var isViewingTeammate = teammateBoardViewer.IsViewingTeammate();
+            var switchedToTeammateBoard = (isViewingTeammate == wasViewingTeammate) ? !wasViewingTeammate : isViewingTeammate;
+            var key = switchedToTeammateBoard
+                ? LocalizationKey.BATTLEGROUNDS_DUOS_GAMEPLAY_SWITCH_TO_TEAMMATES_BOARD
+                : LocalizationKey.BATTLEGROUNDS_DUOS_GAMEPLAY_SWITCH_TO_PLAYERS_BOARD;
+            AccessibilityMgr.Output(this, LocalizationUtils.Get(key));
         }
 
         internal override void HandleCheckStatusKeys()

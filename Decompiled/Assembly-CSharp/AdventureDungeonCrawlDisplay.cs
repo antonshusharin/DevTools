@@ -2701,19 +2701,22 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 
 	private AccessibleHorizontalMenu<AccessibleArenaDraftCard> m_AccessibleTreasure;
 	private AccessibleHorizontalMenu<AccessibleArenaDraftCard> m_AccessibleTreasureReward;
-	//private AccessibleHorizontalMenu<AccessibleArenaDraftCard> m_AccessibleLoot;
 	private AccessibleMenu m_AccessibleLoot;
-	private AccessibleHorizontalMenu<AccessibleArenaDraftCard> m_AccessibleLootA;
 
-	private AccessibleHorizontalMenu<AccessibleArenaDraftCard> m_AccessibleLootB;
+	private class LootOptionSpeechData
+	{
+		internal int RewardOptionIndex;
+		internal string Title;
+		internal List<EntityDef> Cards;
+	}
 
-	private AccessibleHorizontalMenu<AccessibleArenaDraftCard> m_AccessibleLootC;
+	private readonly List<LootOptionSpeechData> m_lootOptions = new List<LootOptionSpeechData>();
+	private int m_lastLootReadIndex = -1;
 
 	private AdventureDataDbfRecord m_adventureDataRecord;
 
 	private Boolean IsTreasureRewardChosen;
 	private static int LootToRead = 0;
-	private static int readFirstTime;
 	private int m_lastTreasureRewardReadIndex = -1;
 	public static Boolean ReadMenu = true;
 
@@ -2863,7 +2866,7 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 			var optionData = treasureReward.GetOptionData();
 			var optionIndex = i;
 			var chooseButton = treasureReward.m_chooseButton;
-			m_AccessibleTreasureReward.AddOption(new AccessibleArenaDraftCard(this, TreasureOptionEntity), () => chooseButton.TriggerRelease(), () => ReadTreasureRewardOptionDetails(optionIndex, optionData, TreasureOptionEntity));
+			m_AccessibleTreasureReward.AddOption(new AccessibleArenaDraftCard(this, TreasureOptionEntity), () => SelectTreasureRewardOption(optionIndex, chooseButton, TreasureOptionEntity), () => ReadTreasureRewardOptionDetails(optionIndex, optionData, TreasureOptionEntity));
 		}
 		m_curAccessibleState = AccessibleState.CHOOSING_TREASURE_REWARD;
 		m_stateAfterVO = AccessibleState.CHOOSING_TREASURE_REWARD;
@@ -2996,6 +2999,66 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 		return AccessibleCardUtils.GetCardCost(entityDef.GetCost());
 	}
 
+	private void SelectTreasureRewardOption(int optionIndex, UIBButton chooseButton, EntityDef selectedEntity)
+	{
+		if (chooseButton == null)
+		{
+			return;
+		}
+
+		var selectionSpeech = BuildTreasureRewardSelectionSpeech(optionIndex, selectedEntity);
+		if (!string.IsNullOrEmpty(selectionSpeech))
+		{
+			AccessibilityMgr.Output(this, selectionSpeech, interrupt: true);
+		}
+
+		chooseButton.TriggerRelease();
+	}
+
+	private string BuildTreasureRewardSelectionSpeech(int selectedOptionIndex, EntityDef selectedEntity)
+	{
+		var lines = new List<string>();
+		var selectedName = selectedEntity != null ? selectedEntity.GetName() : string.Format("option {0}", selectedOptionIndex + 1);
+		lines.Add(AccessibleSpeechUtils.CombineWordsWithColon("selected reward", selectedName));
+
+		var rejectedRewards = new List<string>();
+		if (m_playMat != null && m_playMat.m_rewardOptions != null)
+		{
+			for (int i = 0; i < m_playMat.m_rewardOptions.Count; i++)
+			{
+				if (i == selectedOptionIndex)
+				{
+					continue;
+				}
+
+				var rewardOption = m_playMat.m_rewardOptions[i];
+				if (rewardOption == null)
+				{
+					continue;
+				}
+
+				var rewardDbId = rewardOption.GetTreasureDatabaseID();
+				if (rewardDbId == 0)
+				{
+					continue;
+				}
+
+				var rewardDef = DefLoader.Get().GetEntityDef(rewardDbId);
+				if (rewardDef != null)
+				{
+					rejectedRewards.Add(rewardDef.GetName());
+				}
+			}
+		}
+
+		if (rejectedRewards.Count > 0)
+		{
+			lines.Add(AccessibleSpeechUtils.CombineWordsWithColon("rejected rewards", AccessibleSpeechUtils.HumanizeList(rejectedRewards)));
+		}
+
+		return AccessibleSpeechUtils.CombineLines(lines);
+	}
+
 
 	internal void ChooseLoot()
 	{
@@ -3003,69 +3066,351 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 		{
 			AccessibilityMgr.SetScreen(this);
 		}
-		readFirstTime = 0;
 		m_curAccessibleState = AccessibleState.CHOOSING_LOOT;
 		m_stateAfterVO = AccessibleState.CHOOSING_LOOT;
+		LootToRead = 0;
+		m_lastLootReadIndex = -1;
+		m_lootOptions.Clear();
 
-		List<long> LootOptionsA = null;
-		List<long> LootOptionsB = null;
-		List<long> LootOptionsC = null;
-		GameSaveDataManager.Get().GetSubkeyValue(m_gameSaveDataServerKey, GameSaveKeySubkeyId.DUNGEON_CRAWL_LOOT_OPTION_A, out LootOptionsA);
-		GameSaveDataManager.Get().GetSubkeyValue(m_gameSaveDataServerKey, GameSaveKeySubkeyId.DUNGEON_CRAWL_LOOT_OPTION_B, out LootOptionsB);
-		GameSaveDataManager.Get().GetSubkeyValue(m_gameSaveDataServerKey, GameSaveKeySubkeyId.DUNGEON_CRAWL_LOOT_OPTION_C, out LootOptionsC);
+		m_AccessibleLoot = new AccessibleMenu(this, GameStrings.Get("GLUE_ADVENTURE_DUNGEON_CRAWL_CHOOSE_LOOT"), () => m_BackButton.TriggerRelease());
 
-		AccessibilityMgr.SetScreen(this);
-		AccessibilityMgr.Output(this, GameStrings.Get("GLUE_ADVENTURE_DUNGEON_CRAWL_CHOOSE_LOOT"));
-
-		// create 3 loot crates, only read the first when entering the menu
-		for (int i = 0; i < LootOptionsA.Count; i++)
+		if (m_playMat != null && m_playMat.m_rewardOptions != null)
 		{
-			var Item = DefLoader.Get().GetEntityDef((int)LootOptionsA[i]);
-			var ItemID = Item.GetCardId();
-			var ItemTitle = Item.GetName();
-			var TitleString = "1. " + ItemTitle;
-			if (i == 0) {
-				m_AccessibleLootA = new AccessibleHorizontalMenu<AccessibleArenaDraftCard>(this, TitleString, null); //
-			}
-			else {
-				AccessibleArenaDraftCard newCard=new AccessibleArenaDraftCard(null, Item);
-                m_AccessibleLootA.AddOption(newCard,null);
+			for (int i = 0; i < m_playMat.m_rewardOptions.Count; i++)
+			{
+				var rewardOption = m_playMat.m_rewardOptions[i];
+				if (rewardOption == null)
+				{
+					continue;
+				}
+
+				var optionData = rewardOption.GetOptionData();
+				if (optionData.optionType != AdventureDungeonCrawlPlayMat.OptionType.LOOT)
+				{
+					continue;
+				}
+
+				var lootOption = BuildLootOptionSpeechData(i, optionData.options);
+				if (lootOption == null)
+				{
+					continue;
+				}
+
+				AddLootOption(lootOption);
 			}
 		}
-		//m_AccessibleLootA.StartReading();
 
-		for (int i = 0; i < LootOptionsB.Count; i++)
+		if (m_lootOptions.Count == 0)
 		{
-			var Item = DefLoader.Get().GetEntityDef((int)LootOptionsB[i]);
-			var ItemID = Item.GetCardId();
-			var ItemTitle = Item.GetName();
-			var TitleString = "2. " + ItemTitle;
-			if (i == 0) {
-				m_AccessibleLootB = new AccessibleHorizontalMenu<AccessibleArenaDraftCard>(this, TitleString, null);
+			PopulateLootOptionsFromSavedData();
+		}
+
+		if (m_lootOptions.Count > 0)
+		{
+			LootToRead = Mathf.Clamp(LootToRead, 0, m_lootOptions.Count - 1);
+			m_AccessibleLoot.SetIndex(LootToRead);
+		}
+
+		m_AccessibleLoot.StartReading();
+	}
+
+	private void PopulateLootOptionsFromSavedData()
+	{
+		List<long> lootOptionsA;
+		List<long> lootOptionsB;
+		List<long> lootOptionsC;
+		GameSaveDataManager.Get().GetSubkeyValue(m_gameSaveDataServerKey, GameSaveKeySubkeyId.DUNGEON_CRAWL_LOOT_OPTION_A, out lootOptionsA);
+		GameSaveDataManager.Get().GetSubkeyValue(m_gameSaveDataServerKey, GameSaveKeySubkeyId.DUNGEON_CRAWL_LOOT_OPTION_B, out lootOptionsB);
+		GameSaveDataManager.Get().GetSubkeyValue(m_gameSaveDataServerKey, GameSaveKeySubkeyId.DUNGEON_CRAWL_LOOT_OPTION_C, out lootOptionsC);
+
+		var savedLootOptions = new List<List<long>> { lootOptionsA, lootOptionsB, lootOptionsC };
+		for (int i = 0; i < savedLootOptions.Count; i++)
+		{
+			var lootOption = BuildLootOptionSpeechData(i, savedLootOptions[i]);
+			if (lootOption == null)
+			{
+				continue;
 			}
-			else {
-				AccessibleArenaDraftCard newCard=new AccessibleArenaDraftCard(null, Item);
-                m_AccessibleLootB.AddOption(newCard,null);
+
+			AddLootOption(lootOption);
+		}
+	}
+
+	private void AddLootOption(LootOptionSpeechData lootOption)
+	{
+		var optionNumber = m_lootOptions.Count + 1;
+		var menuOptionText = string.Format("{0}. {1}", optionNumber, lootOption.Title);
+		var lootOptionIdx = m_lootOptions.Count;
+
+		m_lootOptions.Add(lootOption);
+		m_AccessibleLoot.AddOption(menuOptionText, () => SelectLootOption(lootOptionIdx), () => ReadLootOptionDetails(lootOptionIdx));
+	}
+
+	private LootOptionSpeechData BuildLootOptionSpeechData(int rewardOptionIndex, List<long> lootOptionData)
+	{
+		if (lootOptionData == null || lootOptionData.Count == 0)
+		{
+			return null;
+		}
+
+		var optionTitle = string.Format("loot package {0}", rewardOptionIndex + 1);
+		var cards = new List<EntityDef>();
+
+		for (int i = 0; i < lootOptionData.Count; i++)
+		{
+			var dbId = (int)lootOptionData[i];
+			if (dbId == 0)
+			{
+				continue;
+			}
+
+			var entityDef = DefLoader.Get().GetEntityDef(dbId);
+			if (entityDef == null)
+			{
+				continue;
+			}
+
+			if (i == 0)
+			{
+				optionTitle = entityDef.GetName();
+				continue;
+			}
+
+			cards.Add(entityDef);
+		}
+
+		return new LootOptionSpeechData
+		{
+			RewardOptionIndex = rewardOptionIndex,
+			Title = optionTitle,
+			Cards = cards
+		};
+	}
+
+	private void ReadLootOptionDetails(int menuOptionIndex)
+	{
+		if (menuOptionIndex < 0 || menuOptionIndex >= m_lootOptions.Count)
+		{
+			return;
+		}
+
+		var lootOption = m_lootOptions[menuOptionIndex];
+		var details = new List<string>
+		{
+			AccessibleSpeechUtils.CombineWordsWithColon("loot package", string.Format("{0}", menuOptionIndex + 1)),
+			AccessibleSpeechUtils.CombineWordsWithColon("cards", string.Format("{0}", lootOption.Cards.Count))
+		};
+
+		foreach (var card in lootOption.Cards)
+		{
+			AccessibleCardUtils.AddLineIfExists(BuildLootCardDetails(card), details);
+		}
+
+		AccessibleCardUtils.AddLineIfExists(BuildLootOptionComparison(menuOptionIndex), details);
+		AccessibilityMgr.Output(this, AccessibleSpeechUtils.CombineLines(details));
+		m_lastLootReadIndex = menuOptionIndex;
+	}
+
+	private string BuildLootCardDetails(EntityDef cardDef)
+	{
+		if (cardDef == null)
+		{
+			return "";
+		}
+
+		var lines = new List<string>
+		{
+			cardDef.GetName()
+		};
+
+		AccessibleCardUtils.AddLineIfExists(GetTreasureRewardCostText(cardDef), lines);
+		AccessibleCardUtils.AddLineIfExists(AccessibleCardUtils.GetType(cardDef.GetCardType()), lines);
+		AccessibleCardUtils.AddLineIfExists(AccessibleCardUtils.GetResourcesForEntityDef(cardDef), lines);
+		AccessibleCardUtils.AddLineIfExists(cardDef.GetCardTextInHand(), lines);
+
+		return AccessibleSpeechUtils.CombineLines(lines);
+	}
+
+	private string BuildLootOptionComparison(int currentMenuOptionIndex)
+	{
+		if (m_lastLootReadIndex < 0 || m_lastLootReadIndex == currentMenuOptionIndex || m_lastLootReadIndex >= m_lootOptions.Count)
+		{
+			return "";
+		}
+
+		var currentOption = m_lootOptions[currentMenuOptionIndex];
+		var previousOption = m_lootOptions[m_lastLootReadIndex];
+
+		var currentCards = GetLootCardMap(currentOption.Cards);
+		var previousCards = GetLootCardMap(previousOption.Cards);
+
+		var addedCards = new List<string>();
+		foreach (var card in currentCards)
+		{
+			if (!previousCards.ContainsKey(card.Key))
+			{
+				addedCards.Add(card.Value);
 			}
 		}
-		//m_AccessibleLootB.StartReading();
 
-		for (int i = 0; i < LootOptionsC.Count; i++)
+		var removedCards = new List<string>();
+		foreach (var card in previousCards)
 		{
-			var Item = DefLoader.Get().GetEntityDef((int)LootOptionsC[i]);
-			var ItemID = Item.GetCardId();
-			var ItemTitle = Item.GetName();
-			var TitleString = "3. " + ItemTitle;
-			if (i == 0) {
-				m_AccessibleLootC = new AccessibleHorizontalMenu<AccessibleArenaDraftCard>(this, TitleString, null);
-			}
-			else {
-				AccessibleArenaDraftCard newCard=new AccessibleArenaDraftCard(null, Item);
-                m_AccessibleLootC.AddOption(newCard,null);
+			if (!currentCards.ContainsKey(card.Key))
+			{
+				removedCards.Add(card.Value);
 			}
 		}
-		//m_AccessibleLootC.StartReading();
 
+		var lines = new List<string>
+		{
+			string.Format("compared to option {0}", m_lastLootReadIndex + 1)
+		};
+
+		if (addedCards.Count > 0)
+		{
+			lines.Add(AccessibleSpeechUtils.CombineWordsWithColon("new cards", AccessibleSpeechUtils.HumanizeList(addedCards)));
+		}
+
+		if (removedCards.Count > 0)
+		{
+			lines.Add(AccessibleSpeechUtils.CombineWordsWithColon("missing cards", AccessibleSpeechUtils.HumanizeList(removedCards)));
+		}
+
+		if (addedCards.Count == 0 && removedCards.Count == 0)
+		{
+			lines.Add("same card set as previous option");
+		}
+
+		return AccessibleSpeechUtils.CombineLines(lines);
+	}
+
+	private static Dictionary<string, string> GetLootCardMap(List<EntityDef> cards)
+	{
+		var result = new Dictionary<string, string>();
+		if (cards == null)
+		{
+			return result;
+		}
+
+		for (int i = 0; i < cards.Count; i++)
+		{
+			var cardDef = cards[i];
+			if (cardDef == null)
+			{
+				continue;
+			}
+
+			var key = cardDef.GetCardId();
+			if (string.IsNullOrEmpty(key))
+			{
+				key = cardDef.GetName() + "_" + i;
+			}
+
+			if (!result.ContainsKey(key))
+			{
+				result.Add(key, cardDef.GetName());
+			}
+		}
+
+		return result;
+	}
+
+	private bool SelectLootOption(int menuOptionIndex)
+	{
+		if (menuOptionIndex < 0 || menuOptionIndex >= m_lootOptions.Count)
+		{
+			return false;
+		}
+
+		var selectedOption = m_lootOptions[menuOptionIndex];
+		var selectionSpeech = BuildLootSelectionSpeech(menuOptionIndex);
+		if (!string.IsNullOrEmpty(selectionSpeech))
+		{
+			AccessibilityMgr.Output(this, selectionSpeech, interrupt: true);
+		}
+
+		AdventureDungeonCrawlRewardOption rewardOption = null;
+		if (m_playMat != null && m_playMat.m_rewardOptions != null && selectedOption.RewardOptionIndex >= 0 && selectedOption.RewardOptionIndex < m_playMat.m_rewardOptions.Count)
+		{
+			rewardOption = m_playMat.m_rewardOptions[selectedOption.RewardOptionIndex];
+		}
+
+		if (rewardOption == null || rewardOption.m_chooseButton == null)
+		{
+			AccessibilityMgr.Output(this, "unable to choose this loot option right now");
+			return false;
+		}
+
+		m_curAccessibleState = AccessibleState.READING_PLAY_MENU;
+		rewardOption.m_chooseButton.TriggerRelease();
+		ReadPlayMenu();
+		LootToRead = 0;
+		m_lastLootReadIndex = -1;
+		return true;
+	}
+
+	private string BuildLootSelectionSpeech(int selectedMenuOptionIndex)
+	{
+		if (selectedMenuOptionIndex < 0 || selectedMenuOptionIndex >= m_lootOptions.Count)
+		{
+			return "";
+		}
+
+		var lines = new List<string>
+		{
+			AccessibleSpeechUtils.CombineWordsWithColon("selected loot", m_lootOptions[selectedMenuOptionIndex].Title)
+		};
+
+		var rejectedOptions = new List<string>();
+		for (int i = 0; i < m_lootOptions.Count; i++)
+		{
+			if (i == selectedMenuOptionIndex)
+			{
+				continue;
+			}
+
+			rejectedOptions.Add(m_lootOptions[i].Title);
+		}
+
+		if (rejectedOptions.Count > 0)
+		{
+			lines.Add(AccessibleSpeechUtils.CombineWordsWithColon("rejected loot", AccessibleSpeechUtils.HumanizeList(rejectedOptions)));
+		}
+
+		return AccessibleSpeechUtils.CombineLines(lines);
+	}
+
+	private void ReadLootMenuOption(int menuOptionIndex)
+	{
+		if (m_AccessibleLoot == null || m_lootOptions.Count == 0)
+		{
+			return;
+		}
+
+		LootToRead = Mathf.Clamp(menuOptionIndex, 0, m_lootOptions.Count - 1);
+		m_AccessibleLoot.SetIndex(LootToRead);
+		m_AccessibleLoot.ReadCurrentOption();
+	}
+
+	private void MoveLootMenuOption(int increment)
+	{
+		if (m_lootOptions.Count == 0)
+		{
+			return;
+		}
+
+		var next = LootToRead + increment;
+		if (next < 0)
+		{
+			next = m_lootOptions.Count - 1;
+		}
+		else if (next >= m_lootOptions.Count)
+		{
+			next = 0;
+		}
+
+		ReadLootMenuOption(next);
 	}
 
     public void HandleInput()
@@ -3133,19 +3478,27 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 			}
 			else
 			{
-				m_accessibleDeckTray.HandleAccessibleInput();
-				var curCardIdx = m_accessibleDeckTray.GetItemBeingReadIndex();
-				var cardTiles = m_dungeonCrawlDeckTray.GetCardsContent().GetCardTiles();
-				AccessibleInputMgr.MoveMouseTo(cardTiles[curCardIdx]);
+				if (m_accessibleDeckTray != null)
+				{
+					m_accessibleDeckTray.HandleAccessibleInput();
+
+					var curCardIdx = m_accessibleDeckTray.GetItemBeingReadIndex();
+					var cardsContent = m_dungeonCrawlDeckTray != null ? m_dungeonCrawlDeckTray.GetCardsContent() : null;
+					var cardTiles = cardsContent != null ? cardsContent.GetCardTiles() : null;
+					if (cardTiles != null && curCardIdx >= 0 && curCardIdx < cardTiles.Count)
+					{
+						AccessibleInputMgr.MoveMouseTo(cardTiles[curCardIdx]);
+					}
+				}
 			}
 		}
 		else if (m_curAccessibleState == AccessibleState.CHOOSING_HERO_POWER)
 		{
-			m_AccessibleHeroPower.HandleAccessibleInput();
+			m_AccessibleHeroPower?.HandleAccessibleInput();
 		}
 		else if (m_curAccessibleState == AccessibleState.CHOOSING_TREASURE)
 		{
-			m_AccessibleTreasure.HandleAccessibleInput();
+			m_AccessibleTreasure?.HandleAccessibleInput();
 		}
 		else if (m_curAccessibleState == AccessibleState.CHOOSING_TREASURE_REWARD)
 		{
@@ -3157,37 +3510,48 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 			}
 			else
 			{
-				m_AccessibleTreasureReward.HandleAccessibleInput();
+				m_AccessibleTreasureReward?.HandleAccessibleInput();
 			}
 		}
 		else if (m_curAccessibleState == AccessibleState.CHOOSING_LOOT)
 		{
-			readFirstTime += 1;
+			if (m_lootOptions.Count == 0)
+			{
+				if (AccessibleKey.GLOBAL_BACK.IsPressed())
+				{
+					m_BackButton.TriggerRelease();
+				}
+				else if (AccessibleKey.READ_DECK.IsPressed())
+				{
+					ReadDeck();
+					m_curAccessibleState = AccessibleState.READING_DECK;
+				}
+				return;
+			}
 
-			if (AccessibleKey.READ_LOOT_BACKWARDS.IsPressed())
+			if (AccessibleKey.READ_LOOT_BACKWARDS.IsPressed() || AccessibleKey.READ_PREV_MENU_OPTION.IsPressed() || AccessibleKey.READ_PREV_VALID_MENU_OPTION.IsPressed())
 			{
-				LootToRead = LootToRead - 1;
-				if (LootToRead < 0)
-				{
-					LootToRead = 2;
-				}
-				readFirstTime = 0;
+				MoveLootMenuOption(-1);
 			}
-			else if (AccessibleKey.READ_LOOT_FORWARDS.IsPressed())
+			else if (AccessibleKey.READ_LOOT_FORWARDS.IsPressed() || AccessibleKey.READ_NEXT_MENU_OPTION.IsPressed() || AccessibleKey.READ_NEXT_VALID_MENU_OPTION.IsPressed())
 			{
-				LootToRead = LootToRead + 1;
-				if (LootToRead > 2)
-				{
-					LootToRead = 0;
-				}
-				readFirstTime = 0;
+				MoveLootMenuOption(1);
 			}
-			else if (AccessibleKey.TAKE_LOOT.IsPressed() || AccessibleKey.TAKE_LOOT_ALT.IsPressed())
+			else if (AccessibleKey.READ_FIRST_ITEM.IsPressed())
 			{
-				m_curAccessibleState = AccessibleState.READING_PLAY_MENU;
-				m_playMat.m_rewardOptions[LootToRead].m_chooseButton.TriggerRelease();
-				ReadPlayMenu();
-				LootToRead = 0; // read first loot crate again in next run, not the one we took
+				ReadLootMenuOption(0);
+			}
+			else if (AccessibleKey.READ_LAST_ITEM.IsPressed())
+			{
+				ReadLootMenuOption(m_lootOptions.Count - 1);
+			}
+			else if (AccessibleKey.READ_CUR_MENU_OPTION.IsPressed())
+			{
+				ReadLootMenuOption(LootToRead);
+			}
+			else if (AccessibleKey.TAKE_LOOT.IsPressed() || AccessibleKey.TAKE_LOOT_ALT.IsPressed() || AccessibleKey.CONFIRM.IsPressed())
+			{
+				SelectLootOption(LootToRead);
 				return;
 			}
 			else if (AccessibleKey.GLOBAL_BACK.IsPressed())
@@ -3197,34 +3561,7 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 			else if (AccessibleKey.READ_DECK.IsPressed())
 			{
 				ReadDeck();
-				//m_accessibleDeckTray.StartReading(); // don't read the first card twice
 				m_curAccessibleState = AccessibleState.READING_DECK;
-			}
-
-
-			switch (LootToRead)
-			{
-				case 0:
-					if (readFirstTime == 1)
-					{
-						m_AccessibleLootA?.StartReading();
-					}
-					m_AccessibleLootA.HandleAccessibleInput();
-					break;
-				case 1:
-					if (readFirstTime == 1)
-					{
-						m_AccessibleLootB?.StartReading();
-					}
-					m_AccessibleLootB.HandleAccessibleInput();
-					break;
-				case 2:
-					if (readFirstTime == 1)
-					{
-						m_AccessibleLootC?.StartReading();
-					}
-					m_AccessibleLootC.HandleAccessibleInput();
-					break;
 			}
 		}
 
@@ -3237,7 +3574,7 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
 		}
 
 
-		else if (m_playMat.GetPlayMatState() == AdventureDungeonCrawlPlayMat.PlayMatState.TRANSITIONING_FROM_PREV_STATE && IsTreasureRewardChosen == true )
+		else if (m_playMat != null && m_playMat.GetPlayMatState() == AdventureDungeonCrawlPlayMat.PlayMatState.TRANSITIONING_FROM_PREV_STATE && IsTreasureRewardChosen == true )
 		{
 			m_curAccessibleState = AccessibleState.READING_PLAY_MENU; // after chosen loot crate read duels menu again -- todo not needed after first treasure -- but it reads main menu?!
 		}
@@ -3295,19 +3632,19 @@ public class AdventureDungeonCrawlDisplay : MonoBehaviour, AccessibleScreen
         }
 		else if(m_curAccessibleState == AccessibleState.CHOOSING_HERO_POWER)
 		{
-			m_AccessibleHeroPower.StartReading();
+			m_AccessibleHeroPower?.StartReading();
 		}
 		else if (m_curAccessibleState == AccessibleState.CHOOSING_TREASURE)
 		{
-			m_AccessibleTreasure.StartReading();
+			m_AccessibleTreasure?.StartReading();
 		}
 		else if (m_curAccessibleState == AccessibleState.CHOOSING_TREASURE_REWARD)
 		{
-			m_AccessibleTreasureReward.StartReading();
+			m_AccessibleTreasureReward?.StartReading();
 		}
 		else if (m_curAccessibleState == AccessibleState.CHOOSING_LOOT)
 		{
-			m_AccessibleLoot.StartReading();
+			m_AccessibleLoot?.StartReading();
 		}
 		else
         {

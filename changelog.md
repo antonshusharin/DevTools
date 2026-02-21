@@ -16,6 +16,9 @@
 - Added a quick shrine status readout on the anomalies key: reads both friendly and opponent shrine state, including dormant respawn timer text.
 - Added live shrine state announcements during gameplay (spawn/swap, becoming dormant, revival, and dormant timer countdown updates).
 - Improved treasure and shrine reward reading between fights with spoken type, cost, card details, and differences from the previously read option.
+- Reworked loot package reading between fights to announce full package contents with card cost/type/effect details and comparisons between loot options.
+- Added explicit selection feedback for between-fight rewards (selected option and which alternatives were rejected).
+- Hardened between-fight accessibility flows with additional null checks for reward/loot menus and safer deck tile cursor handling.
 
 ### 2026-02-09
 

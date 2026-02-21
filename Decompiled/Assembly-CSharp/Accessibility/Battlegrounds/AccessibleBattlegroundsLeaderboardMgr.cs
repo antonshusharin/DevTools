@@ -103,6 +103,8 @@ namespace Accessibility
 				return;
 			}
 
+			var shouldStartFromMyself = fromIndex < 0;
+
 			if (fromIndex < 0)
 			{
 				fromIndex = GetMyTeamIndex();
@@ -114,9 +116,25 @@ namespace Accessibility
 
 			var accessibleTeams = new List<AccessiblePlayerLeaderboardTeam>();
 
-			foreach (var team in teams)
+			if (shouldStartFromMyself && fromIndex > 0)
 			{
-				accessibleTeams.Add(CreateAccessibleTeam(team));
+				for (int i = fromIndex; i < teams.Count; i++)
+				{
+					accessibleTeams.Add(CreateAccessibleTeam(teams[i]));
+				}
+				for (int i = 0; i < fromIndex; i++)
+				{
+					accessibleTeams.Add(CreateAccessibleTeam(teams[i]));
+				}
+
+				fromIndex = 0;
+			}
+			else
+			{
+				foreach (var team in teams)
+				{
+					accessibleTeams.Add(CreateAccessibleTeam(team));
+				}
 			}
 
 			m_accessibleTeams = new AccessibleListOfItems<AccessiblePlayerLeaderboardTeam>(AccessibleGameplay.Get(), accessibleTeams);

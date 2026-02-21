@@ -1,3 +1,13 @@
+### 2026-02-21
+
+- Improved Battlegrounds Duos card pass handling for held cards and restricted pass flow to cards that are actually passable.
+- Added spoken feedback when switching between your board and your teammate's board via the Duos portal.
+- Expanded Battlegrounds Duos help text in both main option mode and mulligan mode (board switch, last ping read/jump, ping shortcuts, and pass/trade hints).
+- Added keyboard support for Duos exclamation ping (`Shift+1`).
+- Improved reliability of reading/jumping to the last pinged card with better null checks and explicit "no ping" feedback for stale or missing pings.
+- Added spoken feedback when a Duos ping cannot be sent.
+- Added a timeout safeguard when switching to teammate board during jump-to-last-ping to prevent infinite waiting.
+
 ### 2026-02-09
 
 - Updated to Hearthstone version 34.6.0.235290 (contributed by Endefx)

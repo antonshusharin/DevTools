@@ -1,6 +1,7 @@
 ﻿using Hearthstone.DataModels;
 using Hearthstone.UI;
 using System;
+using System.Collections.Generic;
 
 namespace Accessibility
 {
@@ -66,7 +67,7 @@ namespace Accessibility
                 }
 
                 var buttonCopy = button;
-                m_mainMenu.AddOption(GetGameModeOptionText(buttonCopy), () => OnClickGameMode(buttonCopy));
+                m_mainMenu.AddOption(GetGameModeOptionText(buttonCopy), () => OnClickGameMode(buttonCopy), () => OnReadGameMode(buttonCopy));
             }
         }
 
@@ -84,6 +85,102 @@ namespace Accessibility
             }
 
             return "Unknown mode";
+        }
+
+        private void OnReadGameMode(GameModeButtonDataModel button)
+        {
+            var details = GetGameModeDetailsText(button);
+            if (!string.IsNullOrWhiteSpace(details))
+            {
+                AccessibilityMgr.Output(this, details);
+            }
+        }
+
+        private string GetGameModeDetailsText(GameModeButtonDataModel button)
+        {
+            if (button == null)
+            {
+                return "";
+            }
+
+            var details = new List<string>();
+
+            var description = GetGameModeDescriptionText(button);
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                details.Add(description);
+            }
+
+            var statuses = GetGameModeStatuses(button);
+            if (statuses.Count > 0)
+            {
+                details.Add(AccessibleSpeechUtils.HumanizeList(statuses));
+            }
+
+            return AccessibleSpeechUtils.CombineLines(details);
+        }
+
+        private string GetGameModeDescriptionText(GameModeButtonDataModel button)
+        {
+            if (button == null || string.IsNullOrWhiteSpace(button.Description))
+            {
+                return "";
+            }
+
+            var description = GameStrings.Get(button.Description);
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                return description;
+            }
+
+            return button.Description;
+        }
+
+        private List<string> GetGameModeStatuses(GameModeButtonDataModel button)
+        {
+            var statuses = new List<string>();
+
+            if (button == null)
+            {
+                return statuses;
+            }
+
+            if (button.IsDownloading)
+            {
+                statuses.Add(GameStrings.Format("GLUE_GAME_MODE_TOOLTIP_DOWNLOADING_DESCRIPTION", GetGameModeOptionText(button)));
+            }
+            else if (button.IsDownloadRequired)
+            {
+                statuses.Add(GameStrings.Format("GLUE_GAME_MODE_TOOLTIP_DOWNLOAD_REQUIRED_DESCRIPTION", GetGameModeOptionText(button)));
+            }
+
+            if (button.IsNew)
+            {
+                statuses.Add(LocalizedText.COLLECTION_CARD_NEW);
+            }
+
+            if (button.IsEarlyAccess)
+            {
+                statuses.Add(GetGameStringOrFallback("GLOBAL_EARLY_ACCESS", "Early access"));
+            }
+
+            if (button.IsBeta)
+            {
+                statuses.Add(GetGameStringOrFallback("GLOBAL_BETA", "Beta"));
+            }
+
+            return statuses;
+        }
+
+        private string GetGameStringOrFallback(string key, string fallback)
+        {
+            var text = GameStrings.Get(key);
+            if (string.IsNullOrWhiteSpace(text) || text == key)
+            {
+                return fallback;
+            }
+
+            return text;
         }
 
         private void OnClickGameMode(GameModeButtonDataModel button)

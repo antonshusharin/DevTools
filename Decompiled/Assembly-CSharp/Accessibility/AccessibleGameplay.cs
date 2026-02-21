@@ -97,6 +97,19 @@ namespace Accessibility
         private bool m_disableManaCounters;
         private bool m_disableCorpseCounters;
 
+        private struct ShrineStateSnapshot
+        {
+            internal bool Exists;
+            internal int EntityId;
+            internal string Name;
+            internal bool Dormant;
+            internal string BannerText;
+        }
+
+        private bool m_shrineStateInitialized;
+        private ShrineStateSnapshot m_friendlyShrineState;
+        private ShrineStateSnapshot m_opponentShrineState;
+
         internal static AccessibleGameplay Get()
         {
             if (s_instance == null)
@@ -475,6 +488,7 @@ AccessibleHistoryMgr.Get().AddEntry(LocalizationUtils.Format(LocalizationKey.GAM
             }
 
             UpdateState();
+            UpdateShrineAnnouncements();
 
             if (m_curState == AccessibleGameState.ALL_MINIONS_TO_FACE)
             {
@@ -1916,6 +1930,148 @@ AccessibleHistoryMgr.Get().AddEntry(LocalizationUtils.Format(LocalizationKey.GAM
             ReadSingleShrineStatus(opposingShrine, friendly: false, addToHistory);
 
             return true;
+        }
+
+        private void UpdateShrineAnnouncements()
+        {
+            var gameState = GameState.Get();
+            var friendlyPlayer = gameState?.GetFriendlySidePlayer();
+            var opponentPlayer = gameState?.GetOpposingSidePlayer();
+
+            if (friendlyPlayer == null || opponentPlayer == null)
+            {
+                m_shrineStateInitialized = false;
+                return;
+            }
+
+            var friendlyState = BuildShrineStateSnapshot(friendlyPlayer);
+            var opponentState = BuildShrineStateSnapshot(opponentPlayer);
+
+            var hasAnyShrineNow = friendlyState.Exists || opponentState.Exists;
+            var hadAnyShrine = m_friendlyShrineState.Exists || m_opponentShrineState.Exists;
+
+            if (!m_shrineStateInitialized)
+            {
+                m_friendlyShrineState = friendlyState;
+                m_opponentShrineState = opponentState;
+                m_shrineStateInitialized = hasAnyShrineNow;
+                return;
+            }
+
+            if (!hasAnyShrineNow && !hadAnyShrine)
+            {
+                m_shrineStateInitialized = false;
+                return;
+            }
+
+            AnnounceShrineStateTransition(m_friendlyShrineState, friendlyState, friendly: true);
+            AnnounceShrineStateTransition(m_opponentShrineState, opponentState, friendly: false);
+
+            m_friendlyShrineState = friendlyState;
+            m_opponentShrineState = opponentState;
+            m_shrineStateInitialized = hasAnyShrineNow;
+        }
+
+        private static ShrineStateSnapshot BuildShrineStateSnapshot(Player player)
+        {
+            var shrineCard = FindShrineCard(player);
+
+            if (shrineCard == null)
+            {
+                return new ShrineStateSnapshot
+                {
+                    Exists = false,
+                    EntityId = -1,
+                    Name = "",
+                    Dormant = false,
+                    BannerText = ""
+                };
+            }
+
+            var entity = shrineCard.GetEntity();
+
+            return new ShrineStateSnapshot
+            {
+                Exists = true,
+                EntityId = entity.GetEntityId(),
+                Name = entity.GetName(),
+                Dormant = entity.IsDormant() || entity.HasTag(GAME_TAG.DORMANT_VISUAL),
+                BannerText = GetShrineBannerText(entity)
+            };
+        }
+
+        private void AnnounceShrineStateTransition(ShrineStateSnapshot previous, ShrineStateSnapshot current, bool friendly)
+        {
+            if (!previous.Exists && !current.Exists)
+            {
+                return;
+            }
+
+            var sideText = friendly
+                ? LocalizationUtils.Get(LocalizationKey.GAMEPLAY_ZONE_PLAYER_HERO)
+                : LocalizationUtils.Get(LocalizationKey.GAMEPLAY_ZONE_OPPONENT_HERO);
+
+            if (!previous.Exists && current.Exists)
+            {
+                var appearedText = AccessibleSpeechUtils.CombineWordsWithColon(sideText, BuildShrineStatusText(FindShrineCard(friendly ? GameState.Get().GetFriendlySidePlayer() : GameState.Get().GetOpposingSidePlayer()), friendly));
+                AccessibilityMgr.Output(this, appearedText);
+                return;
+            }
+
+            if (previous.Exists && !current.Exists)
+            {
+                var removedText = AccessibleSpeechUtils.CombineLines(new List<string>
+                {
+                    previous.Name,
+                    LocalizationUtils.Get(LocalizationKey.GAMEPLAY_DIFF_ENTITY_DIED)
+                });
+
+                AccessibilityMgr.Output(this, AccessibleSpeechUtils.CombineWordsWithColon(sideText, removedText));
+                return;
+            }
+
+            if (previous.EntityId != current.EntityId)
+            {
+                var changedText = AccessibleSpeechUtils.CombineWordsWithColon(sideText, BuildShrineStatusText(FindShrineCard(friendly ? GameState.Get().GetFriendlySidePlayer() : GameState.Get().GetOpposingSidePlayer()), friendly));
+                AccessibilityMgr.Output(this, changedText);
+                return;
+            }
+
+            if (!previous.Dormant && current.Dormant)
+            {
+                var becameDormantText = AccessibleSpeechUtils.CombineLines(new List<string>
+                {
+                    current.Name,
+                    LocalizationUtils.Get(LocalizationKey.GAMEPLAY_DIFF_ENTITY_BECAME_DORMANT),
+                    current.BannerText
+                });
+
+                AccessibilityMgr.Output(this, AccessibleSpeechUtils.CombineWordsWithColon(sideText, becameDormantText));
+                return;
+            }
+
+            if (previous.Dormant && !current.Dormant)
+            {
+                var revivedText = AccessibleSpeechUtils.CombineLines(new List<string>
+                {
+                    current.Name,
+                    LocalizationUtils.Get(LocalizationKey.GAMEPLAY_DIFF_ENTITY_NO_LONGER_DORMANT)
+                });
+
+                AccessibilityMgr.Output(this, AccessibleSpeechUtils.CombineWordsWithColon(sideText, revivedText));
+                return;
+            }
+
+            if (current.Dormant && previous.BannerText != current.BannerText && current.BannerText.Length > 0)
+            {
+                var timerText = AccessibleSpeechUtils.CombineLines(new List<string>
+                {
+                    current.Name,
+                    current.BannerText
+                });
+
+                AccessibilityMgr.Output(this, AccessibleSpeechUtils.CombineWordsWithColon(sideText, timerText));
+            }
         }
 
         private static Card FindShrineCard(Player player)

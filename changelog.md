@@ -14,6 +14,8 @@
 - Improved Rastakhan's Rumble hero picker narration with additional hero class and flavor text context.
 - Added spoken dormant-banner timer text for shrine-style cards (including Rastakhan's Rumble shrine respawn counters).
 - Added a quick shrine status readout on the anomalies key: reads both friendly and opponent shrine state, including dormant respawn timer text.
+- Added live shrine state announcements during gameplay (spawn/swap, becoming dormant, revival, and dormant timer countdown updates).
+- Improved treasure and shrine reward reading between fights with spoken type, cost, card details, and differences from the previously read option.
 
 ### 2026-02-09
 

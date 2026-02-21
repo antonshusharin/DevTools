@@ -8,6 +8,7 @@
 - Added spoken feedback when a Duos ping cannot be sent.
 - Added a timeout safeguard when switching to teammate board during jump-to-last-ping to prevent infinite waiting.
 - Added support for the Rastakhan's Rumble solo adventure in the accessible adventure menu.
+- Added dedicated spoken status lines on the hero picker for Rastakhan's Rumble (locked/unowned state and unlock information).
 
 ### 2026-02-09
 

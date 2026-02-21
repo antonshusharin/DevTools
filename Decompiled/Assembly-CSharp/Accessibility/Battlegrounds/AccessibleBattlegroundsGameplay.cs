@@ -2446,7 +2446,11 @@ namespace Accessibility
             {
                 return;
             }
-            if (AccessibleKey.BATTLEGROUNDS_DUOS_PING_CHECK.IsPressed())
+            if (IsDuosExclamationPingPressed())
+            {
+                PingCurrentCard(TEAMMATE_PING_TYPE.EXCLAMATION);
+            }
+            else if (AccessibleKey.BATTLEGROUNDS_DUOS_PING_CHECK.IsPressed())
             {
                 PingCurrentCard(TEAMMATE_PING_TYPE.CHECK);
             }
@@ -2462,6 +2466,19 @@ namespace Accessibility
             {
                 PingCurrentCard(TEAMMATE_PING_TYPE.WARP);
             }
+        }
+
+        private static bool IsDuosExclamationPingPressed()
+        {
+            if (!Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                return false;
+            }
+
+            bool shiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            bool ctrlPressed = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+            bool altPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+            return shiftPressed && !ctrlPressed && !altPressed;
         }
 
         private void PingCurrentCard(TEAMMATE_PING_TYPE pingType)
@@ -2543,7 +2560,7 @@ namespace Accessibility
                 lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_SWITCH_TO_TEAMMATES_BOARD} to switch between your board and your teammate's board");
                 lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_READ_LAST_PINGED_CARD} to read the last pinged card");
                 lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_JUMP_TO_LAST_PINGED_CARD} to jump to the last pinged card");
-                lines.Add($"Use {AccessibleKey.BATTLEGROUNDS_DUOS_PING_CHECK}, {AccessibleKey.BATTLEGROUNDS_DUOS_PING_CROSS}, {AccessibleKey.BATTLEGROUNDS_DUOS_PING_QUESTION}, or {AccessibleKey.BATTLEGROUNDS_DUOS_PING_WARP} to ping the current card");
+                lines.Add($"Use Shift+1, {AccessibleKey.BATTLEGROUNDS_DUOS_PING_CHECK}, {AccessibleKey.BATTLEGROUNDS_DUOS_PING_CROSS}, {AccessibleKey.BATTLEGROUNDS_DUOS_PING_QUESTION}, or {AccessibleKey.BATTLEGROUNDS_DUOS_PING_WARP} to ping the current card");
             }
 
             return AccessibleSpeechUtils.CombineLines(lines);

@@ -2463,6 +2463,12 @@ namespace Accessibility
             {
                 ret.Add(LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_GAMEPLAY_HERO_REROLL_HELP, AccessibleKey.REFRESH_TAVERN));
             }
+            if (GameMgr.Get().IsBattlegroundDuoGame())
+            {
+                ret.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_SWITCH_TO_TEAMMATES_BOARD} to switch between your board and your teammate's board");
+                ret.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_READ_LAST_PINGED_CARD} to read the last pinged card");
+                ret.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_JUMP_TO_LAST_PINGED_CARD} to jump to the last pinged card");
+            }
             return AccessibleSpeechUtils.CombineLines(ret);
         }
 
@@ -2508,6 +2514,13 @@ namespace Accessibility
             if (CanPassAnyCardInHand())
             {
                 lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_PASS_CARD} to pass a card in your hand to your teammate");
+            }
+            if (GameMgr.Get().IsBattlegroundDuoGame())
+            {
+                lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_SWITCH_TO_TEAMMATES_BOARD} to switch between your board and your teammate's board");
+                lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_READ_LAST_PINGED_CARD} to read the last pinged card");
+                lines.Add($"Press {AccessibleKey.BATTLEGROUNDS_DUOS_JUMP_TO_LAST_PINGED_CARD} to jump to the last pinged card");
+                lines.Add($"Use {AccessibleKey.BATTLEGROUNDS_DUOS_PING_CHECK}, {AccessibleKey.BATTLEGROUNDS_DUOS_PING_CROSS}, {AccessibleKey.BATTLEGROUNDS_DUOS_PING_QUESTION}, or {AccessibleKey.BATTLEGROUNDS_DUOS_PING_WARP} to ping the current card");
             }
 
             return AccessibleSpeechUtils.CombineLines(lines);

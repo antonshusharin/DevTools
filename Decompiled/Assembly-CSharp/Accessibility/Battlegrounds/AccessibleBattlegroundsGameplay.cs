@@ -2398,12 +2398,20 @@ namespace Accessibility
                 yield break;
             }
 
-            if (TeammateBoardViewer.Get().IsActorTeammates(cardActor) && !m_viewingTeammatesBoard)
+            var teammateBoardViewer = TeammateBoardViewer.Get();
+            if (teammateBoardViewer == null)
+            {
+                AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.GLOBAL_CANNOT_DO_THAT));
+                yield break;
+            }
+
+            if (teammateBoardViewer.IsActorTeammates(cardActor) && !m_viewingTeammatesBoard)
             {
                 ClickDuosPortal();
-                while (!TeammateBoardViewer.Get().IsViewingTeammate())
+                yield return WaitForViewingTeammateBoard(2f);
+                if (TeammateBoardViewer.Get()?.IsViewingTeammate() != true)
                 {
-                    yield return null;
+                    yield break;
                 }
             }
 
@@ -2436,6 +2444,22 @@ namespace Accessibility
             {
                 FocusOnCard(card, true);
             }
+        }
+
+        private IEnumerator WaitForViewingTeammateBoard(float timeoutSeconds)
+        {
+            float timeoutAt = Time.realtimeSinceStartup + timeoutSeconds;
+            while (Time.realtimeSinceStartup < timeoutAt)
+            {
+                if (TeammateBoardViewer.Get()?.IsViewingTeammate() == true)
+                {
+                    yield break;
+                }
+
+                yield return null;
+            }
+
+            AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.GLOBAL_CANNOT_DO_THAT));
         }
 
         private void HandlePingCardInput()

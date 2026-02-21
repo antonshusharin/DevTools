@@ -24,6 +24,9 @@ namespace Accessibility
         private bool m_buyingCard;
         private bool m_sellingMinion;
 
+        private bool m_tradingCard;
+        private bool m_tradingCardWaitingForHold;
+
         private bool m_passingCard;
         private bool m_passingCardWaitingForHold;
         private bool m_viewingTeammatesBoard;
@@ -248,6 +251,8 @@ namespace Accessibility
             m_movingMinionWaitingForHold = false;
             m_buyingCard = false;
             m_sellingMinion = false;
+            m_tradingCard = false;
+            m_tradingCardWaitingForHold = false;
             m_passingCard = false;
             m_passingCardWaitingForHold = false;
 		}
@@ -453,7 +458,7 @@ namespace Accessibility
                     HandleCardReadingInput();
                     HandleCheckStatusKeys();
                     HandleSummoningMinion();
-                    // TODO: Check base file to see what this is HandleTradeCardWhenHoldingCardInput();
+                    HandleTradeCardWhenHoldingCardInput();
                     return;
                 case AccessibleGameState.BUYING_CARD:
                     HandleCheckStatusKeys();
@@ -471,6 +476,11 @@ namespace Accessibility
                     HandleCardReadingInput();
                     HandleCheckStatusKeys();
                     HandlePlayingCard();
+                    HandleTradeCardWhenHoldingCardInput();
+                    return;
+                case AccessibleGameState.TRADING_CARD:
+                    HandleCheckStatusKeys();
+                    HandleTradingCard();
                     return;
                 case AccessibleGameState.READING_LEADERBOARD:
                     HandleReadLeaderboardInput();
@@ -668,6 +678,22 @@ namespace Accessibility
             HandleForcedConfirmOrCancel(ConfirmActionByClicking, CancelActionWithHeldCard, true);
         }
 
+        private void HandleTradingCard()
+        {
+            var collider = Board.Get().GetDeckActionArea();
+
+            if (collider != null)
+            {
+                var cardBounds = m_heldCard.GetActor().GetMeshRenderer().bounds;
+                var tradeAreaCenter = collider.bounds.ClosestPoint(m_heldCard.gameObject.transform.position);
+                var target = tradeAreaCenter;
+                target.x += cardBounds.size.x / 2;
+                AccessibleInputMgr.MoveMouseToWorldPosition(target);
+            }
+
+            HandleForcedConfirmOrCancel(ConfirmActionByClicking, CancelActionWithHeldCard);
+        }
+
 		private bool HandleFreezingTavern()
 		{
             return HandleSmoothConfirmOrCancel(ForceFreezeOrUnfreezeTavern, ResetState, AccessibleKey.FREEZE_TAVERN);
@@ -780,6 +806,7 @@ namespace Accessibility
             if (m_heldCard == null)
             {
                 m_movingMinion = false;
+                m_tradingCard = false;
             }
             else if (m_movingMinionWaitingForHold)
 			{
@@ -790,6 +817,12 @@ namespace Accessibility
             {
                 m_passingCardWaitingForHold = false;
                 m_passingCard = true;
+            }
+            else if (m_tradingCardWaitingForHold && CanTradeCard(m_heldCard))
+            {
+                // Additional check via CanTradeCard to prevent race conditions around turn transitions.
+                m_tradingCardWaitingForHold = false;
+                m_tradingCard = true;
             }
 
             m_prevState = m_curState;
@@ -825,6 +858,10 @@ namespace Accessibility
                         var cardName = AccessibleSpeechUtils.GetEntityName(m_heldCard.GetEntity());
                         AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.BATTLEGROUNDS_DUOS_GAMEPLAY_QUERY_PASS_CARD, cardName));
                     }
+                }
+                else if (m_tradingCard)
+                {
+                    m_curState = AccessibleGameState.TRADING_CARD;
                 }
                 else if (m_heldCard.GetEntity().IsMinion())
                 {
@@ -1091,6 +1128,10 @@ namespace Accessibility
             {
                 ClickCard();
             }
+            else if (AccessibleKey.TRADE_CARD.IsPressed())
+            {
+                ClickCardForTrading();
+            }
             else if (AccessibleKey.SPACE.IsPressed())
 			{
                 ClickCardForMovingOrPassing();
@@ -1199,6 +1240,52 @@ namespace Accessibility
 
                 AccessibleInputMgr.ClickLeftMouseButton();
             }
+        }
+
+        private void ClickCardForTrading()
+        {
+            if (m_cardBeingRead == null)
+            {
+                return;
+            }
+
+            var card = m_cardBeingRead.GetCard();
+
+            if (!CanTradeCard(card))
+            {
+                return;
+            }
+
+            ResetState();
+            QueryTradeOrForgeCard(card);
+            m_tradingCardWaitingForHold = true;
+
+            AccessibleInputMgr.ClickLeftMouseButton();
+        }
+
+        private void HandleTradeCardWhenHoldingCardInput()
+        {
+            if (AccessibleKey.TRADE_CARD.IsPressed() && CanTradeCard(m_heldCard))
+            {
+                QueryTradeOrForgeCard(m_heldCard);
+            }
+        }
+
+        private void QueryTradeOrForgeCard(Card card)
+        {
+            m_tradingCard = true;
+            var key = card.GetEntity().IsTradeable() ? LocalizationKey.GAMEPLAY_QUERY_TRADE_CARD : LocalizationKey.GAMEPLAY_QUERY_FORGE_CARD;
+            AccessibilityMgr.Output(this, LocalizationUtils.Get(key));
+        }
+
+        private bool CanTradeCard(Card card)
+        {
+            if (card == null || card.GetAccessibleZone() != GameState.Get().GetFriendlySidePlayer().GetHandZone())
+            {
+                return false;
+            }
+
+            return card.GetEntity().IsTradeable() || card.GetEntity().IsForgeable();
         }
 
         private void QueryRefreshTavern()

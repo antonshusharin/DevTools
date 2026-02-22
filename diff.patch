@@ -84079,7 +84079,7 @@ index edf13b6c..54ba1608 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/StoreQuantityPrompt.cs b/Assembly-CSharp/StoreQuantityPrompt.cs
-index b364634f..1f37699f 100644
+index b364634f..84e12e6 100644
 --- a/Assembly-CSharp/StoreQuantityPrompt.cs
 +++ b/Assembly-CSharp/StoreQuantityPrompt.cs
 @@ -1,5 +1,6 @@
@@ -84089,18 +84089,43 @@ index b364634f..1f37699f 100644
  
  public class StoreQuantityPrompt : UIBPopup
  {
-@@ -100,8 +101,8 @@ public class StoreQuantityPrompt : UIBPopup
+@@ -90,17 +91,24 @@ public class StoreQuantityPrompt : UIBPopup
+ 	private void Submit()
+ 	{
+ 		int quantity;
+-		switch (GetQuantity(out quantity))
++		QuantityResponse quantityResponse = GetQuantity(out quantity);
++		if (quantityResponse == QuantityResponse.Success)
+ 		{
+-		case QuantityResponse.Success:
+ 			Hide(animate: true);
+ 			FireOkayEvent(quantity);
+ 			return;
+-		case QuantityResponse.AboveMax:
++		}
++		if (quantityResponse == QuantityResponse.AboveMax)
++		{
  			UIStatus.Get().AddError(GameStrings.Get("GLUE_STORE_PACK_QUANTITY_WARN_MAX"));
- 			break;
+-			break;
  		}
 -		FireCancelEvent();
--	}
-+			FireCancelEvent();
++		AccessibilityMgr.Output(null, LocalizationUtils.Format(LocalizationKey.MASS_PACK_OPENING_QUANTITY_PROMPT_ERROR, 1, m_currentMaxQuantity));
++		if (!UniversalInputManager.Get().IsTextInputActive())
++		{
++			ShowInput();
++			return;
 +		}
++		UniversalInputManager.Get().FocusTextInput(base.gameObject);
+ 	}
  
  	public void Cancel()
- 	{
-@@ -151,6 +152,9 @@ public class StoreQuantityPrompt : UIBPopup
+@@ -146,11 +154,15 @@ public class StoreQuantityPrompt : UIBPopup
+ 			m_canceledCallback = OnInputCanceled,
+ 			m_font = m_inputTextFieldBounds.GetLocalizedFont(),
+ 			m_alignment = TextAnchor.MiddleLeft,
++			m_text = m_currentInputText,
+ 			m_maxCharacters = 2,
+ 			m_touchScreenKeyboardHideInput = true,
  			m_touchScreenKeyboardType = 0
  		};
  		UniversalInputManager.Get().UseTextInput(parms);
@@ -84110,12 +84135,10 @@ index b364634f..1f37699f 100644
  	}
  
  	private void HideInput()
-@@ -161,6 +165,9 @@ public class StoreQuantityPrompt : UIBPopup
+@@ -161,6 +173,7 @@ public class StoreQuantityPrompt : UIBPopup
  	private void OnInputUpdated(string input)
  	{
  		UpdateQuantityText(input);
-+
-+		// Quick hack while the input field is not accessible.
 +		AccessibilityMgr.Output(null, input);
  	}
  

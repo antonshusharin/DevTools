@@ -176,6 +176,7 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 
 - Re-enabled opening the Journal on the Event tab for new active events instead of forcing fallback to the default tab.
 - Re-enabled fixed rewards in the end-of-game flow.
+- Improved Store quantity prompt accessibility: invalid values are now spoken with explicit range feedback, and the quantity input remains active for correction instead of closing the flow.
 
 ### 2026-02-21
 

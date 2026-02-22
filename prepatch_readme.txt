@@ -172,6 +172,28 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 [05] Changelog
 ----------
 
+### 2026-02-21
+
+- Improved Battlegrounds Duos card pass handling for held cards and restricted pass flow to cards that are actually passable.
+- Added spoken feedback when switching between your board and your teammate's board via the Duos portal.
+- Expanded Battlegrounds Duos help text in both main option mode and mulligan mode (board switch, last ping read/jump, ping shortcuts, and pass/trade hints).
+- Added keyboard support for Duos exclamation ping (`Shift+1`).
+- Improved reliability of reading/jumping to the last pinged card with better null checks and explicit "no ping" feedback for stale or missing pings.
+- Added spoken feedback when a Duos ping cannot be sent.
+- Added a timeout safeguard when switching to teammate board during jump-to-last-ping to prevent infinite waiting.
+- Added support for the Rastakhan's Rumble solo adventure in the accessible adventure menu.
+- Added dedicated spoken status lines on the hero picker for Rastakhan's Rumble (locked/unowned state and unlock information).
+- Extended hero picker accessibility status speech to non-adventure hero-pick contexts (friendly and Tavern Brawl).
+- Expanded accessible adventure selection to include all available adventure modes automatically (instead of a fixed subset).
+- Improved Rastakhan's Rumble hero picker narration with additional hero class and flavor text context.
+- Added spoken dormant-banner timer text for shrine-style cards (including Rastakhan's Rumble shrine respawn counters).
+- Added a quick shrine status readout on the anomalies key: reads both friendly and opponent shrine state, including dormant respawn timer text.
+- Added live shrine state announcements during gameplay (spawn/swap, becoming dormant, revival, and dormant timer countdown updates).
+- Improved treasure and shrine reward reading between fights with spoken type, cost, card details, and differences from the previously read option.
+- Reworked loot package reading between fights to announce full package contents with card cost/type/effect details and comparisons between loot options.
+- Added explicit selection feedback for between-fight rewards (selected option and which alternatives were rejected).
+- Hardened between-fight accessibility flows with additional null checks for reward/loot menus and safer deck tile cursor handling.
+
 ### 2026-02-09
 
 - Updated to Hearthstone version 34.6.0.235290 (contributed by Endefx)

@@ -1,7 +1,9 @@
 ﻿using Hearthstone.DataModels;
 using Hearthstone.UI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Accessibility
 {
@@ -9,11 +11,17 @@ namespace Accessibility
     {
         private enum State { LOADING, MAIN_MENU };
 
+        private const float MERCENARIES_ENTRY_WAIT_TIMEOUT_SECONDS = 8f;
+
         private State m_curState = State.LOADING;
 
         private AccessibleMenu m_mainMenu;
 
         private GameModeSceneDataModel m_gameModeSceneDataModel;
+
+        private Coroutine m_pendingMercenariesEntryCoroutine;
+
+        private GameModeDisplay m_pendingMercenariesEntryOwner;
 
         private static AccessibleGameModeScene s_instance = new AccessibleGameModeScene();
 
@@ -26,6 +34,7 @@ namespace Accessibility
         {
             try
             {
+                CancelPendingMercenariesEntry();
                 m_gameModeSceneDataModel = gameModeSceneDataModel;
 
                 SetupMainMenu();
@@ -49,6 +58,7 @@ namespace Accessibility
 
         private void OnClickBackButton()
         {
+            CancelPendingMercenariesEntry();
             GameModeDisplay.Get().m_backButton.TriggerRelease();
         }
 
@@ -198,14 +208,154 @@ namespace Accessibility
                 return;
             }
 
-            GameModeDisplay.Get().SelectMode(button);
-            if (!GameModeDisplay.Get().CanEnterMode(out var reason, out var unused))
+            GameModeDisplay gameModeDisplay = GameModeDisplay.Get();
+            if (gameModeDisplay == null)
+            {
+                AccessibilityMgr.Output(this, AccessibleSpeechUtils.CombineLines(LocalizedText.GLOBAL_LOADING, LocalizedText.GLOBAL_PLEASE_WAIT), interrupt: true);
+                return;
+            }
+
+            gameModeDisplay.SelectMode(button);
+            if (!gameModeDisplay.CanEnterMode(out var reason, out var unused))
             {
                 AccessibilityMgr.Output(this, reason);
                 return;
             }
 
-            GameModeDisplay.Get().m_playButton.TriggerRelease();
+            if (IsMercenariesMode(button))
+            {
+                TryEnterMercenariesMode(gameModeDisplay, button);
+                return;
+            }
+
+            CancelPendingMercenariesEntry();
+            gameModeDisplay.m_playButton.TriggerRelease();
+        }
+
+        private bool IsMercenariesMode(GameModeButtonDataModel button)
+        {
+            if (button == null)
+            {
+                return false;
+            }
+            GameModeDbfRecord record = GameDbf.GameMode.GetRecord(button.GameModeRecordId);
+            if (record == null || string.IsNullOrWhiteSpace(record.LinkedScene))
+            {
+                return false;
+            }
+            return string.Equals(record.LinkedScene, SceneMgr.Mode.LETTUCE_VILLAGE.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsMercenariesPlayerInfoLoaded()
+        {
+            return NetCache.Get().GetNetObject<NetCache.NetCacheMercenariesPlayerInfo>() != null;
+        }
+
+        private void TryEnterMercenariesMode(GameModeDisplay gameModeDisplay, GameModeButtonDataModel button)
+        {
+            if (gameModeDisplay == null || button == null)
+            {
+                AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.GLOBAL_CANNOT_DO_THAT));
+                return;
+            }
+            if (IsMercenariesPlayerInfoLoaded())
+            {
+                CancelPendingMercenariesEntry();
+                gameModeDisplay.m_playButton.TriggerRelease();
+                return;
+            }
+            if (m_pendingMercenariesEntryCoroutine != null)
+            {
+                AccessibilityMgr.Output(this, "Mercenaries are still loading. Please wait.", interrupt: true);
+                return;
+            }
+            AccessibilityMgr.Output(this, "Loading Mercenaries data. Entering automatically when ready.", interrupt: true);
+            m_pendingMercenariesEntryOwner = gameModeDisplay;
+            m_pendingMercenariesEntryCoroutine = gameModeDisplay.StartCoroutine(WaitForMercenariesDataAndEnter(button.GameModeRecordId));
+        }
+
+        private IEnumerator WaitForMercenariesDataAndEnter(int gameModeRecordId)
+        {
+            float elapsed = 0f;
+            while (elapsed < MERCENARIES_ENTRY_WAIT_TIMEOUT_SECONDS)
+            {
+                if (SceneMgr.Get().GetMode() != SceneMgr.Mode.GAME_MODE)
+                {
+                    m_pendingMercenariesEntryCoroutine = null;
+                    m_pendingMercenariesEntryOwner = null;
+                    yield break;
+                }
+
+                if (m_gameModeSceneDataModel != null && m_gameModeSceneDataModel.LastSelectedGameModeRecordId != gameModeRecordId)
+                {
+                    m_pendingMercenariesEntryCoroutine = null;
+                    m_pendingMercenariesEntryOwner = null;
+                    yield break;
+                }
+
+                if (IsMercenariesPlayerInfoLoaded())
+                {
+                    GameModeDisplay display = GameModeDisplay.Get();
+                    if (display == null)
+                    {
+                        break;
+                    }
+                    GameModeButtonDataModel modeButton = FindGameModeButton(gameModeRecordId);
+                    if (modeButton == null)
+                    {
+                        AccessibilityMgr.Output(this, "Mercenaries mode is no longer available.", interrupt: true);
+                        m_pendingMercenariesEntryCoroutine = null;
+                        m_pendingMercenariesEntryOwner = null;
+                        yield break;
+                    }
+                    display.SelectMode(modeButton);
+                    if (!display.CanEnterMode(out var reason, out var unused))
+                    {
+                        AccessibilityMgr.Output(this, reason, interrupt: true);
+                        m_pendingMercenariesEntryCoroutine = null;
+                        m_pendingMercenariesEntryOwner = null;
+                        yield break;
+                    }
+                    AccessibilityMgr.Output(this, "Mercenaries data loaded. Entering mode.", interrupt: true);
+                    m_pendingMercenariesEntryCoroutine = null;
+                    m_pendingMercenariesEntryOwner = null;
+                    display.m_playButton.TriggerRelease();
+                    yield break;
+                }
+
+                elapsed += Mathf.Max(Time.unscaledDeltaTime, 0.05f);
+                yield return null;
+            }
+
+            m_pendingMercenariesEntryCoroutine = null;
+            m_pendingMercenariesEntryOwner = null;
+            AccessibilityMgr.Output(this, "Mercenaries data is still loading. Please wait a moment and try again.", interrupt: true);
+        }
+
+        private GameModeButtonDataModel FindGameModeButton(int gameModeRecordId)
+        {
+            if (m_gameModeSceneDataModel?.GameModeButtons == null)
+            {
+                return null;
+            }
+            foreach (GameModeButtonDataModel modeButton in m_gameModeSceneDataModel.GameModeButtons)
+            {
+                if (modeButton != null && modeButton.GameModeRecordId == gameModeRecordId)
+                {
+                    return modeButton;
+                }
+            }
+            return null;
+        }
+
+        private void CancelPendingMercenariesEntry()
+        {
+            if (m_pendingMercenariesEntryCoroutine != null && m_pendingMercenariesEntryOwner != null)
+            {
+                m_pendingMercenariesEntryOwner.StopCoroutine(m_pendingMercenariesEntryCoroutine);
+            }
+            m_pendingMercenariesEntryCoroutine = null;
+            m_pendingMercenariesEntryOwner = null;
         }
 
         public void HandleInput()

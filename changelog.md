@@ -7,6 +7,7 @@
 - Added explicit accessibility feedback when Mercenaries player data is still loading so entering the mode no longer fails silently.
 - Added first-pass accessibility support for the Mercenaries map screen with a keyboard menu (read selected node, next/previous available node, play, retire, and back) plus spoken node details.
 - Added first-pass accessibility support for the Mercenaries village screen with keyboard building navigation, spoken availability/new-status hints, and direct actions for map, collection, PvP, task board, and training hall.
+- Improved entering Mercenaries from the accessible Game Modes menu: the mod now waits for Mercenaries player data, announces loading, enters automatically when ready, and gives a clear timeout message if loading takes too long.
 
 ### 2026-02-21
 

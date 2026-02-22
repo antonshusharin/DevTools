@@ -70127,6 +70127,244 @@ index 7b91908e..69445c4 100644
  		}
  	}
 -}
+diff --git a/Assembly-CSharp/LettuceVillageDisplay.cs b/Assembly-CSharp/LettuceVillageDisplay.cs
+index cde9407..0a8ecc9 100644
+--- a/Assembly-CSharp/LettuceVillageDisplay.cs
++++ b/Assembly-CSharp/LettuceVillageDisplay.cs
+@@ -1,12 +1,15 @@
++using System.Collections;
++using System.Collections.Generic;
+ using Assets;
+ using Hearthstone;
+ using Hearthstone.DataModels;
+ using Hearthstone.UI;
+ using UnityEngine;
++using Accessibility;
+ 
+ [CustomEditClass]
+ [RequireComponent(typeof(WidgetTemplate))]
+-public class LettuceVillageDisplay : AbsSceneDisplay
++public class LettuceVillageDisplay : AbsSceneDisplay, AccessibleScreen
+ {
+ 	public class LettuceSceneTransitionPayload
+ 	{
+@@ -54,6 +57,8 @@ public class LettuceVillageDisplay : AbsSceneDisplay
+ 
+ 	private bool m_lettuceVillageFinishedChangingStates;
+ 
++	private AccessibleMenu m_accessibleVillageMenu;
++
+ 	private void Awake()
+ 	{
+ 		m_widget = GetComponent<WidgetTemplate>();
+@@ -66,6 +71,7 @@ public class LettuceVillageDisplay : AbsSceneDisplay
+ 		NetCache.Get().RegisterUpdatedListener(typeof(NetCache.NetCacheLettuceMap), OnLettuceMapNetCacheUpdated);
+ 		InitializeLettuceMap();
+ 		SetupVillage();
++		StartCoroutine(InitializeAccessibilityWhenReady());
+ 	}
+ 
+ 	public void OnDestroy()
+@@ -150,6 +156,8 @@ public class LettuceVillageDisplay : AbsSceneDisplay
+ 	private void OnVillageWidgetDoneChangingStates(object widget)
+ 	{
+ 		m_lettuceVillageFinishedChangingStates = true;
++		RefreshAccessibleVillageMenu();
++		AccessibilityMgr.SetScreen(this);
+ 	}
+ 
+ 	public override bool IsFinishedLoading(out string failureMessage)
+@@ -256,4 +264,189 @@ public class LettuceVillageDisplay : AbsSceneDisplay
+ 		}
+ 		return true;
+ 	}
++
++	private IEnumerator InitializeAccessibilityWhenReady()
++	{
++		string failureMessage;
++		while (!IsFinishedLoading(out failureMessage))
++		{
++			yield return null;
++		}
++		RefreshAccessibleVillageMenu();
++		AccessibilityMgr.SetScreen(this);
++	}
++
++	private void RefreshAccessibleVillageMenu()
++	{
++		m_accessibleVillageMenu = new AccessibleMenu(this, "Mercenaries village", OnBackToGameModes);
++		List<MercenaryBuilding.Mercenarybuildingtype> availableBuildingsForCurrentFTUEState = LettuceVillageDataUtil.GetAvailableBuildingsForCurrentFTUEState(isUIContext: true);
++		if (availableBuildingsForCurrentFTUEState != null)
++		{
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.PVEZONES);
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.PVP);
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.COLLECTION);
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.TASKBOARD);
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.TRAININGHALL);
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.BUILDINGMANAGER);
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.SHOP);
++			TryAddBuildingMenuOption(availableBuildingsForCurrentFTUEState, MercenaryBuilding.Mercenarybuildingtype.MAILBOX);
++		}
++		m_accessibleVillageMenu.AddOption("Back to game modes", OnBackToGameModes);
++	}
++
++	private void TryAddBuildingMenuOption(List<MercenaryBuilding.Mercenarybuildingtype> availableBuildings, MercenaryBuilding.Mercenarybuildingtype buildingType)
++	{
++		if (availableBuildings == null || !availableBuildings.Contains(buildingType))
++		{
++			return;
++		}
++		MercenaryBuilding.Mercenarybuildingtype selectedBuilding = buildingType;
++		m_accessibleVillageMenu.AddOption(delegate
++		{
++			return GetBuildingMenuOptionText(selectedBuilding);
++		}, delegate
++		{
++			OnBuildingOptionSelected(selectedBuilding);
++		});
++	}
++
++	private string GetBuildingMenuOptionText(MercenaryBuilding.Mercenarybuildingtype buildingType)
++	{
++		string buildingDisplayName = GetBuildingDisplayName(buildingType);
++		if (!IsBuildingEnabled(buildingType))
++		{
++			return buildingDisplayName + " (unavailable)";
++		}
++		if (LettuceVillageDataUtil.GetNotificationStatusForBuilding(buildingType))
++		{
++			return buildingDisplayName + " (new)";
++		}
++		return buildingDisplayName;
++	}
++
++	private string GetBuildingDisplayName(MercenaryBuilding.Mercenarybuildingtype buildingType)
++	{
++		MercenaryBuildingDbfRecord buildingRecordByType = LettuceVillageDataUtil.GetBuildingRecordByType(buildingType);
++		if (buildingRecordByType?.Name != null)
++		{
++			string string2 = buildingRecordByType.Name.GetString();
++			if (!string.IsNullOrWhiteSpace(string2))
++			{
++				return string2;
++			}
++		}
++		return buildingType switch
++		{
++			MercenaryBuilding.Mercenarybuildingtype.PVEZONES => "Travel point",
++			MercenaryBuilding.Mercenarybuildingtype.PVP => "Fighting pit",
++			MercenaryBuilding.Mercenarybuildingtype.COLLECTION => "Collection",
++			MercenaryBuilding.Mercenarybuildingtype.TASKBOARD => "Campfire",
++			MercenaryBuilding.Mercenarybuildingtype.TRAININGHALL => "Training grounds",
++			MercenaryBuilding.Mercenarybuildingtype.BUILDINGMANAGER => "Workshop",
++			MercenaryBuilding.Mercenarybuildingtype.SHOP => "Shop",
++			MercenaryBuilding.Mercenarybuildingtype.MAILBOX => "Mailbox",
++			_ => "Building",
++		};
++	}
++
++	private bool IsBuildingEnabled(MercenaryBuilding.Mercenarybuildingtype buildingType)
++	{
++		NetCache.NetCacheMercenariesPlayerInfo netObject = NetCache.Get().GetNetObject<NetCache.NetCacheMercenariesPlayerInfo>();
++		if (netObject?.BuildingEnabledMap == null)
++		{
++			return true;
++		}
++		if (netObject.BuildingEnabledMap.TryGetValue(buildingType, out var value))
++		{
++			return value;
++		}
++		return true;
++	}
++
++	private void OnBuildingOptionSelected(MercenaryBuilding.Mercenarybuildingtype buildingType)
++	{
++		if (!IsBuildingEnabled(buildingType))
++		{
++			AccessibilityMgr.Output(this, "This building is currently unavailable.");
++			return;
++		}
++		switch (buildingType)
++		{
++		case MercenaryBuilding.Mercenarybuildingtype.PVEZONES:
++			if (!Network.IsLoggedIn())
++			{
++				DialogManager.Get().ShowReconnectHelperDialog();
++				return;
++			}
++			ShowPvEZonePortal();
++			break;
++		case MercenaryBuilding.Mercenarybuildingtype.PVP:
++			NavigateToScene(SceneMgr.Mode.LETTUCE_PLAY);
++			break;
++		case MercenaryBuilding.Mercenarybuildingtype.COLLECTION:
++			NavigateToScene(SceneMgr.Mode.LETTUCE_COLLECTION);
++			break;
++		case MercenaryBuilding.Mercenarybuildingtype.TASKBOARD:
++			m_VillagePopupManager?.Show(LettuceVillagePopupManager.PopupType.TASKBOARD);
++			break;
++		case MercenaryBuilding.Mercenarybuildingtype.TRAININGHALL:
++			m_VillagePopupManager?.Show(LettuceVillagePopupManager.PopupType.TRAININGHALL);
++			break;
++		case MercenaryBuilding.Mercenarybuildingtype.BUILDINGMANAGER:
++		{
++			string text = (LettuceRenownUtil.HasUnlockedRenownOffers() ? "Renown conversion" : "Workshop");
++			AccessibilityMgr.Output(this, text + " cannot be opened from keyboard on this screen yet.");
++			return;
++		}
++		case MercenaryBuilding.Mercenarybuildingtype.SHOP:
++			AccessibilityMgr.Output(this, "Shop cannot be opened from keyboard on this screen yet.");
++			return;
++		case MercenaryBuilding.Mercenarybuildingtype.MAILBOX:
++			AccessibilityMgr.Output(this, "Mailbox cannot be opened from keyboard on this screen yet.");
++			return;
++		default:
++			AccessibilityMgr.Output(this, "This building cannot be opened from keyboard on this screen yet.");
++			return;
++		}
++		LettuceVillageDataUtil.MarkNotificationAsSeenForBuilding(buildingType);
++	}
++
++	private void NavigateToScene(SceneMgr.Mode mode)
++	{
++		if (!Network.IsLoggedIn() && !CanNavigateToSceneWhileOffline(mode))
++		{
++			DialogManager.Get().ShowReconnectHelperDialog();
++			return;
++		}
++		SetNextModeAndHandleTransition(mode, SceneMgr.TransitionHandlerType.NEXT_SCENE, null);
++	}
++
++	private void OnBackToGameModes()
++	{
++		SetNextModeAndHandleTransition(SceneMgr.Mode.GAME_MODE, SceneMgr.TransitionHandlerType.NEXT_SCENE, null);
++	}
++
++	public void HandleInput()
++	{
++		if (m_accessibleVillageMenu == null)
++		{
++			RefreshAccessibleVillageMenu();
++		}
++		m_accessibleVillageMenu?.HandleAccessibleInput();
++	}
++
++	public string GetHelp()
++	{
++		if (m_accessibleVillageMenu == null)
++		{
++			RefreshAccessibleVillageMenu();
++		}
++		return m_accessibleVillageMenu?.GetHelp();
++	}
++
++	public void OnGainedFocus()
++	{
++		RefreshAccessibleVillageMenu();
++		m_accessibleVillageMenu?.StartReading();
++	}
+ }
+
 diff --git a/Assembly-CSharp/LoadingPopupDisplay.cs b/Assembly-CSharp/LoadingPopupDisplay.cs
 index 974ebe1f..a8937899 100644
 --- a/Assembly-CSharp/LoadingPopupDisplay.cs

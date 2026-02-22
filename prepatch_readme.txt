@@ -180,6 +180,7 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 - Reworked the accessible Game Modes menu to list all active modes dynamically (including Mercenaries) instead of only a fixed subset.
 - Added explicit accessibility feedback when Mercenaries player data is still loading so entering the mode no longer fails silently.
 - Added first-pass accessibility support for the Mercenaries map screen with a keyboard menu (read selected node, next/previous available node, play, retire, and back) plus spoken node details.
+- Added first-pass accessibility support for the Mercenaries village screen with keyboard building navigation, spoken availability/new-status hints, and direct actions for map, collection, PvP, task board, and training hall.
 
 ### 2026-02-21
 

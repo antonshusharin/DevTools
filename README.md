@@ -5,6 +5,10 @@ Note: This process was approved by Blizzard. Working with diff files is clunky, 
 
 Please stick to the approved process and ***do not publish and/or share decompiled proprietary code anywhere***.
 
+## Important, read this first!
+
+Any use of artificial intelligence tools during the development of this project is strictly prohibited until further notice. Any contributions found to be made with the use of AI-powered tools during this time will be rejected, and their author will be censured and permenantly banned from the project.
+
 ## Setup
 1. Clone the project:
 ```

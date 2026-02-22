@@ -3954,13 +3954,14 @@ index 00000000..34c93b1e
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleGameModeScene.cs b/Assembly-CSharp/Accessibility/AccessibleGameModeScene.cs
 new file mode 100644
-index 00000000..4555017d
+index 00000000..360ec23a
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleGameModeScene.cs
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,265 @@
 +﻿using Hearthstone.DataModels;
 +using Hearthstone.UI;
 +using System;
++using System.Collections.Generic;
 +
 +namespace Accessibility
 +{
@@ -4000,8 +4001,7 @@ index 00000000..4555017d
 +        private void SetupMainMenu()
 +        {
 +            m_mainMenu = new AccessibleMenu(this, LocalizationUtils.Get(LocalizationKey.GLOBAL_CHOOSE_MODE), OnClickBackButton);
-+            m_mainMenu.AddOption(GameStrings.Get("GLUE_ADVENTURE"), OnClickSoloAdventures);
-+            m_mainMenu.AddOption(LocalizedText.HUB_TAVERN_BRAWL_OPTION, OnClickTavernBrawl);
++            AddGameModeOptions();
 +            m_mainMenu.AddOption(LocalizedText.SCREEN_GO_BACK, OnClickBackButton);
 +
 +            m_curState = State.MAIN_MENU;
@@ -4012,70 +4012,185 @@ index 00000000..4555017d
 +            GameModeDisplay.Get().m_backButton.TriggerRelease();
 +        }
 +
-+        private void OnClickSoloAdventures()
++        private void AddGameModeOptions()
 +        {
-+            var soloAdventuresButton = GetSoloAdventuresButton();
-+
-+            if (soloAdventuresButton == null)
++            if (m_gameModeSceneDataModel?.GameModeButtons == null)
 +            {
-+                AccessibilityUtils.LogFatalError(new Exception("Could not find solo adventures button"));
-+            }
-+
-+            GameModeDisplay.Get().SelectMode(soloAdventuresButton);
-+            if (!GameModeDisplay.Get().CanEnterMode(out var reason, out var unused))
-+            {
-+                AccessibilityMgr.Output(this, reason);
 +                return;
 +            }
-+            GameModeDisplay.Get().m_playButton.TriggerRelease();
++
++            foreach (var button in m_gameModeSceneDataModel.GameModeButtons)
++            {
++                if (button == null)
++                {
++                    continue;
++                }
++
++                var buttonCopy = button;
++                m_mainMenu.AddOption(GetGameModeOptionText(buttonCopy), () => OnClickGameMode(buttonCopy), () => OnReadGameMode(buttonCopy));
++            }
 +        }
 +
-+        private void OnClickTavernBrawl()
++        private string GetGameModeOptionText(GameModeButtonDataModel button)
 +        {
-+            if (!AccessibilityUtils.CanPlayTavernBrawl())
++            var name = GameStrings.Get(button.Name);
++            if (!string.IsNullOrWhiteSpace(name))
++            {
++                return name;
++            }
+
++            if (!string.IsNullOrWhiteSpace(button.Name))
++            {
++                return button.Name;
++            }
++
++            return "Unknown mode";
++        }
++
++        private void OnReadGameMode(GameModeButtonDataModel button)
++        {
++            var details = GetGameModeDetailsText(button);
++            if (!string.IsNullOrWhiteSpace(details))
++            {
++                AccessibilityMgr.Output(this, details);
++            }
++        }
++
++        private string GetGameModeDetailsText(GameModeButtonDataModel button)
++        {
++            if (button == null)
++            {
++                return "";
++            }
++
++            var details = new List<string>();
++
++            var description = GetGameModeDescriptionText(button);
++            if (!string.IsNullOrWhiteSpace(description))
++            {
++                details.Add(description);
++            }
++
++            var statuses = GetGameModeStatuses(button);
++            if (statuses.Count > 0)
++            {
++                details.Add(AccessibleSpeechUtils.HumanizeList(statuses));
++            }
++
++            return AccessibleSpeechUtils.CombineLines(details);
++        }
++
++        private string GetGameModeDescriptionText(GameModeButtonDataModel button)
++        {
++            if (button == null || string.IsNullOrWhiteSpace(button.Description))
++            {
++                return "";
++            }
++
++            var description = GameStrings.Get(button.Description);
++            if (!string.IsNullOrWhiteSpace(description))
++            {
++                return description;
++            }
++
++            return button.Description;
++        }
++
++        private List<string> GetGameModeStatuses(GameModeButtonDataModel button)
++        {
++            var statuses = new List<string>();
++
++            if (button == null)
++            {
++                return statuses;
++            }
++
++            if (button.IsDownloading)
++            {
++                statuses.Add(GameStrings.Format("GLUE_GAME_MODE_TOOLTIP_DOWNLOADING_DESCRIPTION", GetGameModeOptionText(button)));
++            }
++            else if (button.IsDownloadRequired)
++            {
++                statuses.Add(GameStrings.Format("GLUE_GAME_MODE_TOOLTIP_DOWNLOAD_REQUIRED_DESCRIPTION", GetGameModeOptionText(button)));
++            }
++
++            if (button.IsNew)
++            {
++                statuses.Add(LocalizedText.COLLECTION_CARD_NEW);
++            }
++
++            if (button.IsEarlyAccess)
++            {
++                statuses.Add(GetGameStringOrFallback("GLOBAL_EARLY_ACCESS", "Early access"));
++            }
++
++            if (button.IsBeta)
++            {
++                statuses.Add(GetGameStringOrFallback("GLOBAL_BETA", "Beta"));
++            }
++
++            return statuses;
++        }
++
++        private string GetGameStringOrFallback(string key, string fallback)
++        {
++            var text = GameStrings.Get(key);
++            if (string.IsNullOrWhiteSpace(text) || text == key)
++            {
++                return fallback;
++            }
++
++            return text;
++        }
++
++        private void OnClickGameMode(GameModeButtonDataModel button)
++        {
++            if (button == null)
++            {
++                AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.GLOBAL_CANNOT_DO_THAT));
++                return;
++            }
++
++            // Special case: some Tavern Brawl variants are known to be inaccessible.
++            if (button.GameModeRecordId == 8 && !AccessibilityUtils.CanPlayTavernBrawl())
 +            {
 +                AccessibilityMgr.Output(this, LocalizationUtils.Get(LocalizationKey.HUB_TAVERN_BRAWL_INACCESSIBLE));
 +                return;
 +            }
-+            var tavernBrawlButton = GetTavernBrawlButton();
-+            if (tavernBrawlButton == null)
++
++            // GameModeDisplay has an extra Mercenaries readiness gate that is not covered by CanEnterMode().
++            // For accessibility, provide explicit feedback and trigger a refresh request instead of failing silently.
++            if (IsMercenariesVillageMode(button) && NetCache.Get().GetNetObject<NetCache.NetCacheMercenariesPlayerInfo>() == null)
 +            {
-+                AccessibilityUtils.LogFatalError(new Exception("Could not find tavern brawl button"));
++                Network.Get().MercenariesPlayerInfoRequest();
++                AccessibilityMgr.Output(this, GameStrings.Get("GLUE_TOOLTIP_GAME_MODE_DATA_NOT_LOADED"));
++                return;
 +            }
 +
-+            GameModeDisplay.Get().SelectMode(tavernBrawlButton);
++            GameModeDisplay.Get().SelectMode(button);
 +            if (!GameModeDisplay.Get().CanEnterMode(out var reason, out var unused))
 +            {
 +                AccessibilityMgr.Output(this, reason);
 +                return;
 +            }
++
 +            GameModeDisplay.Get().m_playButton.TriggerRelease();
 +        }
 +
-+        private GameModeButtonDataModel GetSoloAdventuresButton()
++        private bool IsMercenariesVillageMode(GameModeButtonDataModel button)
 +        {
-+            foreach (var button in m_gameModeSceneDataModel.GameModeButtons)
++            if (button == null)
 +            {
-+                if (button.GameModeRecordId == 6)
-+                {
-+                    return button;
-+                }
++                return false;
 +            }
 +
-+            return null;
-+        }
-+
-+        private GameModeButtonDataModel GetTavernBrawlButton()
-+        {
-+            foreach (var button in m_gameModeSceneDataModel.GameModeButtons)
++            var gameModeRecord = GameDbf.GameMode.GetRecord(button.GameModeRecordId);
++            if (gameModeRecord == null || string.IsNullOrWhiteSpace(gameModeRecord.LinkedScene))
 +            {
-+                if (button.GameModeRecordId == 8)
-+                {
-+                    return button;
-+                }
++                return false;
 +            }
 +
-+            return null;
++            return string.Equals(gameModeRecord.LinkedScene, SceneMgr.Mode.LETTUCE_VILLAGE.ToString(), StringComparison.OrdinalIgnoreCase);
 +        }
 +
 +        public void HandleInput()

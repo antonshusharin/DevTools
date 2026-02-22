@@ -177,6 +177,8 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 - Re-enabled opening the Journal on the Event tab for new active events instead of forcing fallback to the default tab.
 - Re-enabled fixed rewards in the end-of-game flow.
 - Improved Store quantity prompt accessibility: invalid values are now spoken with explicit range feedback, and the quantity input remains active for correction instead of closing the flow.
+- Reworked the accessible Game Modes menu to list all active modes dynamically (including Mercenaries) instead of only a fixed subset.
+- Added explicit accessibility feedback when Mercenaries player data is still loading so entering the mode no longer fails silently.
 
 ### 2026-02-21
 

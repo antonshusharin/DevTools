@@ -69737,9 +69737,38 @@ index a0cb1501..3d128cc7 100644
  			return false;
  		}
 diff --git a/Assembly-CSharp/LettuceMapDisplay.cs b/Assembly-CSharp/LettuceMapDisplay.cs
-index 7b91908e..d6a04d2b 100644
+index 7b91908e..69445c4 100644
 --- a/Assembly-CSharp/LettuceMapDisplay.cs
 +++ b/Assembly-CSharp/LettuceMapDisplay.cs
+@@ -12,8 +12,9 @@ using Hearthstone.UI;
+ using PegasusLettuce;
+ using PegasusShared;
+ using UnityEngine;
++using Accessibility;
+ 
+-public class LettuceMapDisplay : AbsSceneDisplay
++public class LettuceMapDisplay : AbsSceneDisplay, AccessibleScreen
+ {
+ 	private enum CurrentResultState
+ 	{
+@@ -158,6 +159,8 @@ public class LettuceMapDisplay : AbsSceneDisplay
+ 
+ 	private bool m_isMythicMode;
+ 
++	private AccessibleMenu m_accessibleMapMenu;
++
+ 	private bool LettuceVillageVisitorDataInitialized => NetCache.Get().GetNetObject<NetCache.NetCacheMercenariesVillageInfo>()?.Initialized ?? false;
+ 
+ 	public override void Start()
+@@ -820,6 +823,8 @@ public class LettuceMapDisplay : AbsSceneDisplay
+ 			yield return CheckForNodeDialogueEvents();
+ 		}
+ 		m_clickBlocker.SetActive(value: false);
++		RefreshAccessibleMapMenu();
++		AccessibilityMgr.SetScreen(this);
+ 		if (m_currentMapIsComplete)
+ 		{
+ 			HandleEndOfRun();
 @@ -1113,43 +1113,43 @@ public class LettuceMapDisplay : AbsSceneDisplay
  			foreach (LettuceMapTreasure treasureOption in item.TreasureOptions)
  			{
@@ -69896,7 +69925,178 @@ index 7b91908e..d6a04d2b 100644
  			{
  				m_waitingForVisitorSelectionServerResponse = false;
  				m_screenEffectsHandle.StopEffect();
-@@ -2258,18 +2258,18 @@ public class LettuceMapDisplay : AbsSceneDisplay
+@@ -1562,12 +1567,141 @@ public class LettuceMapDisplay : AbsSceneDisplay
+ 			PartyManager.Get().SetSelectedMercenariesCoOpMapNodeId(m_selectedMapCoin.Id);
+ 		}
+ 		TryEnablePlayButton();
++		RefreshAccessibleMapMenu();
+ 		if (GameDbf.LettuceMapNodeType.GetRecord(m_selectedMapCoin.NodeTypeId).AutoPlay)
+ 		{
+ 			ExecutePlayLogic();
+ 		}
+ 	}
+ 
++	private void RefreshAccessibleMapMenu()
++	{
++		m_accessibleMapMenu = new AccessibleMenu(this, GetAccessibleMapMenuTitle(), delegate
++		{
++			OnBackButtonRelease(null);
++		});
++		m_accessibleMapMenu.AddOption("Read selected node", ReadSelectedMapNode);
++		m_accessibleMapMenu.AddOption("Select next available node", delegate
++		{
++			SelectAdjacentUnlockedMapNode(1);
++		});
++		m_accessibleMapMenu.AddOption("Select previous available node", delegate
++		{
++			SelectAdjacentUnlockedMapNode(-1);
++		});
++		m_accessibleMapMenu.AddOption(GetAccessiblePlayOptionText, TryPlaySelectedMapNode);
++		if (!m_currentMapIsComplete)
++		{
++			m_accessibleMapMenu.AddOption("Retire run", delegate
++			{
++				OnRetireButtonRelease(null);
++			});
++		}
++		m_accessibleMapMenu.AddOption("Back to village", delegate
++		{
++			OnBackButtonRelease(null);
++		});
++	}
++
++	private string GetAccessibleMapMenuTitle()
++	{
++		string text = "Mercenaries map";
++		if (m_lettuceMapProto == null)
++		{
++			return text;
++		}
++		LettuceBountyDbfRecord record = GameDbf.LettuceBounty.GetRecord((int)m_lettuceMapProto.BountyId);
++		if (record != null && LettuceVillageDataUtil.TryGetBountyBossData(record, out var bossName, out var _))
++		{
++			text = text + ": " + bossName;
++		}
++		return text;
++	}
++
++	private string GetAccessiblePlayOptionText()
++	{
++		if (m_playButton?.m_newPlayButtonText != null && !string.IsNullOrWhiteSpace(m_playButton.m_newPlayButtonText.Text))
++		{
++			return m_playButton.m_newPlayButtonText.Text;
++		}
++		return GameStrings.Get("GLOBAL_PLAY");
++	}
++
++	private void SelectAdjacentUnlockedMapNode(int step)
++	{
++		if (m_lettuceMap == null)
++		{
++			AccessibilityMgr.Output(this, "Map is still loading.", interrupt: true);
++			return;
++		}
++		List<LettuceMapCoinDataModel> unlockedCoinDataModels = m_lettuceMap.GetUnlockedCoinDataModels();
++		if (unlockedCoinDataModels == null || unlockedCoinDataModels.Count == 0)
++		{
++			AccessibilityMgr.Output(this, "No available nodes.");
++			return;
++		}
++		unlockedCoinDataModels = unlockedCoinDataModels.OrderBy((LettuceMapCoinDataModel coin) => coin.Id).ToList();
++		int num = unlockedCoinDataModels.FindIndex((LettuceMapCoinDataModel coin) => m_selectedMapCoin != null && coin.Id == m_selectedMapCoin.Id);
++		if (num < 0)
++		{
++			num = 0;
++		}
++		else
++		{
++			num = (num + step + unlockedCoinDataModels.Count) % unlockedCoinDataModels.Count;
++		}
++		SelectCoinInternal(unlockedCoinDataModels[num]);
++		ReadSelectedMapNode();
++	}
++
++	private void ReadSelectedMapNode()
++	{
++		AccessibilityMgr.Output(this, GetSelectedMapNodeSpeech(), interrupt: true);
++	}
++
++	private string GetSelectedMapNodeSpeech()
++	{
++		if (m_selectedMapCoin == null)
++		{
++			return "No map node selected.";
++		}
++		return AccessibleSpeechUtils.CombineSentences(m_selectedMapCoin.HoverTooltipHeader, m_selectedMapCoin.HoverTooltipBody, GetSelectedMapNodeStateSpeech());
++	}
++
++	private string GetSelectedMapNodeStateSpeech()
++	{
++		if (m_selectedMapCoin == null)
++		{
++			return string.Empty;
++		}
++		switch (m_selectedMapCoin.CoinState)
++		{
++		case LettuceMapNode.NodeState.UNLOCKED:
++			return "Node available.";
++		case LettuceMapNode.NodeState.COMPLETE:
++			return "Node completed.";
++		case LettuceMapNode.NodeState.DEFEAT:
++			return "Defeat node.";
++		default:
++			return "Node locked.";
++		}
++	}
++
++	private void TryPlaySelectedMapNode()
++	{
++		if (m_selectedMapCoin == null)
++		{
++			AccessibilityMgr.Output(this, "No map node selected.", interrupt: true);
++			return;
++		}
++		if (!ShouldEnablePlayButton())
++		{
++			AccessibilityMgr.Output(this, "This node cannot be activated right now.");
++			return;
++		}
++		ExecutePlayLogic();
++	}
++
+@@ -2223,6 +2357,34 @@ public class LettuceMapDisplay : AbsSceneDisplay
+ 		return null;
+ 	}
+ 
++	public void HandleInput()
++	{
++		if (m_taskBoardIsOpen || m_waitingForTreasureSelection || m_waitingForVisitorSelectionServerResponse || m_waitingForVisualControllerState)
++		{
++			return;
++		}
++		if (m_accessibleMapMenu == null)
++		{
++			RefreshAccessibleMapMenu();
++		}
++		m_accessibleMapMenu?.HandleAccessibleInput();
++	}
++
++	public string GetHelp()
++	{
++		if (m_accessibleMapMenu == null)
++		{
++			RefreshAccessibleMapMenu();
++		}
++		return m_accessibleMapMenu?.GetHelp();
++	}
++
++	public void OnGainedFocus()
++	{
++		RefreshAccessibleMapMenu();
++		m_accessibleMapMenu?.StartReading();
++	}
++
+ @@ -2258,18 +2258,18 @@ public class LettuceMapDisplay : AbsSceneDisplay
  			long deckId = 0L;
  			int? lettuceMapNodeId = m_selectedMapCoin.Id;
  			gameMgr.FindGame(GameType.GT_MERCENARIES_PVE, FormatType.FT_WILD, missionId, 0, deckId, null, null, restoreSavedGameState: false, null, lettuceMapNodeId, 0L);

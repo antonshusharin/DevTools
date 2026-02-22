@@ -5,6 +5,7 @@
 - Improved Store quantity prompt accessibility: invalid values are now spoken with explicit range feedback, and the quantity input remains active for correction instead of closing the flow.
 - Reworked the accessible Game Modes menu to list all active modes dynamically (including Mercenaries) instead of only a fixed subset.
 - Added explicit accessibility feedback when Mercenaries player data is still loading so entering the mode no longer fails silently.
+- Added first-pass accessibility support for the Mercenaries map screen with a keyboard menu (read selected node, next/previous available node, play, retire, and back) plus spoken node details.
 
 ### 2026-02-21
 

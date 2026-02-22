@@ -57831,13 +57831,10 @@ index 1c25fcdf..e3416eb7 100644
  		{
  			return true;
  		}
--		if (ShowFixedRewards())
-+		/*
-+		if (ShowFixedRewards()) // comment this out because the fixed rewards are currently inaccessible
+ 		if (ShowFixedRewards())
  		{
  			return true;
  		}
-+*/
  		if (ShowGoldReward())
  		{
  			return true;

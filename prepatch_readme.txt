@@ -175,6 +175,7 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 ### 2026-02-22
 
 - Re-enabled opening the Journal on the Event tab for new active events instead of forcing fallback to the default tab.
+- Re-enabled fixed rewards in the end-of-game flow.
 
 ### 2026-02-21
 

@@ -65401,10 +65401,7 @@ index f5fe9246..6d5f34d0 100644
  			{
  				if (m_rewardTrackType == Global.RewardTrackType.GLOBAL && m_journalMetaDatamodel.EventActive && m_journalMetaDatamodel.EventIsNew)
  				{
--					s_activeTabIndexByType[m_rewardTrackType] = 0;
-+					// The event tab is not accessible and spawns a popup that breaks the mod.
-+					//TODO: Implement accessibility for the event tab and reinstate this.
-+					s_activeTabIndexByType[m_rewardTrackType] = m_initialTabIndexPerSession; // was 0
+ 					s_activeTabIndexByType[m_rewardTrackType] = 0;
  				}
  				else if (m_rewardTrackType == Global.RewardTrackType.GLOBAL && !m_journalMetaDatamodel.IsApprenticeTrackActive && m_journalMetaDatamodel.IsTavernGuideActive)
  				{

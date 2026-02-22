@@ -172,6 +172,10 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 [05] Changelog
 ----------
 
+### 2026-02-22
+
+- Re-enabled opening the Journal on the Event tab for new active events instead of forcing fallback to the default tab.
+
 ### 2026-02-21
 
 - Improved Battlegrounds Duos card pass handling for held cards and restricted pass flow to cards that are actually passable.

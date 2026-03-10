@@ -1,3 +1,9 @@
+
+### 2026-03-10
+
+- Updated to Hearthstone version 35.0.0.237510 (contributed by Endefx)
+- Fixed the handling for the reward of the warlock quest Escape the Underfel. (Contributed by Endefx and Challenger)
+
 ### 2026-02-09
 
 - Updated to Hearthstone version 34.6.0.235290 (contributed by Endefx)

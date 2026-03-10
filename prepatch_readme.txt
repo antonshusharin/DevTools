@@ -171,6 +171,10 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 
 [05] Changelog
 ----------
+### 2026-03-10
+
+- Updated to Hearthstone version 35.0.0.237510 (contributed by Endefx)
+- Fixed the handling for the reward of the warlock quest "Escape the Underfel". (Contributed by Endefx and Challenger)
 
 ### 2026-02-09
 

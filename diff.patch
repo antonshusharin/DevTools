@@ -56628,7 +56628,7 @@ index ea53b862..bdc136bb 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/GameState.cs b/Assembly-CSharp/GameState.cs
-index e638688c..058d21a1 100644
+index be37c98d..5b544f5c 100644
 --- a/Assembly-CSharp/GameState.cs
 +++ b/Assembly-CSharp/GameState.cs
 @@ -11,6 +11,7 @@ using Blizzard.T5.Core;
@@ -57955,7 +57955,7 @@ index a168aca6..f865d23f 100644
  	}
  }
 diff --git a/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs b/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs
-index ade7b984..474c90cb 100644
+index 625556e3..d4d2207c 100644
 --- a/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs
 +++ b/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs
 @@ -135,9 +135,9 @@ namespace Hearthstone.Core.Streaming
@@ -58140,7 +58140,7 @@ index c3bcb0fb..1995e30b 100644
  							throw new SeqnMismatchedException($"Mismatched sequential number: {result} != {seqn}");
  						}
 diff --git a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
-index 572aa0d6..5915cc4d 100644
+index cacc1204..37e00309 100644
 --- a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 +++ b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 @@ -1,5 +1,6 @@
@@ -58197,7 +58197,7 @@ index 572aa0d6..5915cc4d 100644
  			catch (Exception ex)
  			{
 diff --git a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
-index 3df8c501..2d6068f7 100644
+index a7cce940..36f9dc49 100644
 --- a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 +++ b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 @@ -5,6 +5,7 @@ using System.IO;
@@ -58257,7 +58257,7 @@ index 3df8c501..2d6068f7 100644
 +			// ExceptionReporterControl.Get().ExceptionReportInitialize(); // Remove so we don't send Blizzard exceptions that may be caused by us
 +			ExceptionReporterControl.Get().ExceptionReportInitializeDebug();
  			TelemetryManager.Client().SendSystemDetail(TelemetryUtil.GetUnitySystemInfo());
- 			HearthstonePerformance.Initialize(TestType, 4541015.ToString(), 237510);
+ 			HearthstonePerformance.Initialize(TestType, 4551722.ToString(), 238003);
  			HearthstonePerformance.Get()?.CaptureAppStartTime();
 @@ -281,7 +286,7 @@ namespace Hearthstone
  			{
@@ -58275,7 +58275,7 @@ index 3df8c501..2d6068f7 100644
 +			AccessibleHearthstoneApplication.OnClosing();
 +			AccessibilityMgr.Shutdown();
  			IsHearthstoneClosing = true;
- 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 237510, Log.UberText);
+ 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 238003, Log.UberText);
  			if (this.OnShutdown != null)
 @@ -561,7 +568,7 @@ namespace Hearthstone
  
@@ -58314,7 +58314,7 @@ index 3df8c501..2d6068f7 100644
 +			jobDefinition.AddJobFinishedEventListener(OnGameStringsLoaded);
 +			Processor.QueueJob("HearthstoneApplication.InitializeMode", Job_InitializeMode(), Array.Empty<IJobDependency>());
  			Processor.QueueJob(jobDefinition);
- 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 237510, Log.UberText));
+ 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 238003, Log.UberText));
  			Processor.QueueJob(HearthstoneJobs.CreateJobFromAction("HearthstoneApplication.SetWindowText", SetWindowText, jobDefinition.CreateDependency()));
 @@ -757,7 +765,12 @@ namespace Hearthstone
  			}
@@ -61556,7 +61556,7 @@ index c0f7af88..531356cc 100644
  		private WidgetTemplate m_parentWidgetTemplate;
  
 diff --git a/Assembly-CSharp/HearthstoneCheckout.cs b/Assembly-CSharp/HearthstoneCheckout.cs
-index 532f1683..be272f90 100644
+index ea22fd27..fc6bfc1c 100644
 --- a/Assembly-CSharp/HearthstoneCheckout.cs
 +++ b/Assembly-CSharp/HearthstoneCheckout.cs
 @@ -199,9 +199,6 @@ public class HearthstoneCheckout : blz_commerce_log_hook, ISceneEventObserver, I
@@ -66037,7 +66037,7 @@ index 920574a3..3a5d3f27 100644
  	}
  
 diff --git a/Assembly-CSharp/Network.cs b/Assembly-CSharp/Network.cs
-index 4e64a691..0917b820 100644
+index e37928c7..b124ad22 100644
 --- a/Assembly-CSharp/Network.cs
 +++ b/Assembly-CSharp/Network.cs
 @@ -37,6 +37,7 @@ using PegasusUtil;
@@ -67052,7 +67052,7 @@ index 9ec8e17c..21d3dbb8 100644
  			Option.DEBUG_SHOW_BATTLEGROUND_SKIN_IDS,
  			false
 diff --git a/Assembly-CSharp/OptionsMenu.cs b/Assembly-CSharp/OptionsMenu.cs
-index 5e8674e4..99cc95a2 100644
+index 1f1a4a00..738bd075 100644
 --- a/Assembly-CSharp/OptionsMenu.cs
 +++ b/Assembly-CSharp/OptionsMenu.cs
 @@ -6,9 +6,11 @@ using Blizzard.T5.Services;
@@ -78492,7 +78492,7 @@ index 176baa56..6e0a91a0 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/TavernBrawlStore.cs b/Assembly-CSharp/TavernBrawlStore.cs
-index 97e46a53..b67cb06d 100644
+index 382e80ab..101ca5db 100644
 --- a/Assembly-CSharp/TavernBrawlStore.cs
 +++ b/Assembly-CSharp/TavernBrawlStore.cs
 @@ -8,8 +8,10 @@ using Blizzard.T5.Services;
@@ -78506,7 +78506,7 @@ index 97e46a53..b67cb06d 100644
  
  public class TavernBrawlStore : Store
  {
-@@ -258,6 +260,10 @@ public class TavernBrawlStore : Store
+@@ -264,6 +266,10 @@ public class TavernBrawlStore : Store
  			{
  				TavernBrawlManager.Get().RequestSessionBegin();
  			}
@@ -78517,7 +78517,7 @@ index 97e46a53..b67cb06d 100644
  		}
  	}
  
-@@ -373,24 +379,24 @@ public class TavernBrawlStore : Store
+@@ -379,24 +385,24 @@ public class TavernBrawlStore : Store
  		{
  			switch (record.TicketBehaviorType)
  			{
@@ -78560,7 +78560,7 @@ index 97e46a53..b67cb06d 100644
  			}
  		}
  		list.RemoveAll((ProductInfo productInfo) => productInfo.Items.Count == 0 || productInfo.Items[0].Quantity != ticketsRequired);
-@@ -496,7 +502,7 @@ public class TavernBrawlStore : Store
+@@ -502,7 +508,7 @@ public class TavernBrawlStore : Store
  		{
  			BlockInterface(blocked: true);
  			AlertPopup.Response? nullableResponse = null;
@@ -78569,7 +78569,7 @@ index 97e46a53..b67cb06d 100644
  			{
  				nullableResponse = response;
  			});
-@@ -508,4 +514,52 @@ public class TavernBrawlStore : Store
+@@ -514,4 +520,52 @@ public class TavernBrawlStore : Store
  			}
  		}
  	}

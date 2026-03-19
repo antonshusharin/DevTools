@@ -1,3 +1,6 @@
+### 2026-03-17
+
+- Fixed a mod freeze when opening the shop (contributed by Endefx)
 
 ### 2026-03-10
 

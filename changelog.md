@@ -1,3 +1,7 @@
+### 2026-04-14
+
+- Updated to Hearthstone version 35.2.0.239550 (contributed by Endefx)
+
 ### 2026-03-17
 
 - Fixed a mod freeze when opening the shop (contributed by Endefx)

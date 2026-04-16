@@ -172,6 +172,10 @@ The situation with older solo adventures is similar to that of tavern brawls, as
 [05] Changelog
 ----------
 
+### 2026-04-16
+
+- Updated to Hearthstone version 35.2.0.240397
+
 ### 2026-04-14
 
 - Updated to Hearthstone version 35.2.0.239550 (contributed by Endefx)

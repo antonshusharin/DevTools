@@ -394,7 +394,7 @@ index 00000000..17c1c11d
 +*.sln.iml
 +.vscode
 diff --git a/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs b/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
-index 39945014..7ba96f16 100644
+index a02b18f8..1c6e7027 100644
 --- a/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
 +++ b/Assembly-CSharp/AbsDeckPickerTrayDisplay.cs
 @@ -7,6 +7,7 @@ using Hearthstone.DataModels;
@@ -46224,7 +46224,7 @@ index 21c33710..491cfabc 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/CollectionManagerDisplay.cs b/Assembly-CSharp/CollectionManagerDisplay.cs
-index f1d8dd6f..c4daa705 100644
+index f0481b8f..1c5eb7ba 100644
 --- a/Assembly-CSharp/CollectionManagerDisplay.cs
 +++ b/Assembly-CSharp/CollectionManagerDisplay.cs
 @@ -14,6 +14,7 @@ using Hearthstone.Util;
@@ -48033,7 +48033,7 @@ index acf30cbb..01f6ea79 100644
 +		#endregion
  }
 diff --git a/Assembly-CSharp/DeckPickerTrayDisplay.cs b/Assembly-CSharp/DeckPickerTrayDisplay.cs
-index e4accf66..5c57c980 100644
+index 45434d1c..e7817c97 100644
 --- a/Assembly-CSharp/DeckPickerTrayDisplay.cs
 +++ b/Assembly-CSharp/DeckPickerTrayDisplay.cs
 @@ -13,9 +13,10 @@ using Hearthstone.UI;
@@ -49128,7 +49128,7 @@ index 604cb021..589f15d3 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/DeckTrayDeckListContent.cs b/Assembly-CSharp/DeckTrayDeckListContent.cs
-index 5b55b59b..5b2ebea0 100644
+index fc74c731..d9ba30e9 100644
 --- a/Assembly-CSharp/DeckTrayDeckListContent.cs
 +++ b/Assembly-CSharp/DeckTrayDeckListContent.cs
 @@ -8,6 +8,7 @@ using Hearthstone.Core;
@@ -51630,7 +51630,7 @@ index dcc4e28e..fc57fee6 100644
  	public class Info
  	{
 diff --git a/Assembly-CSharp/FriendChallengeMgr.cs b/Assembly-CSharp/FriendChallengeMgr.cs
-index b4ddad2e..c15d461d 100644
+index 0d0f0539..022144ba 100644
 --- a/Assembly-CSharp/FriendChallengeMgr.cs
 +++ b/Assembly-CSharp/FriendChallengeMgr.cs
 @@ -1,5 +1,6 @@
@@ -52827,7 +52827,7 @@ index 00000000..0cb326f6
 +    #endregion
 +}
 diff --git a/Assembly-CSharp/FriendListFrame.cs b/Assembly-CSharp/FriendListFrame.cs
-index 6fd6b251..1657674b 100644
+index f852c7c3..88695c5e 100644
 --- a/Assembly-CSharp/FriendListFrame.cs
 +++ b/Assembly-CSharp/FriendListFrame.cs
 @@ -8,8 +8,9 @@ using Hearthstone.UI;
@@ -52936,7 +52936,7 @@ index 6fd6b251..1657674b 100644
  	{
  		if (!(flyoutMenu == null))
  		{
-@@ -1232,6 +1244,7 @@ public class FriendListFrame : MonoBehaviour
+@@ -1243,6 +1255,7 @@ public class FriendListFrame : MonoBehaviour
  		{
  			m_timeSinceLastScroll = Time.realtimeSinceStartup;
  			m_updateItemsAfterScroll = true;
@@ -52944,7 +52944,7 @@ index 6fd6b251..1657674b 100644
  		};
  		SuspendItemsLayout();
  		UpdateRequests(bnetFriendMgr.GetReceivedInvites(), null);
-@@ -1295,45 +1308,55 @@ public class FriendListFrame : MonoBehaviour
+@@ -1306,45 +1319,55 @@ public class FriendListFrame : MonoBehaviour
  		UpdateFriendItems();
  	}
  
@@ -53005,7 +53005,7 @@ index 6fd6b251..1657674b 100644
  			}
  		}
  		UpdateFriendItems();
-@@ -1341,13 +1364,16 @@ public class FriendListFrame : MonoBehaviour
+@@ -1352,13 +1375,16 @@ public class FriendListFrame : MonoBehaviour
  		{
  			foreach (BnetPlayer added in addedList)
  			{
@@ -53026,7 +53026,7 @@ index 6fd6b251..1657674b 100644
  	}
  
  	private FriendListFriendFrame FindRenderedBaseFriendFrame(BnetPlayer friend)
-@@ -1494,20 +1520,12 @@ public class FriendListFrame : MonoBehaviour
+@@ -1505,20 +1531,12 @@ public class FriendListFrame : MonoBehaviour
  
  	private void UpdateFriendsHeader()
  	{
@@ -53049,7 +53049,7 @@ index 6fd6b251..1657674b 100644
  			FriendListItemHeader friendListItemHeader = FindOrCreateHeader(MobileFriendListItem.TypeFlags.Friend);
  			if (!DoesHeaderExist(MobileFriendListItem.TypeFlags.Friend))
  			{
-@@ -1523,7 +1541,7 @@ public class FriendListFrame : MonoBehaviour
+@@ -1534,7 +1552,7 @@ public class FriendListFrame : MonoBehaviour
  		}
  	}
  
@@ -53058,7 +53058,7 @@ index 6fd6b251..1657674b 100644
  	{
  		if (itemHeader == null)
  		{
-@@ -1743,6 +1761,12 @@ public class FriendListFrame : MonoBehaviour
+@@ -1754,6 +1772,12 @@ public class FriendListFrame : MonoBehaviour
  
  	private void AddItem(FriendListItem itemToAdd)
  	{
@@ -53071,7 +53071,7 @@ index 6fd6b251..1657674b 100644
  		m_allItems.Add(itemToAdd);
  	}
  
-@@ -1817,12 +1841,12 @@ public class FriendListFrame : MonoBehaviour
+@@ -1828,12 +1852,12 @@ public class FriendListFrame : MonoBehaviour
  		float num3 = z * flyoutMiddleFrameBottomMargin;
  		float num4 = (float)list.Count * z + (float)(list.Count - 1) * num + num2 + num3;
  		float y = num4 / m_flyoutMiddleFrameBaseWorldSize.z;
@@ -53088,7 +53088,7 @@ index 6fd6b251..1657674b 100644
  		Transform transform = flyoutMiddleFrame.transform;
  		float num6 = m_flyoutMiddleFrameRenderer.bounds.center.z + m_flyoutMiddleFrameRenderer.bounds.extents.z;
  		Vector3 position = new Vector3(transform.position.x, transform.position.y, num6 - num2 - z / 2f);
-@@ -1869,6 +1893,7 @@ public class FriendListFrame : MonoBehaviour
+@@ -1880,6 +1904,7 @@ public class FriendListFrame : MonoBehaviour
  		if (!items.IsLayoutSuspended)
  		{
  			m_allItems.Sort(ItemsSortCompare);
@@ -53096,7 +53096,7 @@ index 6fd6b251..1657674b 100644
  			if (m_longListBehavior == null)
  			{
  				m_longListBehavior = new VirtualizedFriendsListBehavior(this);
-@@ -1954,16 +1979,21 @@ public class FriendListFrame : MonoBehaviour
+@@ -1965,16 +1990,21 @@ public class FriendListFrame : MonoBehaviour
  		}
  	}
  
@@ -53121,7 +53121,7 @@ index 6fd6b251..1657674b 100644
  	}
  
  	private void OnRecentPlayersChanged(BnetRecentOrNearbyPlayerChangelist changelist, object userData)
-@@ -2075,9 +2105,9 @@ public class FriendListFrame : MonoBehaviour
+@@ -2086,9 +2116,9 @@ public class FriendListFrame : MonoBehaviour
  			{
  				if (playerUpdate.Change == PlayerUpdate.ChangeType.Added)
  				{
@@ -53134,7 +53134,7 @@ index 6fd6b251..1657674b 100644
  				else
  				{
  					RemoveItem(isHeader: false, typeFlag, playerUpdate.Player);
-@@ -2295,6 +2325,12 @@ public class FriendListFrame : MonoBehaviour
+@@ -2306,6 +2336,12 @@ public class FriendListFrame : MonoBehaviour
  		{
  			BnetFriendMgr.Get().RemoveFriend(m_friendToRemove);
  		}
@@ -53147,7 +53147,7 @@ index 6fd6b251..1657674b 100644
  		m_friendToRemove = null;
  		m_removeFriendPopup = null;
  		if (this.RemoveFriendPopupClosed != null)
-@@ -2466,4 +2502,906 @@ public class FriendListFrame : MonoBehaviour
+@@ -2477,4 +2513,906 @@ public class FriendListFrame : MonoBehaviour
  			UpdatePortrait(medalIsDisplayable: false);
  		});
  	}
@@ -55066,7 +55066,7 @@ index ea53b862..bdc136bb 100644
 +	#endregion
  }
 diff --git a/Assembly-CSharp/GameState.cs b/Assembly-CSharp/GameState.cs
-index 38a2c7fc..c1609618 100644
+index fd3cd387..cfd5e16d 100644
 --- a/Assembly-CSharp/GameState.cs
 +++ b/Assembly-CSharp/GameState.cs
 @@ -11,6 +11,7 @@ using Blizzard.T5.Core;
@@ -56393,7 +56393,7 @@ index a168aca6..f865d23f 100644
  	}
  }
 diff --git a/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs b/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs
-index 049c0cb5..933ea69a 100644
+index 6e7cf8a2..b319c02c 100644
 --- a/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs
 +++ b/Assembly-CSharp/Hearthstone/Core/Streaming/Tact3AssetDownloader.cs
 @@ -135,9 +135,9 @@ namespace Hearthstone.Core.Streaming
@@ -56578,7 +56578,7 @@ index c3bcb0fb..1995e30b 100644
  							throw new SeqnMismatchedException($"Mismatched sequential number: {result} != {seqn}");
  						}
 diff --git a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
-index 8c78de54..c48b06b1 100644
+index b3a5f8b8..1e2da9ad 100644
 --- a/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 +++ b/Assembly-CSharp/Hearthstone/ExceptionReporterControl.cs
 @@ -1,5 +1,6 @@
@@ -56635,7 +56635,7 @@ index 8c78de54..c48b06b1 100644
  			catch (Exception ex)
  			{
 diff --git a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
-index fb1434af..06abb8d1 100644
+index eaadae49..473eff97 100644
 --- a/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 +++ b/Assembly-CSharp/Hearthstone/HearthstoneApplication.cs
 @@ -5,6 +5,7 @@ using System.IO;
@@ -56695,7 +56695,7 @@ index fb1434af..06abb8d1 100644
 +			// ExceptionReporterControl.Get().ExceptionReportInitialize(); // Remove so we don't send Blizzard exceptions that may be caused by us
 +			ExceptionReporterControl.Get().ExceptionReportInitializeDebug();
  			TelemetryManager.Client().SendSystemDetail(TelemetryUtil.GetUnitySystemInfo());
- 			HearthstonePerformance.Initialize(TestType, 4602101.ToString(), 240397);
+ 			HearthstonePerformance.Initialize(TestType, 4608364.ToString(), 240818);
  			HearthstonePerformance.Get()?.CaptureAppStartTime();
 @@ -281,7 +286,7 @@ namespace Hearthstone
  			{
@@ -56713,7 +56713,7 @@ index fb1434af..06abb8d1 100644
 +			AccessibleHearthstoneApplication.OnClosing();
 +			AccessibilityMgr.Shutdown();
  			IsHearthstoneClosing = true;
- 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 240397, Log.UberText);
+ 			UberText.StoreCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, 240818, Log.UberText);
  			if (this.OnShutdown != null)
 @@ -561,7 +568,7 @@ namespace Hearthstone
  
@@ -56752,7 +56752,7 @@ index fb1434af..06abb8d1 100644
 +			jobDefinition.AddJobFinishedEventListener(OnGameStringsLoaded);
 +			Processor.QueueJob("HearthstoneApplication.InitializeMode", Job_InitializeMode(), Array.Empty<IJobDependency>());
  			Processor.QueueJob(jobDefinition);
- 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 240397, Log.UberText));
+ 			Processor.QueueJob("UberText.LoadCachedData", UberText.Job_LoadCachedData(UberTextCacheFolderPath, UberTextCacheFilePath, PlatformFilePaths.PersistentDataPath, 240818, Log.UberText));
  			Processor.QueueJob(HearthstoneJobs.CreateJobFromAction("HearthstoneApplication.SetWindowText", SetWindowText, jobDefinition.CreateDependency()));
 @@ -757,7 +765,12 @@ namespace Hearthstone
  			}
@@ -59994,7 +59994,7 @@ index 7a1753dd..1b07548b 100644
  		private WidgetTemplate m_parentWidgetTemplate;
  
 diff --git a/Assembly-CSharp/HearthstoneCheckout.cs b/Assembly-CSharp/HearthstoneCheckout.cs
-index 38d37047..b5a70165 100644
+index 775ab9c7..a9916343 100644
 --- a/Assembly-CSharp/HearthstoneCheckout.cs
 +++ b/Assembly-CSharp/HearthstoneCheckout.cs
 @@ -199,9 +199,6 @@ public class HearthstoneCheckout : blz_commerce_log_hook, ISceneEventObserver, I
@@ -60645,7 +60645,7 @@ index c0eb30c8..3fbcdd1c 100644
  	}
  
 diff --git a/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs b/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
-index bbd25ac3..9995ce54 100644
+index 1d23d90e..60ae496d 100644
 --- a/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
 +++ b/Assembly-CSharp/HutongGames/PlayMaker/Actions/AnimationPlayAction.cs
 @@ -87,6 +87,7 @@ namespace HutongGames.PlayMaker.Actions
@@ -64494,7 +64494,7 @@ index ace1298b..29a8acb4 100644
  	}
  
 diff --git a/Assembly-CSharp/Network.cs b/Assembly-CSharp/Network.cs
-index 17c96501..d09d2705 100644
+index 3f316f31..16bf2a83 100644
 --- a/Assembly-CSharp/Network.cs
 +++ b/Assembly-CSharp/Network.cs
 @@ -37,6 +37,7 @@ using PegasusUtil;
@@ -65522,7 +65522,7 @@ index 9ec8e17c..21d3dbb8 100644
  			Option.DEBUG_SHOW_BATTLEGROUND_SKIN_IDS,
  			false
 diff --git a/Assembly-CSharp/OptionsMenu.cs b/Assembly-CSharp/OptionsMenu.cs
-index 11c26399..0ac89f4a 100644
+index 9219063d..0357cb34 100644
 --- a/Assembly-CSharp/OptionsMenu.cs
 +++ b/Assembly-CSharp/OptionsMenu.cs
 @@ -6,9 +6,11 @@ using Blizzard.T5.Services;
@@ -74650,7 +74650,7 @@ index 3d71796f..e1f5624d 100644
  	}
  
 diff --git a/Assembly-CSharp/SoundOptionsMenu.cs b/Assembly-CSharp/SoundOptionsMenu.cs
-index ad4a8454..8dc39eb0 100644
+index 38b3f75f..b64c7349 100644
 --- a/Assembly-CSharp/SoundOptionsMenu.cs
 +++ b/Assembly-CSharp/SoundOptionsMenu.cs
 @@ -1,6 +1,7 @@
@@ -74660,8 +74660,8 @@ index ad4a8454..8dc39eb0 100644
 -public class SoundOptionsMenu : MonoBehaviour
 +public class SoundOptionsMenu : MonoBehaviour, AccessibleUI
  {
- 	[Header("Sound")]
  	[SerializeField]
+ 	[Header("Sound")]
 @@ -113,10 +114,12 @@ public class SoundOptionsMenu : MonoBehaviour
  	{
  		ShowOrHide(showOrHide: true);
@@ -78855,7 +78855,7 @@ index 3276afbd..ba3bc377 100644
  		while (Box.Get().IsTransitioningToSceneMode());
  		yield return new WaitForSecondsRealtime(1f);
 diff --git a/Assembly-CSharp/UIBScrollable.cs b/Assembly-CSharp/UIBScrollable.cs
-index 778218c3..28db27ec 100644
+index af74fdd6..127ee272 100644
 --- a/Assembly-CSharp/UIBScrollable.cs
 +++ b/Assembly-CSharp/UIBScrollable.cs
 @@ -233,7 +233,7 @@ public class UIBScrollable : PegUICustomBehavior
@@ -78965,7 +78965,7 @@ index bcdf9450..1912ea5e 100644
  {
  	public UIVoiceLinesManager.TriggerType m_TriggerType;
 diff --git a/Assembly-CSharp/UnityEngine/UI/HSInputField.cs b/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
-index 6ce5a0c4..2bb14ca6 100644
+index 01e930c9..4d994e23 100644
 --- a/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
 +++ b/Assembly-CSharp/UnityEngine/UI/HSInputField.cs
 @@ -1420,11 +1420,11 @@ namespace UnityEngine.UI

@@ -1,3 +1,9 @@
+### 2026-05-07
+
+- Updated to Hearthstone version 35.4.0.241958 (contributed by Endefx)
+
+Note: Arena is temporarily hidden from the menu.
+
 ### 2026-04-28
 
 - Updated to Hearthstone version 35.2.2.241135

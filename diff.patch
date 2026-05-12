@@ -10447,7 +10447,7 @@ index 00000000..a9482aa6
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleInputMgr.cs b/Assembly-CSharp/Accessibility/AccessibleInputMgr.cs
 new file mode 100644
-index 00000000..a88fc54f
+index 00000000..6db85b1e
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleInputMgr.cs
 @@ -0,0 +1,258 @@
@@ -10693,7 +10693,7 @@ index 00000000..a88fc54f
 +        {
 +            for (var i = 0; i <= 9; i++)
 +            {
-+                if (Input.GetKeyDown(KeyCode.Alpha0 + i))
++                if (Input.GetKeyDown(KeyCode.Alpha0 + i) || Input.GetKeyDown(KeyCode.Keypad0 + i))
 +                {
 +                    if (i == 0)
 +                    {

@@ -1,3 +1,8 @@
+### 2026-05-12
+
+- It is now possible to use the numpad keys in addition to the main number row for fast navigation among cards (contributed by Leibylucw)
+- Support for dual class arena has been added, the mode was returned to the main menu (contributed by Charlie)
+
 ### 2026-05-07
 
 - Updated to Hearthstone version 35.4.0.241958 (contributed by Endefx)

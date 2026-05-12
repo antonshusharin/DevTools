@@ -7820,10 +7820,10 @@ index 00000000..2d7ffcb6
 +}
 diff --git a/Assembly-CSharp/Accessibility/AccessibleHub.cs b/Assembly-CSharp/Accessibility/AccessibleHub.cs
 new file mode 100644
-index 00000000..b01783c6
+index 00000000..08ae878b
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/AccessibleHub.cs
-@@ -0,0 +1,273 @@
+@@ -0,0 +1,272 @@
 +﻿using Hearthstone.Progression;
 +using PegasusShared;
 +using System;
@@ -7880,9 +7880,8 @@ index 00000000..b01783c6
 +            if (box.m_GameModesButton.IsEnabled())
 +                m_mainMenu.AddOption(AccessibleKey.HUB_MODES, LocalizedText.HUB_GAME_MODES_OPTION, OnClickModes);
 +
-+                // TODO: reenable after arena is fixed.
-+            // if (box.m_ArenaButton.IsEnabled())
-+                // m_mainMenu.AddOption(LocalizationUtils.Get(LocalizationKey.GLOBAL_ARENA), OnClickArena);
++             if (box.m_ArenaButton.IsEnabled())
++                 m_mainMenu.AddOption(LocalizationUtils.Get(LocalizationKey.GLOBAL_ARENA), OnClickArena);
 +            if (box.m_BattleGroundsButton.IsEnabled())
 +                m_mainMenu.AddOption(AccessibleKey.HUB_BATTLEGROUNDS, LocalizedText.HUB_BATTLEGROUNDS_OPTION, OnClickBattlegrounds);
 +            if (box.m_CollectionButton.IsEnabled())
@@ -27057,10 +27056,10 @@ index 00000000..fb167df2
 +}
 diff --git a/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
 new file mode 100644
-index 00000000..3570b52f
+index 00000000..2768bcae
 --- /dev/null
 +++ b/Assembly-CSharp/Accessibility/Localization/LocalizationKey.cs
-@@ -0,0 +1,1282 @@
+@@ -0,0 +1,1284 @@
 +﻿using System;
 +using System.Collections.Generic;
 +using System.Linq;
@@ -28252,6 +28251,8 @@ index 00000000..3570b52f
 +    public static LocalizationKey ARENA_RETIRE_BUTTON = CreateKey("ACCESSIBILITY_ARENA_RETIRE_BUTTON");
 +    public static LocalizationKey ARENA_DRAFT_HERO_CONFIRM_HELP = CreateKey("ACCESSIBILITY_ARENA_HELP_DRAFTING_HERO");
 +    public static LocalizationKey ARENA_DRAFT_HERO_CONFIRM_PROMPT = CreateKey("ACCESSIBILITY_ARENA_HERO_SELECTED_PROMPT");
++    public static LocalizationKey ARENA_DRAFT_HERO_POWER_CONFIRM_HELP = CreateKey("ACCESSIBILITY_ARENA_HELP_DRAFTING_HERO_POWER");
++    public static LocalizationKey ARENA_DRAFT_HERO_POWER_CONFIRM_PROMPT = CreateKey("ACCESSIBILITY_ARENA_HERO_POWER_SELECTED_PROMPT");
 +    public static LocalizationKey ARENA_MENU_WELCOME = CreateKey("ACCESSIBILITY_ARENA_MENU_TITLE_WELCOME");
 +    public static LocalizationKey ARENA_MENU_WELCOME_BACK = CreateKey("ACCESSIBILITY_ARENA_MENU_TITLE_WELCOME_BACK");
 +    public static LocalizationKey ARENA_MENU_RUN_COMPLETE = CreateKey("ACCESSIBILITY_ARENA_MENU_TITLE_RUN_COMPLETE");
@@ -49330,7 +49331,7 @@ index aac97f82..7320606f 100644
  
  	private void OnDismissDialog()
 diff --git a/Assembly-CSharp/DraftDisplay.cs b/Assembly-CSharp/DraftDisplay.cs
-index 5d5254eb..ffb4f7f6 100644
+index 5d5254eb..6413ad3d 100644
 --- a/Assembly-CSharp/DraftDisplay.cs
 +++ b/Assembly-CSharp/DraftDisplay.cs
 @@ -1,17 +1,19 @@
@@ -49382,7 +49383,17 @@ index 5d5254eb..ffb4f7f6 100644
  			if (m_bannerWidgets.Count >= heroChoice - 1)
  			{
  				Widget widget = m_bannerWidgets[heroChoice - 1];
-@@ -2114,9 +2122,9 @@ public class DraftDisplay : MonoBehaviour
+@@ -1488,6 +1496,9 @@ public class DraftDisplay : MonoBehaviour
+ 			Actor heroPower = m_heroPowerCardActors[heroChoice - 1];
+ 			m_heroPower = heroPower;
+ 			m_heroPower.Hide();
++			#region Accessibility
++			AccessibilityMgr.Output(this, LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_HERO_POWER_CONFIRM_PROMPT, AccessibleKey.CONFIRM.ToString(), AccessibleKey.BACK.ToString()));
++			#endregion
+ 		}
+ 		if (actor != null)
+ 		{
+@@ -2114,9 +2125,9 @@ public class DraftDisplay : MonoBehaviour
  			m_draftManager.SetArenaState(ArenaSessionState.MIDRUN, m_draftManager.IsUnderground());
  			GoToArenaMidrun();
  		}
@@ -49394,7 +49405,7 @@ index 5d5254eb..ffb4f7f6 100644
  	{
  		BroadcastArenaDraftScreenEvent("CODE_SLIDEIN_REDRAFT");
  		if (m_draftManager != null)
-@@ -2168,6 +2176,11 @@ public class DraftDisplay : MonoBehaviour
+@@ -2168,6 +2179,11 @@ public class DraftDisplay : MonoBehaviour
  			UpdateDeckChiclet(m_deckBox);
  		}
  		InitManaCurve();
@@ -49406,7 +49417,7 @@ index 5d5254eb..ffb4f7f6 100644
  	}
  
  	public void GoToArenaCollection()
-@@ -2294,9 +2307,12 @@ public class DraftDisplay : MonoBehaviour
+@@ -2294,9 +2310,12 @@ public class DraftDisplay : MonoBehaviour
  			m_midrunHeroPowerPuck.Show();
  		}
  		DeterminePlayButtonText();
@@ -49420,7 +49431,7 @@ index 5d5254eb..ffb4f7f6 100644
  	{
  		if (!(m_playButton == null))
  		{
-@@ -2414,7 +2430,10 @@ public class DraftDisplay : MonoBehaviour
+@@ -2414,7 +2433,10 @@ public class DraftDisplay : MonoBehaviour
  			m_packageCardsPopup.ShowTray();
  			m_packageCardsPopup.SetChooseButtonActive(chooseButtonActive);
  		}
@@ -49432,7 +49443,7 @@ index 5d5254eb..ffb4f7f6 100644
  		{
  			CardTileDataModel cardTileDataModel = new CardTileDataModel
  			{
-@@ -2798,7 +2817,12 @@ public class DraftDisplay : MonoBehaviour
+@@ -2798,7 +2820,12 @@ public class DraftDisplay : MonoBehaviour
  
  	private void OnCardTileRelease(DeckTrayDeckTileVisual cardTile)
  	{
@@ -49446,7 +49457,7 @@ index 5d5254eb..ffb4f7f6 100644
  	}
  
  	private void OnCardTileStartDrag(DeckTrayDeckTileVisual cardTile)
-@@ -2904,6 +2928,9 @@ public class DraftDisplay : MonoBehaviour
+@@ -2904,6 +2931,9 @@ public class DraftDisplay : MonoBehaviour
  		m_isDraggingCardFromCollection = false;
  		m_draggingOriginCardSlot = null;
  		m_hoveredCardSlot = null;
@@ -49456,7 +49467,7 @@ index 5d5254eb..ffb4f7f6 100644
  	}
  
  	public bool IsDraggingCardFromDeck()
-@@ -3596,6 +3623,11 @@ public class DraftDisplay : MonoBehaviour
+@@ -3596,6 +3626,11 @@ public class DraftDisplay : MonoBehaviour
  		{
  			return;
  		}
@@ -49468,7 +49479,7 @@ index 5d5254eb..ffb4f7f6 100644
  		DraftManager draftManager = DraftManager.Get();
  		CollectionDeck draftDeck = draftManager.GetDraftDeck();
  		if (draftDeck != null)
-@@ -3773,6 +3805,7 @@ public class DraftDisplay : MonoBehaviour
+@@ -3773,6 +3808,7 @@ public class DraftDisplay : MonoBehaviour
  		case ArenaClientStateType.Normal_DeckEdit:
  		case ArenaClientStateType.Underground_DeckEdit:
  			StartCoroutine(ShowPhaseMessageWithDelays(PhaseMessageType.Edit_Deck));
@@ -49476,7 +49487,7 @@ index 5d5254eb..ffb4f7f6 100644
  			break;
  		case ArenaClientStateType.Normal_Ready:
  		case ArenaClientStateType.Underground_Ready:
-@@ -3800,6 +3833,9 @@ public class DraftDisplay : MonoBehaviour
+@@ -3800,6 +3836,9 @@ public class DraftDisplay : MonoBehaviour
  				yield return null;
  			}
  			PositionAndShowChoices();
@@ -49486,7 +49497,7 @@ index 5d5254eb..ffb4f7f6 100644
  			yield return StartCoroutine(RunAutoDraftCheat());
  			m_isHandlingChoiceDisplay = false;
  		}
-@@ -4737,4 +4773,546 @@ public class DraftDisplay : MonoBehaviour
+@@ -4737,4 +4776,566 @@ public class DraftDisplay : MonoBehaviour
  		}
  		InitManaCurve();
  	}
@@ -49896,9 +49907,13 @@ index 5d5254eb..ffb4f7f6 100644
 +	{
 +		if (AccessibleKey.CONFIRM.IsPressed())
 +		{
-+			if (IsInHeroSelectMode())
++			if (IsInHeroSelectMode()) // once we get to this stage hero powers and hero cards can be treat the same
 +			{
 +				HandleAccessibleHeroClick();
++			}
++			else if (m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO_POWER) // these need their own weird handling because the actors are stored strangely
++			{
++				HandleAccessibleHeroPowerClick();
 +			}
 +			else
 +			{
@@ -49934,7 +49949,19 @@ index 5d5254eb..ffb4f7f6 100644
 +		{
 +			DoHeroCancelAnimation();
 +		}
-+    }
++	}
++
++	private void HandleAccessibleHeroPowerClick()
++	{
++		var index = m_accessibleDraftCards.GetItemBeingReadIndex();
++		if (index < 0 || index >= m_subclassHeroPowerActors.Length)
++		{
++			AccessibilityUtils.LogDebug($"Index out of subclass actor range in hero power select: index={index}, subclass actor array size={m_subclassHeroPowerActors.Length}");
++			DoHeroCancelAnimation(); // so they don't get stuck in a broken state
++			return;
++		}
++		AccessibleInputMgr.Click(m_subclassHeroPowerActors[index]);
++	}
 +
 +    private void HandleAccessibleChoiceSelect()
 +	{
@@ -49996,13 +50023,17 @@ index 5d5254eb..ffb4f7f6 100644
 +		{
 +			stringBuilder.Append(m_accessibleDraftCards?.GetHelp(false));
 +			stringBuilder.Append(". ");
-+			if (IsInHeroSelectMode() || m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO)
++			if (m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO_POWER)
++			{
++				stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_HERO_POWER_CONFIRM_HELP, AccessibleKey.CONFIRM.ToString(), AccessibleKey.BACK.ToString()));
++			}
++            else if (IsInHeroSelectMode() || m_draftManager.GetSlotType() == DraftSlotType.DRAFT_SLOT_HERO)
 +			{
 +				stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_HERO_CONFIRM_HELP, AccessibleKey.CONFIRM.ToString(), AccessibleKey.BACK.ToString()));
 +			}
 +			else
 +			{
-+				stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_SWITCH_HELP, AccessibleKey.ARENA_TOGGLE_DRAFTING_DECK.ToString()));
++				stringBuilder.Append(LocalizationUtils.Format(LocalizationKey.ARENA_DRAFT_SWITCH_HELP			, AccessibleKey.ARENA_TOGGLE_DRAFTING_DECK.ToString()));
 +			}
 +		}
 +		return stringBuilder.ToString();

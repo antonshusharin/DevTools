@@ -1,3 +1,8 @@
+### 2026-10-14
+
+- Updated to Hearthstone version 37.0.0.254477 (contributed by Endefx)
+- Added preliminary support for the assemble mechanic. Press F1 on the assembly screen to find out how it works. More documentation will be provided for the expansion launch. (Contributed by Endefx)
+
 ### 2026-09-16
 
 - Updated to Hearthstone version 36.6.0.251952 (contributed by Endefx)
